@@ -2,8 +2,8 @@
 An SCP:SL EXILED plugin that makes your servers creative with a variety of customizable options!
 
 ### Features
-- Player can have Regeneration
-- Player can have Infinite Ammo
+- Players can have Regeneration
+- Players can have Infinite Ammo
 - Players can have SCP-207 Speed + Resistance
 - Players can respawn as a random class
 - Flash Grenades and Frag Grenades timer modification
@@ -63,7 +63,7 @@ ct_scp500_ahp_healing | Float | 0 | The amount of AHP given if a player uses SCP
 - gnade (frag/flash) (value)
   - frag (value) (Sets the time (in seconds) until frag grenades blow up)
   - flash (value) (Sets the time (in seconds) until flash grenades blow up)
-- invis ((id/name)/(asterisk)/all/clear/list)
+- infammo ((id/name)/(asterisk)/all/clear/list)
   - id/name (Gives or removes Infinite Ammo from the specified player)
   - (asterisk)/all (Gives everyone Infinite Ammo)
   - clear (Clears all players of Infinite Ammo)
