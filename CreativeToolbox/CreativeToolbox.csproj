@@ -79,6 +79,7 @@
     <Compile Include="CreativeToolboxEventHandler.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="InfiniteAmmoComponent.cs" />
+    <Compile Include="InfiniteAmmoMicroHIDPatch.cs" />
     <Compile Include="InvisibleComponent.cs" />
     <Compile Include="PreventExplosionDamage.cs" />
     <Compile Include="PreventSCP018Damage.cs" />
