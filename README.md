@@ -2,6 +2,7 @@
 An SCP:SL EXILED plugin that makes your servers creative with a variety of customizable options!
 
 ### Features
+- Players can have Invisibility
 - Players can have Regeneration
 - Players can have Infinite Ammo
 - Players can have SCP-207 Speed + Resistance
