@@ -2,15 +2,16 @@
 An SCP:SL EXILED plugin that makes your servers creative with a variety of customizable options!
 
 ### Features
+- Scopotophobia Support
 - Players can have Regeneration
 - Players can have Infinite Ammo
-- Players can have SCP-207 Speed + Resistance
 - Players can respawn as a random class
 - Flash Grenades and Frag Grenades timer modification
 - Fall Damage can be prevented
 - Grenade Damage (and SCP-018 Damage) can be prevented
 - Medical Items can give AHP
 - Locations of Players can be obtained (Rooms and Coordinates)
+- Light Containment Zone Decontamination can be force started
 
 ### Notes
 - These values can be changed in game / overridden for only one round if people want to do events, if these plugins are enabled that is
@@ -48,7 +49,7 @@ ct_auto_scale_value | Float | 1 | The scale factor players are set to with auto-
 - ct.infammo (infinite ammo)
 - ct.locate (locating users)
 - ct.regen (regeneration)
-- ct.sdecon
+- ct.sdecon (force start decontamination)
 
 ### Remote Admin Commands
 - arspawn (on/off/time) (Value (if value is selected))
