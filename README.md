@@ -24,6 +24,10 @@ ct_enable_custom_grenade_time | Bool | False | Whether the custom grenade timers
 ct_enable_fall_damage_prevention | Bool | False | Whether the fall damage will be disabled by default or not
 ct_enable_custom_healing | Bool | False | Whether the medical items can give AHP or not
 ct_enable_grenade_damage_prevention | Bool | False | Whether explosives or SCP-018 will deal damage or not
+ct_enable_auto_scaling | Bool | false | Whether auto-scaling at the start of the round is enabled or not
+ct_enable_keep_scale | Bool | false | Whether the auto-scaling re-applies when the user re-joins or not
+ct_disable_autoscale_messages | Bool | false | Whether to disable auto-scale related messages or not
+ct_disable_fall_modification | Bool | false | Whether people with RA access and permissions can modify fall damage
 ct_regeneration_time | Float | 5 | The amount (in seconds) it takes to regenerate health for a given player
 ct_regeneration_value | Float | 5 | The amount of health regenerated per interval for a given player
 ct_random_respawn_timer | Float | 0.05 | The amount (in seconds) it takes to automatically respawn a player
@@ -33,18 +37,18 @@ ct_painkillers_ahp_healing | Float | 0 | The amount of AHP given if a player use
 ct_medkit_ahp_healing | Float | 0 | The amount of AHP given if a player uses Medkits
 ct_adrenaline_ahp_healing | Float | 0 | The amount of AHP given if a player uses Adrenaline
 ct_scp500_ahp_healing | Float | 0 | The amount of AHP given if a player uses SCP-500
+ct_auto_scale_value | Float | 1 | The scale factor players are set to with auto-scaling
 
 ### Permission Values
 - ct.* (all permissions)
 - ct.arspawn (random auto respawn)
 - ct.fdamage (fall damage)
-- ct.fspeed (fast speed (SCP-207 effect))
 - ct.giveammo (give ammo)
 - ct.gnade (grenade timers)
 - ct.infammo (infinite ammo)
-- ct.invis (invisibility (SCP-268 effect))
 - ct.locate (locating users)
 - ct.regen (regeneration)
+- ct.sdecon
 
 ### Remote Admin Commands
 - arspawn (on/off/time) (Value (if value is selected))
@@ -52,11 +56,6 @@ ct_scp500_ahp_healing | Float | 0 | The amount of AHP given if a player uses SCP
   - time (value) (Changes the number (in seconds) it takes to respawn a player)
 - fdamage (on/off)
   - on/off (Enables or disables fall damage)
-- fspeed ((id/name)/(asterisk)/all/clear/list)
-  - id/name (player name / player id) (Gives or removes Fast Speed from the specified player)
-  - (asterisk)/all (Gives everyone Fast Speed)
-  - clear (Clears all players of Fast Speed)
-  - list (Lists all players with Fast Speed)
 - giveammo ((id/name)/(asterisk)/all) (ammo type (5, 7, 9)) (amount)
   - id/name (ammo type) (amount) (Gives the player the specified amount of ammo for the specified ammo type)
   - (asterisk)/all (ammo type) (amount) (Gives everyone the specified amount of ammo for the specified ammo type)
@@ -68,11 +67,6 @@ ct_scp500_ahp_healing | Float | 0 | The amount of AHP given if a player uses SCP
   - (asterisk)/all (Gives everyone Infinite Ammo)
   - clear (Clears all players of Infinite Ammo)
   - list (Lists all players with Infinite Ammo)
-- invis ((id/name)/(asterisk)/all/clear/list)
-  - id/name (Gives or removes Invisibility from the specified player)
-  - (asterisk)/all (Gives everyone Invisibility)
-  - clear (Clears all players of Invisibility)
-  - list (Lists all players with Invisibility)
 - locate (xyz/room) (id/name)
   - xyz (id/name) (Gives the coordinates of a specified player)
   - room (id/name) (Gives the room name a specified player is in)
@@ -83,3 +77,4 @@ ct_scp500_ahp_healing | Float | 0 | The amount of AHP given if a player uses SCP
   - list (Lists all players with Regeneration)
   - time (value) (Sets the time (in seconds) it takes to regenerate health
   - value (value) (Sets the amount of health you gain per interval)
+- sdecon (Turns on Light Containment Zone decontamination (NOTE:  be reversible!))
