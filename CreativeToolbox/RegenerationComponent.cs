@@ -8,7 +8,7 @@ namespace CreativeToolbox
 {
     public class RegenerationComponent : MonoBehaviour
     {
-        public ReferenceHub Hub;
+        private ReferenceHub Hub;
         CoroutineHandle Handle;
         public void Awake()
         {

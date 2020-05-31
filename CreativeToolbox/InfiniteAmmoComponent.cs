@@ -9,7 +9,7 @@ namespace CreativeToolbox
 {
     public class InfiniteAmmoComponent : MonoBehaviour
     {
-        public ReferenceHub Hub;
+        private ReferenceHub Hub;
         CoroutineHandle Handle;
         public void Awake()
         {

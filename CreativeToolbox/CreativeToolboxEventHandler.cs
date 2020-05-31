@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CustomPlayerEffects;
 using EXILED;
 using EXILED.Extensions;
 using Grenades;
@@ -14,15 +15,18 @@ namespace CreativeToolbox
 {
     public class CreativeToolboxEventHandler
     {
-        HashSet<ReferenceHub> PlayersWith207 = new HashSet<ReferenceHub>();
+        //HashSet<ReferenceHub> PlayersWith207 = new HashSet<ReferenceHub>();
+        //HashSet<ReferenceHub> PlayersWithInvisibility = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithRegen = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithInfiniteAmmo = new HashSet<ReferenceHub>();
-        HashSet<ReferenceHub> PlayersWithInvisiblity = new HashSet<ReferenceHub>();
+        HashSet<String> PlayersWithRetainedScale = new HashSet<String>();
         System.Random randNum = new System.Random();
         bool IsWarheadDetonated;
         bool IsDecontanimationActivated;
         bool AllowRespawning = false;
         bool PreventFallDamage = false;
+        bool WasDeconCommandRun = false;
+        bool AutoScaleOn = false;
 
         public void RunOnRoundRestart()
         {
@@ -32,68 +36,86 @@ namespace CreativeToolbox
         public void RunOnRoundStart()
         {
             AllowRespawning = false;
-            PlayersWith207.Clear();
             PlayersWithRegen.Clear();
             if (CreativeToolbox.EnableFallDamagePrevent)
             {
                 PreventFallDamage = true;
             }
+            if (CreativeToolbox.EnableAutoScaling)
+            {
+                foreach (ReferenceHub Player in Player.GetHubs())
+                {
+                    if (!CreativeToolbox.DisableAutoScalingMessage)
+                        Map.Broadcast($"Everyone who joined has their playermodel scale set to {CreativeToolbox.AutoScaleValue}x!", 5);
+                    Player.SetScale(CreativeToolbox.AutoScaleValue);
+                    PlayersWithRetainedScale.Add(Player.GetUserId());
+                    AutoScaleOn = true;
+                }
+            }
         }
 
-        public void RunOnPlayerLeave(PlayerLeaveEvent le)
+        public void RunOnPlayerJoin(PlayerJoinEvent PlyJoin)
         {
-            if (PlayersWith207.Contains(le.Player))
-                PlayersWith207.Remove(le.Player);
-            if (PlayersWithRegen.Contains(le.Player))
-                PlayersWithRegen.Remove(le.Player);
-            if (PlayersWithInfiniteAmmo.Contains(le.Player))
-                PlayersWithInfiniteAmmo.Remove(le.Player);
-            if (PlayersWithInvisiblity.Contains(le.Player))
-                PlayersWithInvisiblity.Remove(le.Player);
+            if (CreativeToolbox.EnableAutoScaling && CreativeToolbox.EnableRetainingScaling)
+            {
+                if (PlayersWithRetainedScale.Contains(PlyJoin.Player.GetUserId())) {
+                    if (!CreativeToolbox.DisableAutoScalingMessage)
+                        PlyJoin.Player.Broadcast(5, $"Your playermodel scale was set to {CreativeToolbox.AutoScaleValue}x!", false);
+                    PlyJoin.Player.SetScale(CreativeToolbox.AutoScaleValue);
+                }
+            }
         }
 
-        public void RunOnPlayerSpawn(PlayerSpawnEvent plySpwn)
+        public void RunOnPlayerLeave(PlayerLeaveEvent PlyLeave)
         {
-            if (PlayersWith207.Contains(plySpwn.Player))
-                Timing.CallDelayed(1f, () => plySpwn.Player.effectsController.EnableEffect("SCP-207"));
+            if (PlayersWithRegen.Contains(PlyLeave.Player))
+                PlayersWithRegen.Remove(PlyLeave.Player);
+            if (PlayersWithInfiniteAmmo.Contains(PlyLeave.Player))
+                PlayersWithInfiniteAmmo.Remove(PlyLeave.Player);
         }
 
-        public void RunOnPlayerDeath(ref PlayerDeathEvent d)
+        /*public void RunOnPlayerSpawn(PlayerSpawnEvent PlySpwn)
+        {
+            if (PlayersWith207.Contains(PlySpwn.Player))
+                Timing.CallDelayed(1f, () => PlySpwn.Player.playerEffectsController.EnableEffect(new Scp207(PlySpwn.Player)));
+        }*/
+
+        public void RunOnPlayerDeath(ref PlayerDeathEvent PlyDeath)
         {
             if (AllowRespawning)
             {
-                ReferenceHub hub = d.Player;
+                ReferenceHub hub = PlyDeath.Player;
                 IsWarheadDetonated = Map.IsNukeDetonated;
                 IsDecontanimationActivated = Map.IsLCZDecontaminated;
                 Timing.CallDelayed(CreativeToolbox.RandomRespawnTimer, () => RevivePlayer(hub));
             }
         }
 
-        public void RunOnPlayerHurt(ref PlayerHurtEvent h)
+        public void RunOnPlayerHurt(ref PlayerHurtEvent PlyHurt)
         {
             if (PreventFallDamage)
-                if (h.DamageType == DamageTypes.Falldown)
-                    h.Amount = 0;
+                if (PlyHurt.DamageType == DamageTypes.Falldown)
+                    PlyHurt.Amount = 0;
         }
 
-        public void RunOnMedItemUsed(UsedMedicalItemEvent m)
+        public void RunOnMedItemUsed(UsedMedicalItemEvent MedUsed)
         {
             if (CreativeToolbox.EnableMedicalItemMod)
             {
-                switch (m.ItemType)
+                switch (MedUsed.ItemType)
                 {
                     case ItemType.Painkillers:
-                        m.Player.AddAdrenalineHealth((byte)CreativeToolbox.PainkillerAHPHealthValue);
+                        MedUsed.Player.AddAdrenalineHealth((byte)CreativeToolbox.PainkillerAHPHealthValue);
                         break;
                     case ItemType.Medkit:
-                        m.Player.AddAdrenalineHealth((byte)CreativeToolbox.MedkitAHPHealthValue);
+                        MedUsed.Player.AddAdrenalineHealth((byte)CreativeToolbox.MedkitAHPHealthValue);
                         break;
                     case ItemType.Adrenaline:
                         if (!(CreativeToolbox.AdrenalineAHPHealthValue <= 0))
-                            m.Player.AddAdrenalineHealth((byte)CreativeToolbox.AdrenalineAHPHealthValue);
+                            MedUsed.Player.AddAdrenalineHealth((byte)CreativeToolbox.AdrenalineAHPHealthValue);
                         break;
                     case ItemType.SCP500:
-                        m.Player.AddAdrenalineHealth((byte)CreativeToolbox.SCP500AHPHealthValue);
+                        MedUsed.Player.AddAdrenalineHealth((byte)CreativeToolbox.SCP500AHPHealthValue);
                         break;
                 }
             }
@@ -177,6 +199,43 @@ namespace CreativeToolbox
                                 break;
                         }
                         break;
+                    case "autoscale":
+                        RAComEv.Allow = false;
+                        if (!Sender.CheckPermission("ct.autoscale"))
+                        {
+                            RAComEv.Sender.RAMessage("You are not authorized to use this command!");
+                            return;
+                        }
+
+                        if (!CreativeToolbox.EnableAutoScaling)
+                        {
+                            RAComEv.Sender.RAMessage("Auto scaling cannot be modified!");
+                            return;
+                        }
+
+                        if (AutoScaleOn)
+                        {
+                            foreach (ReferenceHub Player in Player.GetHubs())
+                            {
+                                Player.SetScale(1);
+                            }
+                            if (!CreativeToolbox.DisableAutoScalingMessage)
+                                Map.Broadcast("Everyone has been restored to their normal size!", 5);
+                            PlayersWithRetainedScale.Clear();
+                            AutoScaleOn = false;
+                        }
+                        else
+                        {
+                            foreach (ReferenceHub Player in Player.GetHubs())
+                            {
+                                Player.SetScale(CreativeToolbox.AutoScaleValue);
+                                PlayersWithRetainedScale.Add(Player.GetUserId());
+                            }
+                            if (!CreativeToolbox.DisableAutoScalingMessage)
+                                Map.Broadcast($"Everyone has their playermodel scale set to {CreativeToolbox.AutoScaleValue}x!", 5);
+                            AutoScaleOn = true;
+                        }
+                        break;
                     case "fdamage":
                         RAComEv.Allow = false;
                         if (!Sender.CheckPermission("ct.fdamage"))
@@ -185,7 +244,7 @@ namespace CreativeToolbox
                             return;
                         }
 
-                        if (CreativeToolbox.EnableFallDamagePrevent)
+                        if (CreativeToolbox.LockFallDamageMod)
                         {
                             RAComEv.Sender.RAMessage("Fall damage cannot be modified!");
                             return;
@@ -203,9 +262,9 @@ namespace CreativeToolbox
                                 switch (Arguments[1].ToLower())
                                 {
                                     case "on":
-                                        if (!PreventFallDamage)
+                                        if (PreventFallDamage)
                                         {
-                                            PreventFallDamage = true;
+                                            PreventFallDamage = false;
                                             RAComEv.Sender.RAMessage("Fall damage enabled!");
                                             Map.Broadcast("<color=green>Fall damage enabled!</color>", 5);
                                             return;
@@ -213,104 +272,17 @@ namespace CreativeToolbox
                                         RAComEv.Sender.RAMessage("Fall damage is already on!");
                                         break;
                                     case "off":
-                                        if (PreventFallDamage)
+                                        if (!PreventFallDamage)
                                         {
-                                            PreventFallDamage = false;
+                                            PreventFallDamage = true;
                                             RAComEv.Sender.RAMessage("Fall damage disabled!");
                                             Map.Broadcast("<color=red>Fall damage disabled!</color>", 5);
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage("Auto respawning is already off!");
+                                        RAComEv.Sender.RAMessage("Fall damage is already off!");
                                         break;
                                     default:
                                         RAComEv.Sender.RAMessage("Please enter either \"on\" or \"off\"!");
-                                        break;
-                                }
-                                break;
-                            default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}");
-                                break;
-                        }
-                        break;
-                    case "fspeed":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.fspeed"))
-                        {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command!");
-                            return;
-                        }
-
-                        if (Arguments.Length < 2)
-                        {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: fspeed (clear/list/*/all/(id or name))");
-                            return;
-                        }
-
-                        switch (Arguments.Length)
-                        {
-                            case 2:
-                                switch (Arguments[1].ToLower())
-                                {
-                                    case "clear":
-                                        foreach (ReferenceHub hub in Player.GetHubs())
-                                        {
-                                            if (hub.TryGetComponent(out SpeedComponent speed))
-                                            {
-                                                UnityEngine.Object.Destroy(speed);
-                                                PlayersWith207.Remove(hub);
-                                            }
-                                        }
-                                        RAComEv.Sender.RAMessage("Faster speed is off for all players now");
-                                        Map.Broadcast("Faster speed is cleared from all players now!", 5);
-                                        break;
-                                    case "list":
-                                        if (PlayersWith207.Count != 0)
-                                        {
-                                            string playerLister = "Players with Fast Speed on: ";
-                                            foreach (ReferenceHub hub in PlayersWith207)
-                                            {
-                                                playerLister += hub.nicknameSync.MyNick + ", ";
-                                            }
-                                            playerLister = playerLister.Substring(0, playerLister.Length - 2);
-                                            RAComEv.Sender.RAMessage(playerLister);
-                                            return;
-                                        }
-                                        RAComEv.Sender.RAMessage("There are no players currently online with Fast Speed on");
-                                        break;
-                                    case "*":
-                                    case "all":
-                                        foreach (ReferenceHub hub in Player.GetHubs())
-                                        {
-                                            if (!hub.TryGetComponent(out SpeedComponent speed))
-                                            {
-                                                speed = hub.gameObject.AddComponent<SpeedComponent>();
-                                                PlayersWith207.Add(hub);
-                                            }
-                                        }
-                                        RAComEv.Sender.RAMessage("Fast Speed is on for all players now");
-                                        Map.Broadcast("Everyone has been given faster speed!", 5);
-                                        break;
-                                    default:
-                                        ReferenceHub ChosenPlayer = Player.GetPlayer(Arguments[1]);
-                                        if (ChosenPlayer == null)
-                                        {
-                                            RAComEv.Sender.RAMessage($"Player \"{Arguments[1]}\" not found");
-                                            return;
-                                        }
-                                        if (!ChosenPlayer.TryGetComponent(out SpeedComponent spd))
-                                        {
-                                            RAComEv.Sender.RAMessage($"Faster speed enabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                            Player.GetPlayer(Arguments[1])?.Broadcast(3, "Faster speed is enabled for you!", false);
-                                            PlayersWith207.Add(ChosenPlayer);
-                                            ChosenPlayer.gameObject.AddComponent<SpeedComponent>();
-                                        }
-                                        else
-                                        {
-                                            RAComEv.Sender.RAMessage($"Faster speed disabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                            Player.GetPlayer(Arguments[1])?.Broadcast(3, "Faster speed is disabled for you!", false);
-                                            PlayersWith207.Remove(ChosenPlayer);
-                                            UnityEngine.Object.Destroy(spd);
-                                        }
                                         break;
                                 }
                                 break;
@@ -348,7 +320,7 @@ namespace CreativeToolbox
                                                     foreach (ReferenceHub hub in Player.GetHubs())
                                                     {
                                                         if (hub.GetRole() != RoleType.None)
-                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped5, hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped5) + FiveMM);
+                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped5, (uint) (hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped5) + FiveMM));
                                                     }
                                                     RAComEv.Sender.RAMessage($"{FiveMM} 5.56mm ammo given to everyone!");
                                                     Map.Broadcast($"Everyone has been given {FiveMM} 5.56mm ammo!", 3);
@@ -362,7 +334,7 @@ namespace CreativeToolbox
                                                     foreach (ReferenceHub hub in Player.GetHubs())
                                                     {
                                                         if (hub.GetRole() != RoleType.None)
-                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped7, hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped7) + SevenMM);
+                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped7, (uint) (hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped7) + SevenMM));
                                                     }
                                                     RAComEv.Sender.RAMessage($"{SevenMM} 7.62mm ammo given to everyone!");
                                                     Map.Broadcast($"Everyone has been given {SevenMM} 7.62mm ammo!", 3);
@@ -376,7 +348,7 @@ namespace CreativeToolbox
                                                     foreach (ReferenceHub hub in Player.GetHubs())
                                                     {
                                                         if (hub.GetRole() != RoleType.None)
-                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped9, hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped9) + NineMM);
+                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped9, (uint) (hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped9) + NineMM));
                                                     }
                                                     RAComEv.Sender.RAMessage($"{NineMM} 9.00mm ammo given to everyone!");
                                                     Map.Broadcast($"Everyone has been given {NineMM} 9mm ammo!", 3);
@@ -391,7 +363,6 @@ namespace CreativeToolbox
                                         break;
                                     default:
                                         ReferenceHub ChosenPlayer = Player.GetPlayer(Arguments[1]);
-                                        ChosenPlayer.HideTag();
                                         if (ChosenPlayer == null)
                                         {
                                             RAComEv.Sender.RAMessage($"Player \"{Arguments[1]}\" not found");
@@ -407,7 +378,7 @@ namespace CreativeToolbox
                                             case "5":
                                                 if (int.TryParse(Arguments[3].ToLower(), out int FiveMM) && FiveMM >= 0)
                                                 {
-                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped5, ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped5) + FiveMM);
+                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped5, (uint) (ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped5) + FiveMM));
                                                     RAComEv.Sender.RAMessage($"{FiveMM} 5.56mm ammo given to \"{ChosenPlayer.nicknameSync.MyNick}\"!");
                                                     Player.GetPlayer(Arguments[1])?.Broadcast(3, $"You were given {FiveMM} of 5.56mm ammo!", false);
                                                     return;
@@ -417,7 +388,7 @@ namespace CreativeToolbox
                                             case "7":
                                                 if (int.TryParse(Arguments[3].ToLower(), out int SevenMM) && SevenMM >= 0)
                                                 {
-                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped7, ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped7) + SevenMM);
+                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped7, (uint) (ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped7) + SevenMM));
                                                     RAComEv.Sender.RAMessage($"{SevenMM} 7.62mm ammo given to \"{ChosenPlayer.nicknameSync.MyNick}\"!");
                                                     Player.GetPlayer(Arguments[1])?.Broadcast(3, $"You were given {SevenMM} of 7.62mm ammo!", false);
                                                     return;
@@ -427,7 +398,7 @@ namespace CreativeToolbox
                                             case "9":
                                                 if (int.TryParse(Arguments[3].ToLower(), out int NineMM) && NineMM >= 0)
                                                 {
-                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped9, ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped9) + NineMM);
+                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped9, (uint) (ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped9) + NineMM));
                                                     RAComEv.Sender.RAMessage($"{NineMM} 9.00mm ammo given to \"{ChosenPlayer.nicknameSync.MyNick}\"!");
                                                     Player.GetPlayer(Arguments[1])?.Broadcast(3, $"You were given {NineMM} of 9.00mm ammo!", false);
                                                     return;
@@ -577,93 +548,6 @@ namespace CreativeToolbox
                                             Player.GetPlayer(Arguments[1])?.Broadcast(3, "Infinite ammo is disabled for you!", false);
                                             PlayersWithInfiniteAmmo.Remove(ChosenPlayer);
                                             UnityEngine.Object.Destroy(inf);
-                                        }
-                                        break;
-                                }
-                                break;
-                            default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}, Expected 2");
-                                break;
-                        }
-                        break;
-                    case "invis":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.invis"))
-                        {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
-                            return;
-                        }
-
-                        if (Arguments.Length < 2)
-                        {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: invis (clear/list/*/all/(id or name))");
-                            return;
-                        }
-
-                        switch (Arguments.Length)
-                        {
-                            case 2:
-                                switch (Arguments[1].ToLower())
-                                {
-                                    case "clear":
-                                        foreach (ReferenceHub hub in Player.GetHubs())
-                                        {
-                                            if (hub.TryGetComponent(out InvisibleComponent invComponent))
-                                            {
-                                                UnityEngine.Object.Destroy(invComponent);
-                                                PlayersWithInvisiblity.Remove(hub);
-                                            }
-                                        }
-                                        RAComEv.Sender.RAMessage("Invisibility is cleared from all players now!");
-                                        Map.Broadcast("Invisibility is cleared from all players now!", 5);
-                                        break;
-                                    case "list":
-                                        if (PlayersWithInfiniteAmmo.Count != 0)
-                                        {
-                                            string playerLister = "Players with Invisibility on: ";
-                                            foreach (ReferenceHub hub in PlayersWithInvisiblity)
-                                            {
-                                                playerLister += hub.nicknameSync.MyNick + ", ";
-                                            }
-                                            playerLister = playerLister.Substring(0, playerLister.Count() - 2);
-                                            RAComEv.Sender.RAMessage(playerLister);
-                                            return;
-                                        }
-                                        RAComEv.Sender.RAMessage("There are no players currently online with Invisibility on");
-                                        break;
-                                    case "*":
-                                    case "all":
-                                        foreach (ReferenceHub hub in Player.GetHubs())
-                                        {
-                                            if (!hub.TryGetComponent(out InvisibleComponent infComponent))
-                                            {
-                                                hub.gameObject.AddComponent<InvisibleComponent>();
-                                                PlayersWithInvisiblity.Add(hub);
-                                            }
-                                        }
-                                        RAComEv.Sender.RAMessage("Invisibility is on for all players now!");
-                                        Map.Broadcast("Everyone has been given invisibility!", 3);
-                                        break;
-                                    default:
-                                        ReferenceHub ChosenPlayer = Player.GetPlayer(Arguments[1]);
-                                        if (ChosenPlayer == null)
-                                        {
-                                            RAComEv.Sender.RAMessage($"Player \"{Arguments[1]}\" not found");
-                                            return;
-                                        }
-                                        if (!ChosenPlayer.TryGetComponent(out InvisibleComponent inv))
-                                        {
-                                            RAComEv.Sender.RAMessage($"Invisibility enabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                            Player.GetPlayer(Arguments[1])?.Broadcast(3, "Invisibility is enabled for you!", false);
-                                            PlayersWithInvisiblity.Add(ChosenPlayer);
-                                            ChosenPlayer.gameObject.AddComponent<InvisibleComponent>();
-                                        }
-                                        else
-                                        {
-                                            RAComEv.Sender.RAMessage($"Invisibility disabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                            Player.GetPlayer(Arguments[1])?.Broadcast(3, "Invisibility is disabled for you!", false);
-                                            PlayersWithInvisiblity.Remove(ChosenPlayer);
-                                            UnityEngine.Object.Destroy(inv);
                                         }
                                         break;
                                 }
@@ -838,6 +722,22 @@ namespace CreativeToolbox
                                 RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}, Expected 3");
                                 break;
                         }
+                        break;
+                    case "sdecon":
+                        RAComEv.Allow = false;
+                        if (!Sender.CheckPermission("ct.sdecon"))
+                        {
+                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
+                            return;
+                        }
+                        if (!Map.IsLCZDecontaminated || !WasDeconCommandRun)
+                        {
+                            RAComEv.Sender.RAMessage("Light Contaimnent Zone Decontamination is on!");
+                            Map.StartDecontamination();
+                            WasDeconCommandRun = true;
+                            return;
+                        }
+                        RAComEv.Sender.RAMessage("Light Contaimnent Zone Decontamination is already active!");
                         break;
                 }
             }

@@ -6,7 +6,7 @@ namespace CreativeToolbox
 {
     public class CreativeToolbox : EXILED.Plugin
     {
-
+        bool IsToolboxEnabled = true;
         public static float MedkitAHPHealthValue;
         public static float PainkillerAHPHealthValue;
         public static float AdrenalineAHPHealthValue;
@@ -17,12 +17,16 @@ namespace CreativeToolbox
         public static float HPRegenerationTimer;
         public static float HPRegenerationValue;
         public static float HPRegenerationIfHit;
-        bool IsToolboxEnabled = true;
+        public static float AutoScaleValue;
         public static bool EnableGrenadeTimeMod = false;
         public static bool EnableMedicalItemMod = false;
         public static bool EnableFallDamagePrevent = false;
         public static bool EnableGrenadeDamagePrevent = false;
-        internal const string pluginVersion = "1.0";
+        public static bool EnableAutoScaling = false;
+        public static bool EnableRetainingScaling = false;
+        public static bool DisableAutoScalingMessage = false;
+        public static bool LockFallDamageMod = false;
+        internal const string pluginVersion = "1.1";
         internal const string pluginPrefix = "CT";
         public static HarmonyInstance HarmonyInstance { private set; get; }
         public static int harmonyCounter;
@@ -44,6 +48,10 @@ namespace CreativeToolbox
             EnableMedicalItemMod = Config.GetBool("ct_enable_custom_healing", false);
             EnableFallDamagePrevent = Config.GetBool("ct_enable_fall_damage_prevention", false);
             EnableGrenadeDamagePrevent = Config.GetBool("ct_enable_grenade_damage_prevention", false);
+            EnableAutoScaling = Config.GetBool("ct_enable_auto_scaling", false);
+            EnableRetainingScaling = Config.GetBool("ct_enable_keep_scale", false);
+            DisableAutoScalingMessage = Config.GetBool("ct_disable_autoscale_messages", false);
+            LockFallDamageMod = Config.GetBool("ct_disable_fall_modification", false);
         }
 
         public void CheckValues()
@@ -100,6 +108,7 @@ namespace CreativeToolbox
             {
                 Log.Info("Detected invalid value in the configuration file for painkiller ahp healing! Using default value of 0");
                 PainkillerAHPHealthValue = 0;
+                Config.SetString("ct_painkillers_ahp_healing", PainkillerAHPHealthValue.ToString());
             }
 
             if (float.TryParse(Config.GetFloat("ct_medkit_ahp_healing").ToString(), out float med_ahpheal) && med_ahpheal >= 0)
@@ -108,6 +117,7 @@ namespace CreativeToolbox
             {
                 Log.Info("Detected invalid value in the configuration file for medkit ahp healing! Using default value of 0");
                 MedkitAHPHealthValue = 0;
+                Config.SetString("ct_medkit_ahp_healing", MedkitAHPHealthValue.ToString());
             }
 
             if (float.TryParse(Config.GetFloat("ct_adrenaline_ahp_healing").ToString(), out float adr_ahpheal) && adr_ahpheal >= 0)
@@ -116,6 +126,7 @@ namespace CreativeToolbox
             {
                 Log.Info("Detected invalid value in the configuration file for adrenaline ahp healing! Using default value of 0");
                 AdrenalineAHPHealthValue = 0;
+                Config.SetString("ct_adrenaline_ahp_healing", AdrenalineAHPHealthValue.ToString());
             }
 
             if (float.TryParse(Config.GetFloat("ct_scp500_ahp_healing").ToString(), out float scp500_ahpheal) && scp500_ahpheal >= 0)
@@ -124,14 +135,16 @@ namespace CreativeToolbox
             {
                 Log.Info("Detected invalid value in the configuration file for SCP-500 ahp healing! Using default value of 0");
                 SCP500AHPHealthValue = 0;
+                Config.SetString("ct_scp500_ahp_healing", SCP500AHPHealthValue.ToString());
             }
 
-            if (float.TryParse(Config.GetFloat("ct_bloodthirst_hp_healing").ToString(), out float bt_heal) && bt_heal >= 0)
-                HPRegenerationIfHit = bt_heal;
+            if (float.TryParse(Config.GetFloat("ct_auto_scale_value").ToString(), out float as_val) && as_val != 0)
+                AutoScaleValue = as_val;
             else
             {
-                Log.Info("Detected invalid value in the configuration file for bloodthirsty healing! Using default value of 0");
-                HPRegenerationIfHit = 0;
+                Log.Info("Detected invalid value in the configuration file for auto scaling! Using default value of 1");
+                AutoScaleValue = 1;
+                Config.SetString("ct_auto_scale_value", AutoScaleValue.ToString());
             }
         }
 
@@ -145,11 +158,12 @@ namespace CreativeToolbox
             Events.RoundStartEvent -= Handler.RunOnRoundStart;
             Events.RoundRestartEvent -= Handler.RunOnRoundRestart;
             Events.RemoteAdminCommandEvent -= Handler.RunOnRemoteAdminCommand;
-            Events.PlayerSpawnEvent -= Handler.RunOnPlayerSpawn;
+            //Events.PlayerSpawnEvent -= Handler.RunOnPlayerSpawn;
             Events.PlayerDeathEvent -= Handler.RunOnPlayerDeath;
             Events.PlayerHurtEvent -= Handler.RunOnPlayerHurt;
             Events.UsedMedicalItemEvent -= Handler.RunOnMedItemUsed;
             Events.PlayerLeaveEvent -= Handler.RunOnPlayerLeave;
+            Events.PlayerJoinEvent -= Handler.RunOnPlayerJoin;
             Handler = null;
         }
 
@@ -164,11 +178,12 @@ namespace CreativeToolbox
             harmonyCounter++;
             HarmonyInstance = HarmonyInstance.Create($"defytherush.creativetoolbox_{harmonyCounter}");
             HarmonyInstance.PatchAll();
+            Events.PlayerJoinEvent += Handler.RunOnPlayerJoin;
             Events.PlayerLeaveEvent += Handler.RunOnPlayerLeave;
             Events.UsedMedicalItemEvent += Handler.RunOnMedItemUsed;
             Events.PlayerHurtEvent += Handler.RunOnPlayerHurt;
             Events.PlayerDeathEvent += Handler.RunOnPlayerDeath;
-            Events.PlayerSpawnEvent += Handler.RunOnPlayerSpawn;
+            //Events.PlayerSpawnEvent += Handler.RunOnPlayerSpawn;
             Events.RemoteAdminCommandEvent += Handler.RunOnRemoteAdminCommand;
             Events.RoundRestartEvent += Handler.RunOnRoundRestart;
             Events.RoundStartEvent += Handler.RunOnRoundStart;

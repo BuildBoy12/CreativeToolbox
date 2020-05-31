@@ -1,4 +1,5 @@
 ﻿using EXILED.Extensions;
+using MEC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,8 @@ namespace CreativeToolbox
 
         public static bool IsGun(this Pickup item)
         {
-            switch (item.ItemId) {
+            switch (item.ItemId)
+            {
                 case ItemType.GunCOM15:
                 case ItemType.GunE11SR:
                 case ItemType.GunLogicer:
