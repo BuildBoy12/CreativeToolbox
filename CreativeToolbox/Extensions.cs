@@ -1,5 +1,4 @@
-﻿using EXILED.Extensions;
-using MEC;
+﻿using MEC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +16,9 @@ namespace CreativeToolbox
             amount);
         }
 
-        public static bool IsGun(this Pickup item)
+        public static bool IsGun(this ItemType item)
         {
-            switch (item.ItemId)
+            switch (item)
             {
                 case ItemType.GunCOM15:
                 case ItemType.GunE11SR:
@@ -32,6 +31,12 @@ namespace CreativeToolbox
                 default:
                     return false;
             }
+        }
+
+        public static bool ItemInHandIsKeycard(this ReferenceHub rh)
+        {
+            ItemCategory ItemCat = rh.inventory.GetItemByID(rh.inventory.curItem)?.itemCategory ?? ItemCategory.None;
+            return ItemCat == ItemCategory.Keycard;
         }
     }
 }

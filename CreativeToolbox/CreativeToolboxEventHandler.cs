@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using CustomPlayerEffects;
-using EXILED;
-using EXILED.Extensions;
+using Exiled.API.Features;
+using Exiled.Events.EventArgs;
+using Exiled.Permissions.Extensions;
 using Grenades;
-using Harmony;
+using Hints;
 using MEC;
 using Mirror;
+using PlayableScps;
+using Targeting;
 using UnityEngine;
 
 namespace CreativeToolbox
@@ -17,10 +18,17 @@ namespace CreativeToolbox
     {
         //HashSet<ReferenceHub> PlayersWith207 = new HashSet<ReferenceHub>();
         //HashSet<ReferenceHub> PlayersWithInvisibility = new HashSet<ReferenceHub>();
+        public static HashSet<ReferenceHub> PlayersWithAdvancedGodmode = new HashSet<ReferenceHub>();
+        HashSet<ReferenceHub> PlayersThatCanPryGates = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithRegen = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithInfiniteAmmo = new HashSet<ReferenceHub>();
         HashSet<String> PlayersWithRetainedScale = new HashSet<String>();
-        System.Random randNum = new System.Random();
+        string[] DoorsThatAreLocked = { "012", "049_ARMORY", "079_FIRST", "079_SECOND", "096", "106_BOTTOM", 
+            "106_PRIMARY", "106_SECONDARY", "173_ARMORY", "914", "CHECKPOINT_ENT", "CHECKPOINT_LCZ_A", "CHECKPOINT_LCZ_B",
+            "GATE_A", "GATE_B", "HCZ_ARMORY", "HID", "INTERCOM", "LCZ_ARMORY", "NUKE_ARMORY" };
+        string[] GatesThatExist = { "914", "GATE_A", "GATE_B", "079_FIRST", "079_SECOND" };
+        System.Random RandNum = new System.Random();
+        Item[] AvailableItems;
         bool IsWarheadDetonated;
         bool IsDecontanimationActivated;
         bool AllowRespawning = false;
@@ -37,41 +45,48 @@ namespace CreativeToolbox
         {
             AllowRespawning = false;
             PlayersWithRegen.Clear();
-            if (CreativeToolbox.EnableFallDamagePrevent)
-            {
+            PlayersWithInfiniteAmmo.Clear();
+            PlayersThatCanPryGates.Clear();
+            PlayersWithRetainedScale.Clear();
+            if (CreativeToolbox.CT_Config.EnableFallDamagePrevent)
                 PreventFallDamage = true;
-            }
-            if (CreativeToolbox.EnableAutoScaling)
+            if (CreativeToolbox.CT_Config.EnableAutoScaling)
             {
-                foreach (ReferenceHub Player in Player.GetHubs())
+                foreach (Player Ply in Player.List)
                 {
-                    if (!CreativeToolbox.DisableAutoScalingMessage)
-                        Map.Broadcast($"Everyone who joined has their playermodel scale set to {CreativeToolbox.AutoScaleValue}x!", 5);
-                    Player.SetScale(CreativeToolbox.AutoScaleValue);
-                    PlayersWithRetainedScale.Add(Player.GetUserId());
+                    if (!CreativeToolbox.CT_Config.DisableAutoScalingMessage)
+                        Map.Broadcast(5, $"Everyone who joined has their playermodel scale set to {CreativeToolbox.CT_Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
+                    Ply.Scale = new Vector3(CreativeToolbox.CT_Config.AutoScaleValue, CreativeToolbox.CT_Config.AutoScaleValue, CreativeToolbox.CT_Config.AutoScaleValue);
+                    PlayersWithRetainedScale.Add(Ply.UserId);
                     AutoScaleOn = true;
                 }
             }
+            if (CreativeToolbox.CT_Config.EnableGrenadeSpawnOnDeath)
+                Map.Broadcast(10, $"<color=red>Warning: Grenades spawn after you die, they explode after {CreativeToolbox.CT_Config.GrenadeDeathTimer} seconds of them spawning, be careful!</color>", Broadcast.BroadcastFlags.Normal);
         }
 
-        public void RunOnPlayerJoin(PlayerJoinEvent PlyJoin)
+        public void RunOnPlayerJoin(JoinedEventArgs PlyJoin)
         {
-            if (CreativeToolbox.EnableAutoScaling && CreativeToolbox.EnableRetainingScaling)
+            if (CreativeToolbox.CT_Config.EnableAutoScaling && CreativeToolbox.CT_Config.EnableRetainingScaling)
             {
-                if (PlayersWithRetainedScale.Contains(PlyJoin.Player.GetUserId())) {
-                    if (!CreativeToolbox.DisableAutoScalingMessage)
-                        PlyJoin.Player.Broadcast(5, $"Your playermodel scale was set to {CreativeToolbox.AutoScaleValue}x!", false);
-                    PlyJoin.Player.SetScale(CreativeToolbox.AutoScaleValue);
+                if (PlayersWithRetainedScale.Contains(PlyJoin.Player.UserId)) {
+                    if (!CreativeToolbox.CT_Config.DisableAutoScalingMessage)
+                        PlyJoin.Player.Broadcast(5, $"Your playermodel scale was set to {CreativeToolbox.CT_Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
+                    PlyJoin.Player.Scale = new Vector3(CreativeToolbox.CT_Config.AutoScaleValue, CreativeToolbox.CT_Config.AutoScaleValue, CreativeToolbox.CT_Config.AutoScaleValue);
                 }
             }
         }
 
-        public void RunOnPlayerLeave(PlayerLeaveEvent PlyLeave)
+        public void RunOnPlayerLeave(LeftEventArgs PlyLeave)
         {
-            if (PlayersWithRegen.Contains(PlyLeave.Player))
-                PlayersWithRegen.Remove(PlyLeave.Player);
-            if (PlayersWithInfiniteAmmo.Contains(PlyLeave.Player))
-                PlayersWithInfiniteAmmo.Remove(PlyLeave.Player);
+            if (PlayersWithRegen.Contains(PlyLeave.Player.ReferenceHub))
+                PlayersWithRegen.Remove(PlyLeave.Player.ReferenceHub);
+            if (PlayersWithInfiniteAmmo.Contains(PlyLeave.Player.ReferenceHub))
+                PlayersWithInfiniteAmmo.Remove(PlyLeave.Player.ReferenceHub);
+            if (PlayersThatCanPryGates.Contains(PlyLeave.Player.ReferenceHub))
+                PlayersThatCanPryGates.Remove(PlyLeave.Player.ReferenceHub);
+            if (PlayersWithAdvancedGodmode.Contains(PlyLeave.Player.ReferenceHub))
+                PlayersWithAdvancedGodmode.Remove(PlyLeave.Player.ReferenceHub);
         }
 
         /*public void RunOnPlayerSpawn(PlayerSpawnEvent PlySpwn)
@@ -80,426 +95,654 @@ namespace CreativeToolbox
                 Timing.CallDelayed(1f, () => PlySpwn.Player.playerEffectsController.EnableEffect(new Scp207(PlySpwn.Player)));
         }*/
 
-        public void RunOnPlayerDeath(ref PlayerDeathEvent PlyDeath)
+        public void RunOnPlayerDeath(DiedEventArgs PlyDeath)
         {
             if (AllowRespawning)
             {
-                ReferenceHub hub = PlyDeath.Player;
-                IsWarheadDetonated = Map.IsNukeDetonated;
+                IsWarheadDetonated = Warhead.IsDetonated;
                 IsDecontanimationActivated = Map.IsLCZDecontaminated;
-                Timing.CallDelayed(CreativeToolbox.RandomRespawnTimer, () => RevivePlayer(hub));
+                Timing.CallDelayed(CreativeToolbox.CT_Config.RandomRespawnTimer, () => RevivePlayer(PlyDeath.Target));
+            }
+            if (CreativeToolbox.CT_Config.EnableGrenadeSpawnOnDeath)
+            {
+                SpawnGrenadeOnPlayer(PlyDeath.Target, true);
             }
         }
 
-        public void RunOnPlayerHurt(ref PlayerHurtEvent PlyHurt)
+        public void RunOnPlayerHurt(HurtingEventArgs PlyHurt)
         {
             if (PreventFallDamage)
                 if (PlyHurt.DamageType == DamageTypes.Falldown)
                     PlyHurt.Amount = 0;
         }
 
-        public void RunOnMedItemUsed(UsedMedicalItemEvent MedUsed)
+        public void RunOnMedItemUsed(UsedMedicalItemEventArgs MedUsed)
         {
-            if (CreativeToolbox.EnableMedicalItemMod)
+            if (CreativeToolbox.CT_Config.EnableMedicalItemMod)
             {
-                switch (MedUsed.ItemType)
+                switch (MedUsed.Item)
                 {
                     case ItemType.Painkillers:
-                        MedUsed.Player.AddAdrenalineHealth((byte)CreativeToolbox.PainkillerAHPHealthValue);
+                        MedUsed.Player.AdrenalineHealth = (int)CreativeToolbox.CT_Config.PainkillerAHPHealthValue;
                         break;
                     case ItemType.Medkit:
-                        MedUsed.Player.AddAdrenalineHealth((byte)CreativeToolbox.MedkitAHPHealthValue);
+                        MedUsed.Player.AdrenalineHealth = (int)CreativeToolbox.CT_Config.MedkitAHPHealthValue;
                         break;
                     case ItemType.Adrenaline:
-                        if (!(CreativeToolbox.AdrenalineAHPHealthValue <= 0))
-                            MedUsed.Player.AddAdrenalineHealth((byte)CreativeToolbox.AdrenalineAHPHealthValue);
+                        if (!(CreativeToolbox.CT_Config.AdrenalineAHPHealthValue <= 0))
+                            MedUsed.Player.AdrenalineHealth = (int)CreativeToolbox.CT_Config.AdrenalineAHPHealthValue;
                         break;
                     case ItemType.SCP500:
-                        MedUsed.Player.AddAdrenalineHealth((byte)CreativeToolbox.SCP500AHPHealthValue);
+                        MedUsed.Player.AdrenalineHealth = (int)CreativeToolbox.CT_Config.SCP500AHPHealthValue;
+                        break;
+                    case ItemType.SCP207:
+                        MedUsed.Player.AdrenalineHealth = 75;
                         break;
                 }
             }
         }
 
-        public void RunOnRemoteAdminCommand(ref RACommandEvent RAComEv)
+        public void RunWhenDoorIsInteractedWith(InteractingDoorEventArgs DoorInter)
+        {
+            if (CreativeToolbox.CT_Config.EnableDoorMessages)
+            {
+                if (PlayersThatCanPryGates.Contains(DoorInter.Player.ReferenceHub) && GatesThatExist.Contains(DoorInter.Door.DoorName))
+                {
+                    DoorInter.Door.PryGate();
+                    if (!DoorInter.Player.IsBypassModeEnabled)
+                    {
+                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.CT_Config.PryGatesMessage}", new HintParameter[]
+                        {
+                            new StringHintParameter("")
+                        }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
+                    }
+                    else
+                    {
+                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.CT_Config.PryGatesBypassMessage}", new HintParameter[]
+                        {
+                            new StringHintParameter("")
+                        }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
+                    }
+                }
+                else
+                {
+                    if (!DoorInter.Player.IsBypassModeEnabled)
+                    {
+                        if (DoorInter.Player.ReferenceHub.ItemInHandIsKeycard() && DoorsThatAreLocked.Contains(DoorInter.Door.DoorName))
+                        {
+                            if (DoorInter.IsAllowed)
+                            {
+                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.CT_Config.UnlockedDoorMessage}", new HintParameter[]
+                                {
+                                    new StringHintParameter("")
+                                }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
+                            }
+                            else
+                            {
+                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.CT_Config.LockedDoorMessage}", new HintParameter[]
+                                {
+                                    new StringHintParameter("")
+                                }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
+                            }
+                        }
+                        else if (!DoorInter.Player.ReferenceHub.ItemInHandIsKeycard() && DoorsThatAreLocked.Contains(DoorInter.Door.DoorName))
+                        {
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.CT_Config.NeedKeycardMessage}", new HintParameter[]
+                            {
+                                new StringHintParameter("")
+                            }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
+                        }
+                    }
+                    else if (DoorInter.Player.IsBypassModeEnabled && DoorsThatAreLocked.Contains(DoorInter.Door.DoorName))
+                    {
+                        if (DoorInter.Player.ReferenceHub.ItemInHandIsKeycard())
+                        {
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.CT_Config.BypassWithKeycardInHandMessage}", new HintParameter[]
+                            {
+                                new StringHintParameter("")
+                            }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
+                        }
+                        else
+                        {
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.CT_Config.BypassKeycardMessage}", new HintParameter[]
+                            {
+                                new StringHintParameter("")
+                            }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
+                        }
+                    }
+                }
+            }
+        }
+
+        public void RunWhenPlayerEntersFemurBreaker(EnteringFemurBreakerEventArgs FemurBreaker)
+        {
+            if (PlayersWithAdvancedGodmode.Count == 0)
+            {
+                FemurBreaker.IsAllowed = false;
+                FemurBreaker.Player.Broadcast((ushort)2, "SCP-106 has advanced godmode, you cannot contain him", Broadcast.BroadcastFlags.Normal);
+            }
+        }
+
+        public void RunOnRemoteAdminCommand(SendingRemoteAdminCommandEventArgs RAComEv)
         {
             try
             {
-                string[] Arguments = RAComEv.Command.Split(' ');
-                ReferenceHub Sender = RAComEv.Sender.SenderId == "SERVER CONSOLE" || RAComEv.Sender.SenderId == "GAME CONSOLE" ? PlayerManager.localPlayer.GetPlayer() : Player.GetPlayer(RAComEv.Sender.SenderId);
-                switch (Arguments[0].ToLower())
+                switch (RAComEv.Name.ToLower())
                 {
-                    case "arspawn":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.arspawn"))
+                    case "advgod":
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.advgod"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
                             return;
                         }
 
-                        if (Arguments.Length < 2)
+                        if (RAComEv.Arguments.Count < 2)
                         {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: arspawn (on/off/value) (value (if choosing \"time\"))");
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: advgod ((id/name)/*/all/clear/list) (Note: This only will be given to SCP-106 roles)");
                             return;
                         }
 
-                        switch (Arguments.Length)
+                        switch (RAComEv.Arguments.Count)
                         {
                             case 2:
-                                switch (Arguments[1].ToLower())
+                                switch (RAComEv.Arguments[0].ToLower())
                                 {
-                                    case "on":
-                                        if (!AllowRespawning)
+                                    case "*":
+                                    case "all":
+                                        foreach (Player Ply in Player.List)
                                         {
-                                            RAComEv.Sender.RAMessage("Auto respawning enabled!");
-                                            Map.Broadcast("<color=green>Random auto respawning enabled!</color>", 5);
-                                            AllowRespawning = true;
+                                            if (!(Ply.Role == RoleType.Scp106) || PlayersWithAdvancedGodmode.Contains(Ply.ReferenceHub))
+                                                continue;
+
+                                            Ply.ReferenceHub.gameObject.AddComponent<SCP106AdvancedGodComponent>();
+                                            PlayersWithAdvancedGodmode.Add(Ply.ReferenceHub);
+                                        }
+                                        Map.Broadcast(5, "Everyone who is SCP-106 has Advanced Godmode!", Broadcast.BroadcastFlags.Normal);
+                                        break;
+                                    case "clear":
+                                        foreach (Player Ply in Player.List)
+                                        {
+                                            if (!PlayersWithAdvancedGodmode.Contains(Ply.ReferenceHub) || Ply.ReferenceHub.TryGetComponent(out SCP106AdvancedGodComponent SCPAdvGod))
+                                                continue;
+
+                                            UnityEngine.Object.Destroy(SCPAdvGod);
+                                        }
+                                        PlayersWithAdvancedGodmode.Clear();
+                                        Map.Broadcast(5, "Everyone who is SCP-106 does not have Advanced Godmode anymore!", Broadcast.BroadcastFlags.Normal);
+                                        break;
+                                    case "list":
+                                        if (PlayersWithAdvancedGodmode.Count != 0)
+                                        {
+                                            string playerLister = "Players with Advanced Godmode on: ";
+                                            foreach (ReferenceHub hub in PlayersWithAdvancedGodmode)
+                                            {
+                                                playerLister += hub.nicknameSync.MyNick + ", ";
+                                            }
+                                            playerLister = playerLister.Substring(0, playerLister.Count() - 2);
+                                            RAComEv.Sender.RemoteAdminMessage(playerLister);
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage("Auto respawning is already on!");
-                                        break;
-                                    case "off":
-                                        if (AllowRespawning)
-                                        {
-                                            RAComEv.Sender.RAMessage("Auto respawning disabled!");
-                                            Map.Broadcast("<color=red>Random auto respawning disabled!</color>", 5);
-                                            AllowRespawning = false;
-                                            return;
-                                        }
-                                        RAComEv.Sender.RAMessage("Auto respawning is already off!");
-                                        break;
-                                    case "time":
-                                        RAComEv.Sender.RAMessage("Missing value for time!");
+                                        RAComEv.Sender.RemoteAdminMessage("There are no players currently online with Advanced Godmode on");
                                         break;
                                     default:
-                                        RAComEv.Sender.RAMessage("Please enter either \"on\" or \"off\" (If # of arguments is 2)!");
-                                        break;
-                                }
-                                break;
-                            case 3:
-                                switch (Arguments[1].ToLower())
-                                {
-                                    case "time":
-                                        if (float.TryParse(Arguments[2].ToLower(), out float rspwn) && rspwn > 0)
+                                        Player ChosenPlayer = Player.Get(RAComEv.Arguments[1]);
+                                        if (ChosenPlayer == null)
                                         {
-                                            CreativeToolbox.RandomRespawnTimer = rspwn;
-                                            RAComEv.Sender.RAMessage($"Auto respawning timer is now set to {rspwn} seconds!");
-                                            Map.Broadcast($"Auto respawning timer is now set to {rspwn} seconds!", 5);
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[1]}\" not found");
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage($"Invalid value for auto respawn timer! Value: {Arguments[2].ToLower()}");
-                                        break;
-                                    default:
-                                        RAComEv.Sender.RAMessage("Please enter only \"time\"!");
+
+                                        if (!(ChosenPlayer.Role == RoleType.Scp106))
+                                        {
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.Nickname}\" is not SCP-106!");
+                                            return;
+                                        }
+
+                                        if (ChosenPlayer.ReferenceHub.TryGetComponent(out SCP106AdvancedGodComponent AdvGod))
+                                        {
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.Nickname}\" already has Advanced Godmode!");
+                                            return;
+                                        }
+
+                                        ChosenPlayer.ReferenceHub.gameObject.AddComponent<SCP106AdvancedGodComponent>();
+                                        PlayersWithAdvancedGodmode.Add(ChosenPlayer.ReferenceHub);
+                                        Player.Get(RAComEv.Arguments[1])?.Broadcast(3, "Advanced Godmode is enabled for you!", Broadcast.BroadcastFlags.Normal);
                                         break;
                                 }
                                 break;
                             default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}, Expected 3");
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 2");
+                                break;
+                        }
+                        break;
+                    case "arspawn":
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.arspawn"))
+                        {
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
+                            return;
+                        }
+
+                        if (RAComEv.Arguments.Count < 1)
+                        {
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: arspawn (on/off/value) (value (if choosing \"time\"))");
+                            return;
+                        }
+
+                        switch (RAComEv.Arguments.Count)
+                        {
+                            case 1:
+                                switch (RAComEv.Arguments[0].ToLower())
+                                {
+                                    case "on":
+                                        if (!AllowRespawning)
+                                        {
+                                            RAComEv.Sender.RemoteAdminMessage("Auto respawning enabled!");
+                                            Map.Broadcast(5, "<color=green>Random auto respawning enabled!</color>", Broadcast.BroadcastFlags.Normal);
+                                            AllowRespawning = true;
+                                            return;
+                                        }
+                                        RAComEv.Sender.RemoteAdminMessage("Auto respawning is already on!");
+                                        break;
+                                    case "off":
+                                        if (AllowRespawning)
+                                        {
+                                            RAComEv.Sender.RemoteAdminMessage("Auto respawning disabled!");
+                                            Map.Broadcast(5, "<color=red>Random auto respawning disabled!</color>", Broadcast.BroadcastFlags.Normal);
+                                            AllowRespawning = false;
+                                            return;
+                                        }
+                                        RAComEv.Sender.RemoteAdminMessage("Auto respawning is already off!");
+                                        break;
+                                    case "time":
+                                        RAComEv.Sender.RemoteAdminMessage("Missing value for time!");
+                                        break;
+                                    default:
+                                        RAComEv.Sender.RemoteAdminMessage("Please enter either \"on\" or \"off\" (If # of arguments is 1)!");
+                                        break;
+                                }
+                                break;
+                            case 2:
+                                switch (RAComEv.Arguments[0].ToLower())
+                                {
+                                    case "time":
+                                        if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rspwn) && rspwn > 0)
+                                        {
+                                            CreativeToolbox.CT_Config.RandomRespawnTimer = rspwn;
+                                            RAComEv.Sender.RemoteAdminMessage($"Auto respawning timer is now set to {rspwn} seconds!");
+                                            Map.Broadcast(5, $"Auto respawning timer is now set to {rspwn} seconds!", Broadcast.BroadcastFlags.Normal);
+                                            return;
+                                        }
+                                        RAComEv.Sender.RemoteAdminMessage($"Invalid value for auto respawn timer! Value: {RAComEv.Arguments[1].ToLower()}");
+                                        break;
+                                    default:
+                                        RAComEv.Sender.RemoteAdminMessage("Please enter only \"time\"!");
+                                        break;
+                                }
+                                break;
+                            default:
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 2");
                                 break;
                         }
                         break;
                     case "autoscale":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.autoscale"))
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.autoscale"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command!");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command!");
                             return;
                         }
 
-                        if (!CreativeToolbox.EnableAutoScaling)
+                        if (!CreativeToolbox.CT_Config.EnableAutoScaling)
                         {
-                            RAComEv.Sender.RAMessage("Auto scaling cannot be modified!");
+                            RAComEv.Sender.RemoteAdminMessage("Auto scaling cannot be modified!");
                             return;
                         }
 
                         if (AutoScaleOn)
                         {
-                            foreach (ReferenceHub Player in Player.GetHubs())
+                            foreach (Player Ply in Player.List)
                             {
-                                Player.SetScale(1);
+                                Ply.Scale = Vector3.one;
                             }
-                            if (!CreativeToolbox.DisableAutoScalingMessage)
-                                Map.Broadcast("Everyone has been restored to their normal size!", 5);
+                            if (!CreativeToolbox.CT_Config.DisableAutoScalingMessage)
+                                Map.Broadcast(5, "Everyone has been restored to their normal size!", Broadcast.BroadcastFlags.Normal);
                             PlayersWithRetainedScale.Clear();
                             AutoScaleOn = false;
                         }
                         else
                         {
-                            foreach (ReferenceHub Player in Player.GetHubs())
+                            foreach (Player Ply in Player.List)
                             {
-                                Player.SetScale(CreativeToolbox.AutoScaleValue);
-                                PlayersWithRetainedScale.Add(Player.GetUserId());
+                                Ply.Scale = new Vector3(CreativeToolbox.CT_Config.AutoScaleValue, CreativeToolbox.CT_Config.AutoScaleValue, CreativeToolbox.CT_Config.AutoScaleValue);
+                                PlayersWithRetainedScale.Add(Ply.UserId);
                             }
-                            if (!CreativeToolbox.DisableAutoScalingMessage)
-                                Map.Broadcast($"Everyone has their playermodel scale set to {CreativeToolbox.AutoScaleValue}x!", 5);
+                            if (!CreativeToolbox.CT_Config.DisableAutoScalingMessage)
+                                Map.Broadcast(5, $"Everyone has their playermodel scale set to {CreativeToolbox.CT_Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
                             AutoScaleOn = true;
                         }
                         break;
+                    case "explode":
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.explode"))
+                        {
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command!");
+                            return;
+                        }
+
+                        if (RAComEv.Arguments.Count < 1)
+                        {
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: explode ((id/name)/*/all)");
+                            return;
+                        }
+
+                        switch (RAComEv.Arguments[0].ToLower())
+                        {
+                            case "all":
+                            case "*":
+                                foreach (Player Ply in Player.List)
+                                {
+                                    switch (Ply.Role)
+                                    {
+                                        case RoleType.Spectator:
+                                        case RoleType.None:
+                                            break;
+                                        default:
+                                            Ply.Kill();
+                                            SpawnGrenadeOnPlayer(Ply, false);
+                                            break;
+                                    }
+                                }
+                                RAComEv.Sender.RemoteAdminMessage($"Everyone exploded, Hubert cannot believe you did this");
+                                break;
+                            default:
+                                Player ChosenPlayer = Player.Get(RAComEv.Arguments[0]);
+                                if (ChosenPlayer == null)
+                                {
+                                    RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[0]}\" not found");
+                                    return;
+                                }
+                                
+                                switch (ChosenPlayer.Role)
+                                {
+                                    case RoleType.Spectator:
+                                    case RoleType.None:
+                                        RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\" is not a valid class to explode, not this time!");
+                                        break;
+                                    default:
+                                        RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\" game ended (exploded)");
+                                        ChosenPlayer.Kill();
+                                        SpawnGrenadeOnPlayer(ChosenPlayer, false);
+                                        break;
+                                }
+                                break;
+                        }
+                        break;
                     case "fdamage":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.fdamage"))
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.fdamage"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command!");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command!");
                             return;
                         }
 
-                        if (CreativeToolbox.LockFallDamageMod)
+                        if (CreativeToolbox.CT_Config.LockFallDamageMod)
                         {
-                            RAComEv.Sender.RAMessage("Fall damage cannot be modified!");
+                            RAComEv.Sender.RemoteAdminMessage("Fall damage cannot be modified!");
                             return;
                         }
 
-                        if (Arguments.Length < 2)
+                        if (RAComEv.Arguments.Count < 1)
                         {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: fdamage (on/off)");
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: fdamage (on/off)");
                             return;
                         }
 
-                        switch (Arguments.Length)
+                        switch (RAComEv.Arguments.Count)
                         {
-                            case 2:
-                                switch (Arguments[1].ToLower())
+                            case 1:
+                                switch (RAComEv.Arguments[0].ToLower())
                                 {
                                     case "on":
                                         if (PreventFallDamage)
                                         {
                                             PreventFallDamage = false;
-                                            RAComEv.Sender.RAMessage("Fall damage enabled!");
-                                            Map.Broadcast("<color=green>Fall damage enabled!</color>", 5);
+                                            RAComEv.Sender.RemoteAdminMessage("Fall damage enabled!");
+                                            Map.Broadcast(5, "<color=green>Fall damage enabled!</color>", Broadcast.BroadcastFlags.Normal);
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage("Fall damage is already on!");
+                                        RAComEv.Sender.RemoteAdminMessage("Fall damage is already on!");
                                         break;
                                     case "off":
                                         if (!PreventFallDamage)
                                         {
                                             PreventFallDamage = true;
-                                            RAComEv.Sender.RAMessage("Fall damage disabled!");
-                                            Map.Broadcast("<color=red>Fall damage disabled!</color>", 5);
+                                            RAComEv.Sender.RemoteAdminMessage("Fall damage disabled!");
+                                            Map.Broadcast(5, "<color=red>Fall damage disabled!</color>", Broadcast.BroadcastFlags.Normal);
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage("Fall damage is already off!");
+                                        RAComEv.Sender.RemoteAdminMessage("Fall damage is already off!");
                                         break;
                                     default:
-                                        RAComEv.Sender.RAMessage("Please enter either \"on\" or \"off\"!");
+                                        RAComEv.Sender.RemoteAdminMessage("Please enter either \"on\" or \"off\"!");
                                         break;
                                 }
                                 break;
                             default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}");
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}");
                                 break;
                         }
                         break;
                     case "giveammo":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.giveammo"))
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.giveammo"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
                             return;
                         }
 
-                        if (Arguments.Length < 4)
+                        if (RAComEv.Arguments.Count < 3)
                         {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: giveam (*/all/(id or name)) (5/7/9) (amount)");
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: giveam (*/all/(id or name)) (5/7/9) (amount)");
                             return;
                         }
 
-                        switch (Arguments.Length)
+                        switch (RAComEv.Arguments.Count)
                         {
-                            case 4:
-                                switch (Arguments[1].ToLower())
+                            case 3:
+                                switch (RAComEv.Arguments[0].ToLower())
                                 {
                                     case "*":
                                     case "all":
-                                        switch (Arguments[2].ToLower())
+                                        switch (RAComEv.Arguments[1].ToLower())
                                         {
                                             case "5":
-                                                if (int.TryParse(Arguments[3].ToLower(), out int FiveMM) && FiveMM >= 0)
+                                                if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int FiveMM) && FiveMM >= 0)
                                                 {
-                                                    foreach (ReferenceHub hub in Player.GetHubs())
+                                                    foreach (Player Ply in Player.List)
                                                     {
-                                                        if (hub.GetRole() != RoleType.None)
-                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped5, (uint) (hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped5) + FiveMM));
+                                                        if (Ply.Role != RoleType.None)
+                                                            Ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato556, (uint) (Ply.GetAmmo(Exiled.API.Enums.AmmoType.Nato556) + FiveMM));
                                                     }
-                                                    RAComEv.Sender.RAMessage($"{FiveMM} 5.56mm ammo given to everyone!");
-                                                    Map.Broadcast($"Everyone has been given {FiveMM} 5.56mm ammo!", 3);
+                                                    RAComEv.Sender.RemoteAdminMessage($"{FiveMM} 5.56mm ammo given to everyone!");
+                                                    Map.Broadcast(3, $"Everyone has been given {FiveMM} 5.56mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
-                                                RAComEv.Sender.RAMessage($"Invalid value for ammo count! Value: {Arguments[3]}");
+                                                RAComEv.Sender.RemoteAdminMessage($"Invalid value for ammo count! Value: {RAComEv.Arguments[3]}");
                                                 break;
                                             case "7":
-                                                if (int.TryParse(Arguments[3].ToLower(), out int SevenMM) && SevenMM >= 0)
+                                                if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int SevenMM) && SevenMM >= 0)
                                                 {
-                                                    foreach (ReferenceHub hub in Player.GetHubs())
+                                                    foreach (Player Ply in Player.List)
                                                     {
-                                                        if (hub.GetRole() != RoleType.None)
-                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped7, (uint) (hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped7) + SevenMM));
+                                                        if (Ply.Role != RoleType.None)
+                                                            Ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato762, (uint) (Ply.GetAmmo(Exiled.API.Enums.AmmoType.Nato762) + SevenMM));
                                                     }
-                                                    RAComEv.Sender.RAMessage($"{SevenMM} 7.62mm ammo given to everyone!");
-                                                    Map.Broadcast($"Everyone has been given {SevenMM} 7.62mm ammo!", 3);
+                                                    RAComEv.Sender.RemoteAdminMessage($"{SevenMM} 7.62mm ammo given to everyone!");
+                                                    Map.Broadcast(3, $"Everyone has been given {SevenMM} 7.62mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
-                                                RAComEv.Sender.RAMessage($"Invalid value for ammo count! Value: {Arguments[3]}");
+                                                RAComEv.Sender.RemoteAdminMessage($"Invalid value for ammo count! Value: {RAComEv.Arguments[3]}");
                                                 break;
                                             case "9":
-                                                if (int.TryParse(Arguments[3].ToLower(), out int NineMM) && NineMM >= 0)
+                                                if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int NineMM) && NineMM >= 0)
                                                 {
-                                                    foreach (ReferenceHub hub in Player.GetHubs())
+                                                    foreach (Player Ply in Player.List)
                                                     {
-                                                        if (hub.GetRole() != RoleType.None)
-                                                            hub.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped9, (uint) (hub.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped9) + NineMM));
+                                                        if (Ply.Role != RoleType.None)
+                                                            Ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato9, (uint) (Ply.GetAmmo(Exiled.API.Enums.AmmoType.Nato9) + NineMM));
                                                     }
-                                                    RAComEv.Sender.RAMessage($"{NineMM} 9.00mm ammo given to everyone!");
-                                                    Map.Broadcast($"Everyone has been given {NineMM} 9mm ammo!", 3);
+                                                    RAComEv.Sender.RemoteAdminMessage($"{NineMM} 9.00mm ammo given to everyone!");
+                                                    Map.Broadcast(3, $"Everyone has been given {NineMM} 9mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
-                                                RAComEv.Sender.RAMessage($"Invalid value for ammo count! Value: {Arguments[3]}");
+                                                RAComEv.Sender.RemoteAdminMessage($"Invalid value for ammo count! Value: {RAComEv.Arguments[3]}");
                                                 break;
                                             default:
-                                                RAComEv.Sender.RAMessage($"Please enter \"5\" (5.56mm), \"7\" (7.62mm), or \"9\" (9.00mm)!");
+                                                RAComEv.Sender.RemoteAdminMessage($"Please enter \"5\" (5.56mm), \"7\" (7.62mm), or \"9\" (9.00mm)!");
                                                 break;
                                         }
                                         break;
                                     default:
-                                        ReferenceHub ChosenPlayer = Player.GetPlayer(Arguments[1]);
+                                        Player ChosenPlayer = Player.Get(RAComEv.Arguments[0]);
                                         if (ChosenPlayer == null)
                                         {
-                                            RAComEv.Sender.RAMessage($"Player \"{Arguments[1]}\" not found");
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[0]}\" not found");
                                             return;
                                         }
-                                        else if (ChosenPlayer.GetRole() == RoleType.None)
+                                        else if (ChosenPlayer.Role == RoleType.None)
                                         {
-                                            RAComEv.Sender.RAMessage("You cannot give ammo to a person with no role!");
+                                            RAComEv.Sender.RemoteAdminMessage("You cannot give ammo to a person with no role!");
                                             return;
                                         }
-                                        switch (Arguments[2].ToLower())
+                                        switch (RAComEv.Arguments[1].ToLower())
                                         {
                                             case "5":
-                                                if (int.TryParse(Arguments[3].ToLower(), out int FiveMM) && FiveMM >= 0)
+                                                if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int FiveMM) && FiveMM >= 0)
                                                 {
-                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped5, (uint) (ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped5) + FiveMM));
-                                                    RAComEv.Sender.RAMessage($"{FiveMM} 5.56mm ammo given to \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                                    Player.GetPlayer(Arguments[1])?.Broadcast(3, $"You were given {FiveMM} of 5.56mm ammo!", false);
+                                                    ChosenPlayer.SetAmmo(Exiled.API.Enums.AmmoType.Nato556, (uint) (ChosenPlayer.GetAmmo(Exiled.API.Enums.AmmoType.Nato556) + FiveMM));
+                                                    RAComEv.Sender.RemoteAdminMessage($"{FiveMM} 5.56mm ammo given to \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                                    Player.Get(RAComEv.Arguments[0])?.Broadcast(3, $"You were given {FiveMM} of 5.56mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
-                                                RAComEv.Sender.RAMessage($"Invalid value for ammo count! Value: {Arguments[3]}");
+                                                RAComEv.Sender.RemoteAdminMessage($"Invalid value for ammo count! Value: {RAComEv.Arguments[3]}");
                                                 break;
                                             case "7":
-                                                if (int.TryParse(Arguments[3].ToLower(), out int SevenMM) && SevenMM >= 0)
+                                                if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int SevenMM) && SevenMM >= 0)
                                                 {
-                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped7, (uint) (ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped7) + SevenMM));
-                                                    RAComEv.Sender.RAMessage($"{SevenMM} 7.62mm ammo given to \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                                    Player.GetPlayer(Arguments[1])?.Broadcast(3, $"You were given {SevenMM} of 7.62mm ammo!", false);
+                                                    ChosenPlayer.SetAmmo(Exiled.API.Enums.AmmoType.Nato762, (uint) (ChosenPlayer.GetAmmo(Exiled.API.Enums.AmmoType.Nato762) + SevenMM));
+                                                    RAComEv.Sender.RemoteAdminMessage($"{SevenMM} 7.62mm ammo given to \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                                    Player.Get(RAComEv.Arguments[0])?.Broadcast(3, $"You were given {SevenMM} of 7.62mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
-                                                RAComEv.Sender.RAMessage($"Invalid value for ammo count! Value: {Arguments[3]}");
+                                                RAComEv.Sender.RemoteAdminMessage($"Invalid value for ammo count! Value: {RAComEv.Arguments[3]}");
                                                 break;
                                             case "9":
-                                                if (int.TryParse(Arguments[3].ToLower(), out int NineMM) && NineMM >= 0)
+                                                if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int NineMM) && NineMM >= 0)
                                                 {
-                                                    ChosenPlayer.SetAmmo(EXILED.ApiObjects.AmmoType.Dropped9, (uint) (ChosenPlayer.GetAmmo(EXILED.ApiObjects.AmmoType.Dropped9) + NineMM));
-                                                    RAComEv.Sender.RAMessage($"{NineMM} 9.00mm ammo given to \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                                    Player.GetPlayer(Arguments[1])?.Broadcast(3, $"You were given {NineMM} of 9.00mm ammo!", false);
+                                                    ChosenPlayer.SetAmmo(Exiled.API.Enums.AmmoType.Nato9, (uint) (ChosenPlayer.GetAmmo(Exiled.API.Enums.AmmoType.Nato9) + NineMM));
+                                                    RAComEv.Sender.RemoteAdminMessage($"{NineMM} 9.00mm ammo given to \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                                    Player.Get(RAComEv.Arguments[0])?.Broadcast(3, $"You were given {NineMM} of 9.00mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
-                                                RAComEv.Sender.RAMessage($"Invalid value for ammo count! Value: {Arguments[3]}");
+                                                RAComEv.Sender.RemoteAdminMessage($"Invalid value for ammo count! Value: {RAComEv.Arguments[3]}");
                                                 break;
                                             default:
-                                                RAComEv.Sender.RAMessage($"Please enter \"5\" (5.62mm), \"7\" (7mm), or \"9\" (9mm)!");
+                                                RAComEv.Sender.RemoteAdminMessage($"Please enter \"5\" (5.62mm), \"7\" (7mm), or \"9\" (9mm)!");
                                                 break;
                                         }
                                         break;
                                 }
                                 break;
                             default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}, Expected 4");
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 4");
                                 break;
                         }
                         break;
                     case "gnade":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.gnade"))
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.gnade"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
                             return;
                         }
 
-                        if (!CreativeToolbox.EnableGrenadeTimeMod)
+                        if (!CreativeToolbox.CT_Config.EnableGrenadeTimeMod)
                         {
-                            RAComEv.Sender.RAMessage("You cannot modify grenades as it is disabled!");
+                            RAComEv.Sender.RemoteAdminMessage("You cannot modify grenades as it is disabled!");
                             return;
                         }
 
-                        if (Arguments.Length < 3)
+                        if (RAComEv.Arguments.Count < 2)
                         {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: gnade (frag/flash) (value)");
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: gnade (frag/flash) (value)");
                             return;
                         }
 
-                        switch (Arguments.Length)
+                        switch (RAComEv.Arguments.Count)
                         {
-                            case 3:
-                                switch (Arguments[1].ToLower())
+                            case 2:
+                                switch (RAComEv.Arguments[0].ToLower())
                                 {
                                     case "frag":
-                                        if (float.TryParse(Arguments[2].ToLower(), out float value) && value > 0)
+                                        if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float value) && value > 0)
                                         {
-                                            CreativeToolbox.FragGrenadeFuseTimer = value;
-                                            RAComEv.Sender.RAMessage($"Frag grenade fuse timer set to {value}");
+                                            CreativeToolbox.CT_Config.FragGrenadeFuseTimer = value;
+                                            RAComEv.Sender.RemoteAdminMessage($"Frag grenade fuse timer set to {value}");
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage($"Invalid value for fuse timer! Value: {Arguments[2]}");
+                                        RAComEv.Sender.RemoteAdminMessage($"Invalid value for fuse timer! Value: {RAComEv.Arguments[1]}");
                                         break;
                                     case "flash":
-                                        if (float.TryParse(Arguments[2].ToLower(), out float val) && val > 0)
+                                        if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float val) && val > 0)
                                         {
-                                            CreativeToolbox.FlashGrenadeFuseTimer = val;
-                                            RAComEv.Sender.RAMessage($"Flash grenade fuse timer set to {val}");
+                                            CreativeToolbox.CT_Config.FlashGrenadeFuseTimer = val;
+                                            RAComEv.Sender.RemoteAdminMessage($"Flash grenade fuse timer set to {val}");
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage($"Invalid value for fuse timer! Value: {Arguments[2]}");
+                                        RAComEv.Sender.RemoteAdminMessage($"Invalid value for fuse timer! Value: {RAComEv.Arguments[1]}");
                                         break;
                                     default:
-                                        RAComEv.Sender.RAMessage("Please enter either \"frag\" or \"flash\"!");
+                                        RAComEv.Sender.RemoteAdminMessage("Please enter either \"frag\" or \"flash\"!");
                                         break;
                                 }
                                 break;
                             default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}, Expected 3");
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 3");
                                 break;
                         }
                         break;
                     case "infammo":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.infammo") || !Sender.CheckPermission("ct.*"))
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.infammo") || !RAComEv.Sender.CheckPermission("ct.*"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
                             return;
                         }
 
-                        if (Arguments.Length < 2)
+                        if (RAComEv.Arguments.Count < 1)
                         {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: infam (clear/list/*/all/(id or name))");
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: infam (clear/list/*/all/(id or name))");
                             return;
                         }
 
-                        switch (Arguments.Length)
+                        switch (RAComEv.Arguments.Count)
                         {
-                            case 2:
-                                switch (Arguments[1].ToLower())
+                            case 1:
+                                switch (RAComEv.Arguments[0].ToLower())
                                 {
                                     case "clear":
-                                        foreach (ReferenceHub hub in Player.GetHubs())
+                                        foreach (Player Ply in Player.List)
                                         {
-                                            if (hub.TryGetComponent(out InfiniteAmmoComponent infComponent))
+                                            if (Ply.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent infComponent))
                                             {
                                                 UnityEngine.Object.Destroy(infComponent);
-                                                PlayersWithInfiniteAmmo.Remove(hub);
                                             }
+                                            PlayersWithInfiniteAmmo.Clear();
                                         }
-                                        RAComEv.Sender.RAMessage("Infinite ammo is cleared from all players now!");
-                                        Map.Broadcast("Infinite ammo is cleared from all players now!", 5);
+                                        RAComEv.Sender.RemoteAdminMessage("Infinite ammo is cleared from all players now!");
+                                        Map.Broadcast(5, "Infinite ammo is cleared from all players now!", Broadcast.BroadcastFlags.Normal);
                                         break;
                                     case "list":
                                         if (PlayersWithInfiniteAmmo.Count != 0)
@@ -510,130 +753,206 @@ namespace CreativeToolbox
                                                 playerLister += hub.nicknameSync.MyNick + ", ";
                                             }
                                             playerLister = playerLister.Substring(0, playerLister.Count() - 2);
-                                            RAComEv.Sender.RAMessage(playerLister);
+                                            RAComEv.Sender.RemoteAdminMessage(playerLister);
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage("There are no players currently online with Infinite Ammo on");
+                                        RAComEv.Sender.RemoteAdminMessage("There are no players currently online with Infinite Ammo on");
                                         break;
                                     case "*":
                                     case "all":
-                                        foreach (ReferenceHub hub in Player.GetHubs())
+                                        foreach (Player Ply in Player.List)
                                         {
-                                            if (!hub.TryGetComponent(out InfiniteAmmoComponent infComponent))
+                                            if (!Ply.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent infComponent))
                                             {
-                                                hub.gameObject.AddComponent<InfiniteAmmoComponent>();
-                                                PlayersWithInfiniteAmmo.Add(hub);
+                                                Ply.ReferenceHub.gameObject.AddComponent<InfiniteAmmoComponent>();
+                                                PlayersWithInfiniteAmmo.Add(Ply.ReferenceHub);
                                             }
                                         }
-                                        RAComEv.Sender.RAMessage("Infinite ammo is on for all players now!");
-                                        Map.Broadcast("Everyone has been given infinite ammo!", 3);
+                                        RAComEv.Sender.RemoteAdminMessage("Infinite ammo is on for all players now!");
+                                        Map.Broadcast(3, "Everyone has been given infinite ammo!", Broadcast.BroadcastFlags.Normal);
                                         break;
                                     default:
-                                        ReferenceHub ChosenPlayer = Player.GetPlayer(Arguments[1]);
+                                        Player ChosenPlayer = Player.Get(RAComEv.Arguments[0]);
                                         if (ChosenPlayer == null)
                                         {
-                                            RAComEv.Sender.RAMessage($"Player \"{Arguments[1]}\" not found");
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[1]}\" not found");
                                             return;
                                         }
-                                        if (!ChosenPlayer.TryGetComponent(out InfiniteAmmoComponent inf))
+                                        if (!ChosenPlayer.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent inf))
                                         {
-                                            RAComEv.Sender.RAMessage($"Infinite ammo enabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                            Player.GetPlayer(Arguments[1])?.Broadcast(3, "Infinite ammo is enabled for you!", false);
-                                            PlayersWithInfiniteAmmo.Add(ChosenPlayer);
-                                            ChosenPlayer.gameObject.AddComponent<InfiniteAmmoComponent>();
+                                            RAComEv.Sender.RemoteAdminMessage($"Infinite ammo enabled for \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                            Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Infinite ammo is enabled for you!", Broadcast.BroadcastFlags.Normal);
+                                            PlayersWithInfiniteAmmo.Add(ChosenPlayer.ReferenceHub);
+                                            ChosenPlayer.ReferenceHub.gameObject.AddComponent<InfiniteAmmoComponent>();
                                         }
                                         else
                                         {
-                                            RAComEv.Sender.RAMessage($"Infinite ammo disabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                            Player.GetPlayer(Arguments[1])?.Broadcast(3, "Infinite ammo is disabled for you!", false);
-                                            PlayersWithInfiniteAmmo.Remove(ChosenPlayer);
+                                            RAComEv.Sender.RemoteAdminMessage($"Infinite ammo disabled for \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                            Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Infinite ammo is disabled for you!", Broadcast.BroadcastFlags.Normal);
+                                            PlayersWithInfiniteAmmo.Remove(ChosenPlayer.ReferenceHub);
                                             UnityEngine.Object.Destroy(inf);
                                         }
                                         break;
                                 }
                                 break;
                             default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}, Expected 2");
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 2");
                                 break;
                         }
                         break;
                     case "locate":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.locate"))
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.locate"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
                             return;
                         }
 
-                        if (Arguments.Length < 3)
+                        if (RAComEv.Arguments.Count < 2)
                         {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: locate (xyz/room) (id or name)");
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: locate (xyz/room) (id or name)");
                             return;
                         }
 
-                        switch (Arguments.Length)
+                        switch (RAComEv.Arguments.Count)
                         {
-                            case 3:
-                                switch (Arguments[1].ToLower())
+                            case 2:
+                                switch (RAComEv.Arguments[0].ToLower())
                                 {
                                     case "room":
-                                        ReferenceHub ChosenPlayer = Player.GetPlayer(Arguments[2]);
+                                        Player ChosenPlayer = Player.Get(RAComEv.Arguments[1]);
                                         if (ChosenPlayer == null)
                                         {
-                                            RAComEv.Sender.RAMessage($"Player \"{Arguments[2]}\" not found");
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[1]}\" not found");
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage($"Player \"{Arguments[2]}\" is located at room: {ChosenPlayer.GetCurrentRoom().Name}");
+                                        RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.Nickname}\" is located at room: {ChosenPlayer.CurrentRoom.Name}");
                                         break;
                                     case "xyz":
-                                        ChosenPlayer = Player.GetPlayer(Arguments[2]);
+                                        ChosenPlayer = Player.Get(RAComEv.Arguments[1]);
                                         if (ChosenPlayer == null)
                                         {
-                                            RAComEv.Sender.RAMessage($"Player \"{Arguments[2]}\" not found");
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[1]}\" not found");
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage($"Player \"{Arguments[2]}\" is located at X: {ChosenPlayer.GetPosition().x}, Y: {ChosenPlayer.GetPosition().y}, Z: {ChosenPlayer.GetPosition().z}");
+                                        RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.Nickname}\" is located at X: {ChosenPlayer.Position.x}, Y: {ChosenPlayer.Position.y}, Z: {ChosenPlayer.Position.z}");
                                         break;
                                     default:
-                                        RAComEv.Sender.RAMessage("Please enter either \"room\" or \"xyz\"!");
+                                        RAComEv.Sender.RemoteAdminMessage("Please enter either \"room\" or \"xyz\"!");
                                         break;
                                 }
                                 break;
                             default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}, Expected 3");
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 2");
+                                break;
+                        }
+                        break;
+                    case "prygates":
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.prygates"))
+                        {
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
+                            return;
+                        }
+
+                        if (RAComEv.Arguments.Count < 1)
+                        {
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: prygates (clear/list/*/all/id)");
+                            return;
+                        }
+
+                        switch (RAComEv.Arguments.Count)
+                        {
+                            case 1:
+                                switch (RAComEv.Arguments[0].ToLower())
+                                {
+                                    case "clear":
+                                        PlayersThatCanPryGates.Clear();
+                                        RAComEv.Sender.RemoteAdminMessage("Ability to pry gates is cleared from all players now!");
+                                        Map.Broadcast(5, "The ability to pry gates is cleared from all players now!", Broadcast.BroadcastFlags.Normal);
+                                        break;
+                                    case "list":
+                                        if (PlayersThatCanPryGates.Count != 0)
+                                        {
+                                            string playerLister = "Players with Pry Gates on: ";
+                                            foreach (ReferenceHub hub in PlayersThatCanPryGates)
+                                            {
+                                                playerLister += hub.nicknameSync.MyNick + ", ";
+                                            }
+                                            playerLister = playerLister.Substring(0, playerLister.Count() - 2);
+                                            RAComEv.Sender.RemoteAdminMessage(playerLister);
+                                            return;
+                                        }
+                                        RAComEv.Sender.RemoteAdminMessage("There are no players currently online with Pry Gates on");
+                                        break;
+                                    case "*":
+                                    case "all":
+                                        foreach (Player Ply in Player.List)
+                                        {
+                                            if (!PlayersThatCanPryGates.Contains(Ply.ReferenceHub))
+                                                PlayersThatCanPryGates.Add(Ply.ReferenceHub);
+                                        }
+                                        RAComEv.Sender.RemoteAdminMessage("Ability to pry gates is on for all players now!");
+                                        Map.Broadcast(5, "Everyone has been given the pry gates ability!", Broadcast.BroadcastFlags.Normal);
+                                        break;
+                                    default:
+                                        Player ChosenPlayer = Player.Get(RAComEv.Arguments[0]);
+                                        if (ChosenPlayer == null)
+                                        {
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[0]}\" not found");
+                                            return;
+                                        }
+                                        if (!PlayersThatCanPryGates.Contains(ChosenPlayer.ReferenceHub))
+                                        {
+                                            RAComEv.Sender.RemoteAdminMessage($"Pry gates ability enabled for \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                            Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Pry gates ability is enabled for you!", Broadcast.BroadcastFlags.Normal);
+                                            PlayersThatCanPryGates.Add(ChosenPlayer.ReferenceHub);
+                                        }
+                                        else
+                                        {
+                                            RAComEv.Sender.RemoteAdminMessage($"Pry gates ability disabled for \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                            Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Pry gates ability is disabled for you!", Broadcast.BroadcastFlags.Normal);
+                                            PlayersThatCanPryGates.Remove(ChosenPlayer.ReferenceHub);
+                                        }
+                                        break;
+                                }
+                                break;
+                            default:
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 2");
                                 break;
                         }
                         break;
                     case "regen":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.regen"))
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.regen"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
                             return;
                         }
 
-                        if (Arguments.Length < 2)
+                        if (RAComEv.Arguments.Count < 1)
                         {
-                            RAComEv.Sender.RAMessage("Invalid parameters! Syntax: regen (clear/list/*/all/id)");
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: regen (clear/list/*/all/id)");
                             return;
                         }
 
-                        switch (Arguments.Length)
+                        switch (RAComEv.Arguments.Count)
                         {
-                            case 2:
-                                switch (Arguments[1].ToLower())
+                            case 1:
+                                switch (RAComEv.Arguments[0].ToLower())
                                 {
                                     case "clear":
-                                        foreach (ReferenceHub hub in Player.GetHubs())
+                                        foreach (Player Ply in Player.List)
                                         {
-                                            if (hub.TryGetComponent(out RegenerationComponent rgnComponent))
+                                            if (Ply.ReferenceHub.TryGetComponent(out RegenerationComponent rgnComponent))
                                             {
                                                 UnityEngine.Object.Destroy(rgnComponent);
-                                                PlayersWithRegen.Remove(hub);
                                             }
+                                            PlayersWithRegen.Clear();
+
                                         }
-                                        RAComEv.Sender.RAMessage("Regeneration is cleared from all players now!");
-                                        Map.Broadcast("Regeneration is cleared from all players now!", 5);
+                                        RAComEv.Sender.RemoteAdminMessage("Regeneration is cleared from all players now!");
+                                        Map.Broadcast(5, "Regeneration is cleared from all players now!", Broadcast.BroadcastFlags.Normal);
                                         break;
                                     case "list":
                                         if (PlayersWithRegen.Count != 0)
@@ -644,151 +963,175 @@ namespace CreativeToolbox
                                                 playerLister += hub.nicknameSync.MyNick + ", ";
                                             }
                                             playerLister = playerLister.Substring(0, playerLister.Count() - 2);
-                                            RAComEv.Sender.RAMessage(playerLister);
+                                            RAComEv.Sender.RemoteAdminMessage(playerLister);
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage("There are no players currently online with Regeneration on");
+                                        RAComEv.Sender.RemoteAdminMessage("There are no players currently online with Regeneration on");
                                         break;
                                     case "*":
                                     case "all":
-                                        foreach (ReferenceHub hub in Player.GetHubs())
+                                        foreach (Player ply in Player.List)
                                         {
-                                            if (!hub.TryGetComponent(out RegenerationComponent rgnComponent))
+                                            if (!ply.ReferenceHub.TryGetComponent(out RegenerationComponent rgnComponent))
                                             {
-                                                hub.gameObject.AddComponent<RegenerationComponent>();
-                                                PlayersWithRegen.Add(hub);
+                                                ply.ReferenceHub.gameObject.AddComponent<RegenerationComponent>();
+                                                PlayersWithRegen.Add(ply.ReferenceHub);
                                             }
                                         }
-                                        RAComEv.Sender.RAMessage("Regeneration is on for all players now!");
-                                        Map.Broadcast("Regeneration is on for all players now!", 5);
+                                        RAComEv.Sender.RemoteAdminMessage("Regeneration is on for all players now!");
+                                        Map.Broadcast(5, "Regeneration is on for all players now!", Broadcast.BroadcastFlags.Normal);
                                         break;
                                     case "time":
-                                        RAComEv.Sender.RAMessage("Missing value for seconds!");
+                                        RAComEv.Sender.RemoteAdminMessage("Missing value for seconds!");
                                         break;
                                     case "value":
-                                        RAComEv.Sender.RAMessage("Missing value for health!");
+                                        RAComEv.Sender.RemoteAdminMessage("Missing value for health!");
                                         break;
                                     default:
-                                        ReferenceHub ChosenPlayer = Player.GetPlayer(Arguments[1]);
+                                        ReferenceHub ChosenPlayer = Player.Get(RAComEv.Arguments[0]).ReferenceHub;
                                         if (ChosenPlayer == null)
                                         {
-                                            RAComEv.Sender.RAMessage($"Player \"{Arguments[1]}\" not found");
+                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[0]}\" not found");
                                             return;
                                         }
                                         if (!ChosenPlayer.TryGetComponent(out RegenerationComponent rgn))
                                         {
-                                            RAComEv.Sender.RAMessage($"Regeneration enabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                            Player.GetPlayer(Arguments[1])?.Broadcast(3, "Regeneration is enabled for you!", false);
+                                            RAComEv.Sender.RemoteAdminMessage($"Regeneration enabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
+                                            Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Regeneration is enabled for you!", Broadcast.BroadcastFlags.Normal);
                                             PlayersWithRegen.Add(ChosenPlayer);
                                             ChosenPlayer.gameObject.AddComponent<RegenerationComponent>();
                                         }
                                         else
                                         {
-                                            RAComEv.Sender.RAMessage($"Regeneration disabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
-                                            Player.GetPlayer(Arguments[1])?.Broadcast(3, "Regeneration is disabled for you!", false);
+                                            RAComEv.Sender.RemoteAdminMessage($"Regeneration disabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
+                                            Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Regeneration is disabled for you!", Broadcast.BroadcastFlags.Normal);
                                             PlayersWithRegen.Remove(ChosenPlayer);
                                             UnityEngine.Object.Destroy(rgn);
                                         }
                                         break;
                                 }
                                 break;
-                            case 3:
-                                switch (Arguments[1].ToLower())
+                            case 2:
+                                switch (RAComEv.Arguments[0].ToLower())
                                 {
                                     case "time":
-                                        if (float.TryParse(Arguments[2].ToLower(), out float rgn_t) && rgn_t > 0)
+                                        if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rgn_t) && rgn_t > 0)
                                         {
-                                            CreativeToolbox.HPRegenerationTimer = rgn_t;
-                                            RAComEv.Sender.RAMessage($"Players with regeneration gain health every {rgn_t} seconds!");
+                                            CreativeToolbox.CT_Config.HPRegenerationTimer = rgn_t;
+                                            RAComEv.Sender.RemoteAdminMessage($"Players with regeneration gain health every {rgn_t} seconds!");
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage($"Invalid value for regeneration timer! Value: {Arguments[2].ToLower()}");
+                                        RAComEv.Sender.RemoteAdminMessage($"Invalid value for regeneration timer! Value: {RAComEv.Arguments[1].ToLower()}");
                                         break;
                                     case "value":
-                                        if (float.TryParse(Arguments[2].ToLower(), out float rgn_v) && rgn_v > 0)
+                                        if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rgn_v) && rgn_v > 0)
                                         {
-                                            CreativeToolbox.HPRegenerationValue = rgn_v;
-                                            RAComEv.Sender.RAMessage($"Players with regeneration gain {rgn_v} health every {CreativeToolbox.HPRegenerationTimer} seconds!");
+                                            CreativeToolbox.CT_Config.HPRegenerationValue = rgn_v;
+                                            RAComEv.Sender.RemoteAdminMessage($"Players with regeneration gain {rgn_v} health every {CreativeToolbox.CT_Config.HPRegenerationTimer} seconds!");
                                             return;
                                         }
-                                        RAComEv.Sender.RAMessage($"Invalid value for regeneration healing! Value: {Arguments[2].ToLower()}");
+                                        RAComEv.Sender.RemoteAdminMessage($"Invalid value for regeneration healing! Value: {RAComEv.Arguments[1].ToLower()}");
                                         break;
                                     default:
-                                        RAComEv.Sender.RAMessage("Please enter either \"time\" or \"value\"!");
+                                        RAComEv.Sender.RemoteAdminMessage("Please enter either \"time\" or \"value\"!");
                                         break;
                                 }
                                 break;
                             default:
-                                RAComEv.Sender.RAMessage($"Invalid number of parameters! Value: {Arguments.Length}, Expected 3");
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 3");
                                 break;
                         }
                         break;
+                    case "scp096":
+
+                        break;
                     case "sdecon":
-                        RAComEv.Allow = false;
-                        if (!Sender.CheckPermission("ct.sdecon"))
+                        RAComEv.IsAllowed = false;
+                        if (!RAComEv.Sender.CheckPermission("ct.sdecon"))
                         {
-                            RAComEv.Sender.RAMessage("You are not authorized to use this command");
+                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
                             return;
                         }
                         if (!Map.IsLCZDecontaminated || !WasDeconCommandRun)
                         {
-                            RAComEv.Sender.RAMessage("Light Contaimnent Zone Decontamination is on!");
+                            RAComEv.Sender.RemoteAdminMessage("Light Contaimnent Zone Decontamination is on!");
                             Map.StartDecontamination();
                             WasDeconCommandRun = true;
                             return;
                         }
-                        RAComEv.Sender.RAMessage("Light Contaimnent Zone Decontamination is already active!");
+                        RAComEv.Sender.RemoteAdminMessage("Light Contaimnent Zone Decontamination is already active!");
                         break;
                 }
             }
             catch (Exception e)
             {
                 Log.Info($"Error handling command: {e}");
-                RAComEv.Sender.RAMessage("There was an error handling this command, check console for details", false);
+                RAComEv.Sender.RemoteAdminMessage("There was an error handling this command, check console for details", false);
                 return;
             }
         }
 
-        public void RevivePlayer(ReferenceHub rh)
+        public void RevivePlayer(Player ply)
         {
-            if (rh.GetRole() != RoleType.Spectator) return;
-            int num = randNum.Next(0, 7);
+            if (ply.Role != RoleType.Spectator) return;
+            int num = RandNum.Next(0, 7);
             switch (num)
             {
                 case 0:
-                    rh.characterClassManager.SetPlayersClass(RoleType.NtfCadet, rh.gameObject);
+                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfCadet, ply.ReferenceHub.gameObject);
                     break;
                 case 1:
                     if (!IsWarheadDetonated && !IsDecontanimationActivated)
-                        rh.characterClassManager.SetPlayersClass(RoleType.ClassD, rh.gameObject);
+                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.ClassD, ply.ReferenceHub.gameObject);
                     else
-                        rh.characterClassManager.SetPlayersClass(RoleType.ChaosInsurgency, rh.gameObject);
+                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.ChaosInsurgency, ply.ReferenceHub.gameObject);
                     break;
                 case 2:
                     if (!IsWarheadDetonated)
-                        rh.characterClassManager.SetPlayersClass(RoleType.FacilityGuard, rh.gameObject);
+                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.FacilityGuard, ply.ReferenceHub.gameObject);
                     else
-                        rh.characterClassManager.SetPlayersClass(RoleType.NtfCommander, rh.gameObject);
+                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfCommander, ply.ReferenceHub.gameObject);
                     break;
                 case 3:
-                    rh.characterClassManager.SetPlayersClass(RoleType.NtfLieutenant, rh.gameObject);
+                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfLieutenant, ply.ReferenceHub.gameObject);
                     break;
                 case 4:
-                    rh.characterClassManager.SetPlayersClass(RoleType.NtfScientist, rh.gameObject);
+                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfScientist, ply.ReferenceHub.gameObject);
                     break;
                 case 5:
-                    rh.characterClassManager.SetPlayersClass(RoleType.ChaosInsurgency, rh.gameObject);
+                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.ChaosInsurgency, ply.ReferenceHub.gameObject);
                     break;
                 case 6:
                     if (!IsWarheadDetonated && !IsDecontanimationActivated)
-                        rh.characterClassManager.SetPlayersClass(RoleType.Scientist, rh.gameObject);
+                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.Scientist, ply.ReferenceHub.gameObject);
                     else
-                        rh.characterClassManager.SetPlayersClass(RoleType.NtfLieutenant, rh.gameObject);
+                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfLieutenant, ply.ReferenceHub.gameObject);
                     break;
                 case 7:
-                    rh.characterClassManager.SetPlayersClass(RoleType.NtfCommander, rh.gameObject);
+                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfCommander, ply.ReferenceHub.gameObject);
                     break;
             }
+        }
+
+        public void SpawnGrenadeOnPlayer(Player PlayerToSpawnGrenade, bool UseCustomTimer)
+        {
+            GrenadeManager gm = PlayerToSpawnGrenade.ReferenceHub.gameObject.GetComponent<GrenadeManager>();
+            Grenade gnade = UnityEngine.Object.Instantiate(gm.availableGrenades[0].grenadeInstance.GetComponent<Grenade>());
+            if (UseCustomTimer)
+                gnade.fuseDuration = CreativeToolbox.CT_Config.GrenadeDeathTimer;
+            else
+            {
+                gnade.fuseDuration = 0.01f;
+            }
+            gnade.FullInitData(gm, PlayerToSpawnGrenade.Position, Quaternion.Euler(gnade.throwStartAngle), gnade.throwLinearVelocityOffset, gnade.throwAngularVelocity);
+            NetworkServer.Spawn(gnade.gameObject);
+        }
+
+        public Item[] GetItems()
+        {
+            if (AvailableItems == null)
+                AvailableItems = GameObject.FindObjectOfType<Inventory>().availableItems;
+            return AvailableItems;
         }
     }
 }

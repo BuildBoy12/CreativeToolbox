@@ -1,7 +1,6 @@
 ﻿using System;
 using Grenades;
-using Harmony;
-using UnityEngine;
+using HarmonyLib;
 
 namespace CreativeToolbox
 {
@@ -10,10 +9,8 @@ namespace CreativeToolbox
     {
         public static bool Prefix(FragGrenade __instance)
         {
-            if (CreativeToolbox.EnableGrenadeDamagePrevent)
-            {
+            if (CreativeToolbox.CT_Config.EnableGrenadeDamagePrevent)
                 __instance.absoluteDamageFalloff = int.MaxValue;
-            }
             return true;
         }
     }

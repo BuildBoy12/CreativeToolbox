@@ -1,7 +1,5 @@
 ﻿using System;
-using Harmony;
-using Mirror;
-using UnityEngine;
+using HarmonyLib;
 
 namespace CreativeToolbox
 {
