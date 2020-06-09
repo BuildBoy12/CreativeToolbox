@@ -9,12 +9,12 @@ namespace CreativeToolbox
     {
         public static bool Prefix(Grenade __instance)
         {
-            if (CreativeToolbox.CT_Config.EnableGrenadeTimeMod)
+            if (CreativeConfig.EnableGrenadeTimeMod)
             {
                 if (__instance.GetType() == typeof(FragGrenade))
-                        __instance.fuseDuration = CreativeToolbox.CT_Config.FragGrenadeFuseTimer;
+                        __instance.fuseDuration = CreativeConfig.FragGrenadeFuseTimer;
                 else if (__instance.GetType() == typeof(FlashGrenade))
-                    __instance.fuseDuration = CreativeToolbox.CT_Config.FlashGrenadeFuseTimer;
+                    __instance.fuseDuration = CreativeConfig.FlashGrenadeFuseTimer;
             }
             return true;
         }

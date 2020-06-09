@@ -9,7 +9,7 @@ namespace CreativeToolbox
     {
         public static bool Prefix(Scp018Grenade __instance)
         {
-            if (CreativeToolbox.CT_Config.EnableGrenadeDamagePrevent)
+            if (CreativeConfig.EnableGrenadeDamagePrevent)
             {
                 __instance.damageHurt = 0;
                 __instance.damageScpMultiplier = 0;

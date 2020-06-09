@@ -7,48 +7,53 @@ namespace CreativeToolbox
 {
     public class CreativeConfig : IConfig
     {
-        public bool IsToolboxEnabled = true;
-        public float MedkitAHPHealthValue;
-        public float PainkillerAHPHealthValue;
-        public float AdrenalineAHPHealthValue;
-        public float SCP500AHPHealthValue;
-        public float RandomRespawnTimer;
-        public float FragGrenadeFuseTimer;
-        public float FlashGrenadeFuseTimer;
-        public float HPRegenerationTimer;
-        public float HPRegenerationValue;
-        public float HPRegenerationIfHit;
-        public float AutoScaleValue;
-        public float GrenadeDeathTimer;
-        public int SCP096AHP;
-        public bool EnableGrenadeTimeMod = false;
-        public bool EnableMedicalItemMod = false;
-        public bool EnableFallDamagePrevent = false;
-        public bool EnableGrenadeDamagePrevent = false;
-        public bool EnableAutoScaling = false;
-        public bool EnableRetainingScaling = false;
-        public bool EnableGrenadeSpawnOnDeath = false;
-        public bool EnableGrenadeRangeMod = false;
-        public bool EnableDoorMessages = false;
-        public bool EnableDamageMessage = false;
-        public bool DisableAutoScalingMessage = false;
-        public bool LockFallDamageMod = false;
-        public bool SCP018WarheadBounce = false;
-        public string LockedDoorMessage;
-        public string UnlockedDoorMessage;
-        public string NeedKeycardMessage;
-        public string BypassKeycardMessage;
-        public string BypassWithKeycardInHandMessage;
-        public string PryGatesMessage;
-        public string PryGatesBypassMessage;
-        public string DamageMessage;
+        public static bool IsToolboxEnabled = true;
+        public static float MedkitAHPHealthValue;
+        public static float PainkillerAHPHealthValue;
+        public static float AdrenalineAHPHealthValue;
+        public static float SCP500AHPHealthValue;
+        public static float SCP207AHPHealthValue;
+        public static float RandomRespawnTimer;
+        public static float FragGrenadeFuseTimer;
+        public static float FlashGrenadeFuseTimer;
+        public static float HPRegenerationTimer;
+        public static float HPRegenerationValue;
+        public static float HPRegenerationIfHit;
+        public static float AutoScaleValue;
+        public static float GrenadeDeathTimer;
+        public static int SCP207DrinkLimit;
+        public static int SCP096AHP;
+        public static bool EnableGrenadeTimeMod = false;
+        public static bool EnableMedicalItemMod = false;
+        public static bool EnableFallDamagePrevent = false;
+        public static bool EnableGrenadeDamagePrevent = false;
+        public static bool EnableAutoScaling = false;
+        public static bool EnableRetainingScaling = false;
+        public static bool EnableGrenadeSpawnOnDeath = false;
+        public static bool EnableGrenadeRangeMod = false;
+        public static bool EnableDoorMessages = false;
+        public static bool EnableDamageMessage = false;
+        public static bool EnableExplodingAfterTooMuchSCP207 = false;
+        public static bool EnableSCP018WarheadBounce = false;
+        public static bool EnableRespawnsAsSameClass = false;
+        public static bool DisableAutoScalingMessage = false;
+        public static bool LockFallDamageMod = false;
+        public static string LockedDoorMessage;
+        public static string UnlockedDoorMessage;
+        public static string NeedKeycardMessage;
+        public static string BypassKeycardMessage;
+        public static string BypassWithKeycardInHandMessage;
+        public static string PryGatesMessage;
+        public static string PryGatesBypassMessage;
+        public static string DamageMessage;
 
-        public bool IsEnabled { get; set; } = PluginManager.YamlConfig.GetBool("creativetoolbox_enable", false);
+        public bool IsEnabled { get; set; }
 
         public string Prefix => "creativetoolbox_";
 
         public void Reload()
         {
+            IsEnabled = PluginManager.YamlConfig.GetBool("creativetoolbox_enable", false);
             EnableGrenadeTimeMod = PluginManager.YamlConfig.GetBool("ct_enable_custom_grenade_time", false);
             EnableMedicalItemMod = PluginManager.YamlConfig.GetBool("ct_enable_custom_healing", false);
             EnableFallDamagePrevent = PluginManager.YamlConfig.GetBool("ct_enable_fall_damage_prevention", false);
@@ -59,7 +64,9 @@ namespace CreativeToolbox
             EnableDoorMessages = PluginManager.YamlConfig.GetBool("ct_enable_door_messages", false);
             EnableDamageMessage = PluginManager.YamlConfig.GetBool("ct_enable_damage_message", false);
             EnableGrenadeRangeMod = PluginManager.YamlConfig.GetBool("ct_enable_custom_grenade_range", false);
-            SCP018WarheadBounce = PluginManager.YamlConfig.GetBool("ct_enable_scp018_warhead_bounce", false);
+            EnableSCP018WarheadBounce = PluginManager.YamlConfig.GetBool("ct_enable_scp018_warhead_bounce", false);
+            EnableExplodingAfterTooMuchSCP207 = PluginManager.YamlConfig.GetBool("ct_enable_exploding_after_drinking_scp207", false);
+            EnableRespawnsAsSameClass = PluginManager.YamlConfig.GetBool("ct_enable_same_class_respawn", false);
             DisableAutoScalingMessage = PluginManager.YamlConfig.GetBool("ct_disable_autoscale_messages", false);
             LockFallDamageMod = PluginManager.YamlConfig.GetBool("ct_disable_fall_modification", false);
             LockedDoorMessage = PluginManager.YamlConfig.GetString("ct_locked_door_message", "you need a better keycard to open this door!");
@@ -156,6 +163,16 @@ namespace CreativeToolbox
                 PluginManager.YamlConfig.SetString("ct_scp500_ahp_healing", SCP500AHPHealthValue.ToString());
             }
 
+            
+            if (float.TryParse(PluginManager.YamlConfig.GetFloat("ct_scp207_ahp_healing").ToString(), out float scp207_ahpheal) && scp207_ahpheal >= 0)
+                SCP207AHPHealthValue = scp207_ahpheal;
+            else
+            {
+                Log.Info("Detected invalid value in the configuration file for SCP-207 ahp healing! Using default value of 0");
+                SCP207AHPHealthValue = 0;
+                PluginManager.YamlConfig.SetString("ct_scp207_ahp_healing", SCP207AHPHealthValue.ToString());
+            }
+
             if (float.TryParse(PluginManager.YamlConfig.GetFloat("ct_auto_scale_value").ToString(), out float as_val) && as_val != 0)
                 AutoScaleValue = as_val;
             else
@@ -190,6 +207,15 @@ namespace CreativeToolbox
                 Log.Info("Detected invalid value in the configuration file for SCP-096 AHP health! Using default value of 250");
                 SCP096AHP = 250;
                 PluginManager.YamlConfig.SetString("ct_sco096_ahp", SCP096AHP.ToString());
+            }
+
+            if (int.TryParse(PluginManager.YamlConfig.GetInt("ct_scp207_drink_limit").ToString(), out int scp207_lim) && scp207_lim > 0)
+                SCP207DrinkLimit = scp207_lim;
+            else
+            {
+                Log.Info("Detected invalid value in the configuration file for SCP-207 drink limit! Using default value of 5");
+                SCP207DrinkLimit = 5;
+                PluginManager.YamlConfig.SetString("ct_scp207_drink_limit", SCP207DrinkLimit.ToString());
             }
         }
     }

@@ -12,16 +12,12 @@ namespace CreativeToolbox
         public static Harmony HarmonyInstance { private set; get; }
 
         public override IConfig Config { get; } = new CreativeConfig();
-        public static CreativeConfig CT_Config;
 
         public static int harmonyCounter;
         public CreativeToolboxEventHandler Handler;
 
         public override void OnEnabled()
         {
-            CT_Config = (CreativeConfig)Config;
-            CT_Config.Reload();
-
             Handler = new CreativeToolboxEventHandler();
             harmonyCounter++;
             HarmonyInstance = new Harmony($"defytherush.creativetoolbox_{harmonyCounter}");

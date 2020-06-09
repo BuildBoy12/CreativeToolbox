@@ -99,6 +99,7 @@
     <Compile Include="RegenerationComponent.cs" />
     <Compile Include="SCP018EndgamePatch.cs" />
     <Compile Include="SCP106AdvancedGodComponent.cs" />
+    <Compile Include="SCP207Counter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

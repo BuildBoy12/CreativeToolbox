@@ -10,7 +10,7 @@ namespace CreativeToolbox
     {
         public static bool Prefix(Scp096 __instance, GameObject target)
         {
-			ReferenceHub hub = ReferenceHub.GetHub(target);
+			/*ReferenceHub hub = ReferenceHub.GetHub(target);
 			if (__instance.CanReceiveTargets || hub != null || !__instance._targets.Contains(hub))
 			{
 				if (!__instance._targets.IsEmpty<ReferenceHub>())
@@ -19,8 +19,8 @@ namespace CreativeToolbox
 				}
 				__instance._targets.Add(hub);
 				__instance.AdjustShield(CreativeToolbox.CT_Config.SCP096AHP);
-			}
-			return false;
+			}*/
+			return true;
         }
     }
 }
