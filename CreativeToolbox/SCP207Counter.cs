@@ -13,6 +13,10 @@ namespace CreativeToolbox
         {
             Hub = Player.Get(gameObject);
             Counter = 1;
+            Hub.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nnumber of drinks consumed: {Counter}", new HintParameter[]
+            {
+                new StringHintParameter("")
+            }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
             Exiled.Events.Handlers.Player.ChangingRole += RunWhenPlayerSwitchesClasses;
             Exiled.Events.Handlers.Player.MedicalItemUsed += RunWhenplayerDrinksSCP207;
         }

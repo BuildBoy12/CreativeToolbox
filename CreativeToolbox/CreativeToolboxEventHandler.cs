@@ -63,6 +63,14 @@ namespace CreativeToolbox
             }
             if (CreativeConfig.EnableGrenadeSpawnOnDeath)
                 Map.Broadcast(10, $"<color=red>Warning: Grenades spawn after you die, they explode after {CreativeConfig.GrenadeDeathTimer} seconds of them spawning, be careful!</color>", Broadcast.BroadcastFlags.Normal);
+            if (CreativeConfig.KeepAHPShieldForAllUsers)
+            {
+                foreach (Player Ply in Player.List)
+                {
+                    Ply.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
+                }
+                Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can gp up if you get more AHP through medical items. The AHP Limit is: </color>", Broadcast.BroadcastFlags.Normal);
+            }
         }
 
         public void RunOnPlayerJoin(JoinedEventArgs PlyJoin)
@@ -89,11 +97,11 @@ namespace CreativeToolbox
                 PlayersWithAdvancedGodmode.Remove(PlyLeave.Player.ReferenceHub);
         }
 
-        /*public void RunOnPlayerSpawn(PlayerSpawnEvent PlySpwn)
+        public void RunOnPlayerSpawn(SpawningEventArgs PlySpawn)
         {
-            if (PlayersWith207.Contains(PlySpwn.Player))
-                Timing.CallDelayed(1f, () => PlySpwn.Player.playerEffectsController.EnableEffect(new Scp207(PlySpwn.Player)));
-        }*/
+            /*if (PlayersWith207.Contains(PlySpwn.Player))
+                Timing.CallDelayed(1f, () => PlySpwn.Player.playerEffectsController.EnableEffect(new Scp207(PlySpwn.Player)));*/
+        }
 
         public void RunOnPlayerDeath(DiedEventArgs PlyDeath)
         {
@@ -228,10 +236,21 @@ namespace CreativeToolbox
 
         public void RunWhenPlayerEntersFemurBreaker(EnteringFemurBreakerEventArgs FemurBreaker)
         {
-            if (PlayersWithAdvancedGodmode.Count == 0)
+            if (CreativeConfig.EnableSCP106AdvancedGodmode)
             {
-                FemurBreaker.IsAllowed = false;
-                FemurBreaker.Player.Broadcast((ushort)2, "SCP-106 has advanced godmode, you cannot contain him", Broadcast.BroadcastFlags.Normal);
+                foreach (Player Ply in Player.List)
+                {
+                    if (!(Ply.Role == RoleType.Scp106))
+                        continue;
+
+
+                    if (Ply.IsGodModeEnabled)
+                    {
+                        FemurBreaker.IsAllowed = false;
+                        FemurBreaker.Player.Broadcast((ushort)2, "SCP-106 has advanced godmode, you cannot contain him", Broadcast.BroadcastFlags.Normal);
+                        return;
+                    }
+                }
             }
         }
 
@@ -241,93 +260,6 @@ namespace CreativeToolbox
             {
                 switch (RAComEv.Name.ToLower())
                 {
-                    case "advgod":
-                        RAComEv.IsAllowed = false;
-                        if (!RAComEv.Sender.CheckPermission("ct.advgod"))
-                        {
-                            RAComEv.Sender.RemoteAdminMessage("You are not authorized to use this command");
-                            return;
-                        }
-
-                        if (RAComEv.Arguments.Count < 2)
-                        {
-                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: advgod ((id/name)/*/all/clear/list) (Note: This only will be given to SCP-106 roles)");
-                            return;
-                        }
-
-                        switch (RAComEv.Arguments.Count)
-                        {
-                            case 2:
-                                switch (RAComEv.Arguments[0].ToLower())
-                                {
-                                    case "*":
-                                    case "all":
-                                        foreach (Player Ply in Player.List)
-                                        {
-                                            if (!(Ply.Role == RoleType.Scp106) || PlayersWithAdvancedGodmode.Contains(Ply.ReferenceHub))
-                                                continue;
-
-                                            Ply.ReferenceHub.gameObject.AddComponent<SCP106AdvancedGodComponent>();
-                                            PlayersWithAdvancedGodmode.Add(Ply.ReferenceHub);
-                                        }
-                                        Map.Broadcast(5, "Everyone who is SCP-106 has Advanced Godmode!", Broadcast.BroadcastFlags.Normal);
-                                        break;
-                                    case "clear":
-                                        foreach (Player Ply in Player.List)
-                                        {
-                                            if (!PlayersWithAdvancedGodmode.Contains(Ply.ReferenceHub) || Ply.ReferenceHub.TryGetComponent(out SCP106AdvancedGodComponent SCPAdvGod))
-                                                continue;
-
-                                            UnityEngine.Object.Destroy(SCPAdvGod);
-                                        }
-                                        PlayersWithAdvancedGodmode.Clear();
-                                        Map.Broadcast(5, "Everyone who is SCP-106 does not have Advanced Godmode anymore!", Broadcast.BroadcastFlags.Normal);
-                                        break;
-                                    case "list":
-                                        if (PlayersWithAdvancedGodmode.Count != 0)
-                                        {
-                                            string playerLister = "Players with Advanced Godmode on: ";
-                                            foreach (ReferenceHub hub in PlayersWithAdvancedGodmode)
-                                            {
-                                                playerLister += hub.nicknameSync.MyNick + ", ";
-                                            }
-                                            playerLister = playerLister.Substring(0, playerLister.Count() - 2);
-                                            RAComEv.Sender.RemoteAdminMessage(playerLister);
-                                            return;
-                                        }
-                                        RAComEv.Sender.RemoteAdminMessage("There are no players currently online with Advanced Godmode on");
-                                        break;
-                                    default:
-                                        Player ChosenPlayer = Player.Get(RAComEv.Arguments[1]);
-                                        if (ChosenPlayer == null)
-                                        {
-                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[1]}\" not found");
-                                            return;
-                                        }
-
-                                        if (!(ChosenPlayer.Role == RoleType.Scp106))
-                                        {
-                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.Nickname}\" is not SCP-106!");
-                                            return;
-                                        }
-
-                                        if (ChosenPlayer.ReferenceHub.TryGetComponent(out SCP106AdvancedGodComponent AdvGod))
-                                        {
-                                            RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.Nickname}\" already has Advanced Godmode!");
-                                            return;
-                                        }
-
-                                        ChosenPlayer.ReferenceHub.gameObject.AddComponent<SCP106AdvancedGodComponent>();
-                                        PlayersWithAdvancedGodmode.Add(ChosenPlayer.ReferenceHub);
-                                        Player.Get(RAComEv.Arguments[1])?.Broadcast(3, "Advanced Godmode is enabled for you!", Broadcast.BroadcastFlags.Normal);
-                                        break;
-                                }
-                                break;
-                            default:
-                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 2");
-                                break;
-                        }
-                        break;
                     case "arspawn":
                         RAComEv.IsAllowed = false;
                         if (!RAComEv.Sender.CheckPermission("ct.arspawn"))
@@ -1103,6 +1035,9 @@ namespace CreativeToolbox
                                 RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 3");
                                 break;
                         }
+                        break;
+                    case "scp096target":
+                        RAComEv.IsAllowed = false;
                         break;
                     case "sdecon":
                         RAComEv.IsAllowed = false;

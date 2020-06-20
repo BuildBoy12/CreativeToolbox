@@ -85,7 +85,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddTargetsOnClientPatch.cs" />
+    <Compile Include="ModifySCP096PropertiesWhileEnragedPatch.cs" />
+    <Compile Include="ModifySCP096ShieldPatch.cs" />
     <Compile Include="CreateCustomGrenadePatch.cs" />
     <Compile Include="CreativeConfig.cs" />
     <Compile Include="CreativeToolbox.cs" />
@@ -93,12 +94,12 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="InfiniteAmmoComponent.cs" />
     <Compile Include="InfiniteAmmoMicroHIDPatch.cs" />
+    <Compile Include="KeepAHPShield.cs" />
     <Compile Include="PreventExplosionDamage.cs" />
     <Compile Include="PreventSCP018Damage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegenerationComponent.cs" />
     <Compile Include="SCP018EndgamePatch.cs" />
-    <Compile Include="SCP106AdvancedGodComponent.cs" />
     <Compile Include="SCP207Counter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
