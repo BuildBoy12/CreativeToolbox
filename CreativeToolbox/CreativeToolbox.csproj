@@ -33,8 +33,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\..\..\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Plugins\dependencies\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\EXILED BETAS\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Plugins\dependencies\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass_publicized">
       <HintPath>..\..\..\SCPSL_Server\SCPSL_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
@@ -85,7 +86,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ModifySCP096PropertiesWhileEnragedPatch.cs" />
+    <Compile Include="AddCustomCIAnnouncement.cs" />
+    <Compile Include="AddCustomMTFAnnouncement.cs" />
     <Compile Include="ModifySCP096ShieldPatch.cs" />
     <Compile Include="CreateCustomGrenadePatch.cs" />
     <Compile Include="CreativeConfig.cs" />

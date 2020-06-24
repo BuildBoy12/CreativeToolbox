@@ -21,30 +21,28 @@ namespace CreativeToolbox
         public static float HPRegenerationIfHit;
         public static float AutoScaleValue;
         public static float GrenadeDeathTimer;
-        public static float SCP096EnrageJumpHeight;
-        public static float SCP096EnrageMoveSpeed;
         public static float AHPValueLimit;
         public static int SCP207DrinkLimit;
         public static int SCP096AHP;
-        public static bool EnableGrenadeTimeMod = false;
-        public static bool EnableMedicalItemMod = false;
-        public static bool EnableFallDamagePrevent = false;
-        public static bool EnableGrenadeDamagePrevent = false;
-        public static bool EnableAutoScaling = false;
-        public static bool EnableRetainingScaling = false;
-        public static bool EnableGrenadeSpawnOnDeath = false;
-        public static bool EnableGrenadeRangeMod = false;
-        public static bool EnableDoorMessages = false;
-        public static bool EnableDamageMessage = false;
-        public static bool EnableExplodingAfterTooMuchSCP207 = false;
-        public static bool EnableSCP018WarheadBounce = false;
-        public static bool EnableRespawnsAsSameClass = false;
-        public static bool EnableSCP096ShieldModify = false;
-        public static bool EnableSCP096StatsModify = false;
-        public static bool EnableSCP106AdvancedGodmode = false;
-        public static bool DisableAutoScalingMessage = false;
-        public static bool LockFallDamageMod = false;
-        public static bool KeepAHPShieldForAllUsers = false;
+        public static bool EnableGrenadeTimeMod;
+        public static bool EnableMedicalItemMod;
+        public static bool EnableFallDamagePrevent;
+        public static bool EnableGrenadeDamagePrevent;
+        public static bool EnableAutoScaling;
+        public static bool EnableRetainingScaling;
+        public static bool EnableGrenadeSpawnOnDeath;
+        public static bool EnableGrenadeRangeMod;
+        public static bool EnableDoorMessages;
+        public static bool EnableDamageMessage;
+        public static bool EnableExplodingAfterTooMuchSCP207;
+        public static bool EnableSCP018WarheadBounce;
+        public static bool EnableRespawnsAsSameClass;
+        public static bool EnableSCP096ShieldModify;
+        public static bool EnableSCP106AdvancedGodmode;
+        public static bool EnableCustomAnnouncement;
+        public static bool DisableAutoScalingMessage;
+        public static bool LockFallDamageMod;
+        public static bool KeepAHPShieldForAllUsers;
         public static string LockedDoorMessage;
         public static string UnlockedDoorMessage;
         public static string NeedKeycardMessage;
@@ -53,10 +51,12 @@ namespace CreativeToolbox
         public static string PryGatesMessage;
         public static string PryGatesBypassMessage;
         public static string DamageMessage;
+        public static string CIAnnouncement;
+        public static string MTFAnnouncement;
 
         public bool IsEnabled { get; set; }
 
-        public string Prefix => "creativetoolbox_";
+        public string Prefix => "creativetoolbox";
 
         public void Reload()
         {
@@ -76,6 +76,7 @@ namespace CreativeToolbox
             EnableRespawnsAsSameClass = PluginManager.YamlConfig.GetBool("ct_enable_same_class_respawn", false);
             KeepAHPShieldForAllUsers = PluginManager.YamlConfig.GetBool("ct_enable_ahp_shield", false);
             EnableSCP106AdvancedGodmode = PluginManager.YamlConfig.GetBool("ct_enable_scp106_advanced_god", false);
+            EnableCustomAnnouncement = PluginManager.YamlConfig.GetBool("ct_enable_custom_announcements", false);
             DisableAutoScalingMessage = PluginManager.YamlConfig.GetBool("ct_disable_autoscale_messages", false);
             LockFallDamageMod = PluginManager.YamlConfig.GetBool("ct_disable_fall_modification", false);
             LockedDoorMessage = PluginManager.YamlConfig.GetString("ct_locked_door_message", "you need a better keycard to open this door!");
@@ -85,6 +86,8 @@ namespace CreativeToolbox
             BypassWithKeycardInHandMessage = PluginManager.YamlConfig.GetString("ct_bypass_with_keycard_message", "you bypassed the reader, but you did not need a keycard");
             PryGatesMessage = PluginManager.YamlConfig.GetString("ct_pry_gate_message", "you pried the gate open");
             PryGatesBypassMessage = PluginManager.YamlConfig.GetString("ct_pry_gate_bypass_message", "you pried the gate open, but you could bypass it");
+            CIAnnouncement = PluginManager.YamlConfig.GetString("ct_chaos_insurgency_announcement", String.Empty);
+            MTFAnnouncement = PluginManager.YamlConfig.GetString("ct_chaos_insurgency_announcement", String.Empty);
             RandomRespawnTimer = Math.Abs(PluginManager.YamlConfig.GetFloat("ct_random_respawn_timer", 0.05f)) >= 0.05f ? RandomRespawnTimer : 0.05f;
             FragGrenadeFuseTimer = Math.Abs(PluginManager.YamlConfig.GetFloat("ct_frag_grenade_fuse_timer", 5f)) >= 0.01f ? FragGrenadeFuseTimer : 5f;
             FlashGrenadeFuseTimer = Math.Abs(PluginManager.YamlConfig.GetFloat("ct_flash_grenade_fuse_timer", 3f)) >= 0.01f ? FlashGrenadeFuseTimer : 3f;
@@ -98,8 +101,6 @@ namespace CreativeToolbox
             AutoScaleValue = PluginManager.YamlConfig.GetFloat("ct_auto_scale_value", 1f);
             GrenadeDeathTimer = Math.Abs(PluginManager.YamlConfig.GetFloat("ct_grenade_timer_on_death", 5f)) >= 0.01f ? GrenadeDeathTimer : 5f;
             SCP096AHP = Math.Abs(PluginManager.YamlConfig.GetInt("ct_sco096_enrage_shield", 250));
-            SCP096EnrageJumpHeight = Math.Abs(PluginManager.YamlConfig.GetFloat("ct_scp096_enrage_jump_height", 10f));
-            SCP096EnrageMoveSpeed = Math.Abs(PluginManager.YamlConfig.GetFloat("ct_scp096_enrage_move_speed", 12f));
             SCP207DrinkLimit = Math.Abs(PluginManager.YamlConfig.GetInt("ct_scp207_drink_limit", 5));
             AHPValueLimit = Math.Abs(PluginManager.YamlConfig.GetFloat("ct_ahp_max_limit", 150f));
         }

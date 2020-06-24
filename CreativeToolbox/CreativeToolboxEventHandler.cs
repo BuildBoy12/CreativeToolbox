@@ -16,9 +16,6 @@ namespace CreativeToolbox
 {
     public class CreativeToolboxEventHandler
     {
-        //HashSet<ReferenceHub> PlayersWith207 = new HashSet<ReferenceHub>();
-        //HashSet<ReferenceHub> PlayersWithInvisibility = new HashSet<ReferenceHub>();
-        public static HashSet<ReferenceHub> PlayersWithAdvancedGodmode = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersThatCanPryGates = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithRegen = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithInfiniteAmmo = new HashSet<ReferenceHub>();
@@ -28,7 +25,6 @@ namespace CreativeToolbox
             "GATE_A", "GATE_B", "HCZ_ARMORY", "HID", "INTERCOM", "LCZ_ARMORY", "NUKE_ARMORY" };
         string[] GatesThatExist = { "914", "GATE_A", "GATE_B", "079_FIRST", "079_SECOND" };
         System.Random RandNum = new System.Random();
-        Item[] AvailableItems;
         bool IsWarheadDetonated;
         bool IsDecontanimationActivated;
         bool AllowRespawning = false;
@@ -69,7 +65,7 @@ namespace CreativeToolbox
                 {
                     Ply.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
                 }
-                Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can gp up if you get more AHP through medical items. The AHP Limit is: </color>", Broadcast.BroadcastFlags.Normal);
+                Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can go up if you get more AHP through medical items. The AHP Limit is: {CreativeConfig.AHPValueLimit}</color>", Broadcast.BroadcastFlags.Normal);
             }
         }
 
@@ -83,6 +79,8 @@ namespace CreativeToolbox
                     PlyJoin.Player.Scale = new Vector3(CreativeConfig.AutoScaleValue, CreativeConfig.AutoScaleValue, CreativeConfig.AutoScaleValue);
                 }
             }
+            if (CreativeConfig.KeepAHPShieldForAllUsers)
+                PlyJoin.Player.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
         }
 
         public void RunOnPlayerLeave(LeftEventArgs PlyLeave)
@@ -93,14 +91,6 @@ namespace CreativeToolbox
                 PlayersWithInfiniteAmmo.Remove(PlyLeave.Player.ReferenceHub);
             if (PlayersThatCanPryGates.Contains(PlyLeave.Player.ReferenceHub))
                 PlayersThatCanPryGates.Remove(PlyLeave.Player.ReferenceHub);
-            if (PlayersWithAdvancedGodmode.Contains(PlyLeave.Player.ReferenceHub))
-                PlayersWithAdvancedGodmode.Remove(PlyLeave.Player.ReferenceHub);
-        }
-
-        public void RunOnPlayerSpawn(SpawningEventArgs PlySpawn)
-        {
-            /*if (PlayersWith207.Contains(PlySpwn.Player))
-                Timing.CallDelayed(1f, () => PlySpwn.Player.playerEffectsController.EnableEffect(new Scp207(PlySpwn.Player)));*/
         }
 
         public void RunOnPlayerDeath(DiedEventArgs PlyDeath)
@@ -251,6 +241,15 @@ namespace CreativeToolbox
                         return;
                     }
                 }
+            }
+        }
+
+        public void RunWhenWarheadIsDetonated()
+        {
+            foreach (Door door in UnityEngine.Object.FindObjectsOfType<Door>())
+            {
+                door.Networkdestroyed = true;
+                door.Networklocked = true;
             }
         }
 
@@ -1120,13 +1119,6 @@ namespace CreativeToolbox
             }
             gnade.FullInitData(gm, PlayerToSpawnGrenade.Position, Quaternion.Euler(gnade.throwStartAngle), gnade.throwLinearVelocityOffset, gnade.throwAngularVelocity);
             NetworkServer.Spawn(gnade.gameObject);
-        }
-
-        public Item[] GetItems()
-        {
-            if (AvailableItems == null)
-                AvailableItems = GameObject.FindObjectOfType<Inventory>().availableItems;
-            return AvailableItems;
         }
     }
 }

@@ -28,11 +28,11 @@ namespace CreativeToolbox
             Exiled.Events.Handlers.Player.MedicalItemUsed += Handler.RunOnMedItemUsed;
             Exiled.Events.Handlers.Player.Hurting += Handler.RunOnPlayerHurt;
             Exiled.Events.Handlers.Player.Died += Handler.RunOnPlayerDeath;
-            //Events.PlayerSpawnEvent += Handler.RunOnPlayerSpawn;
             Exiled.Events.Handlers.Server.SendingRemoteAdminCommand += Handler.RunOnRemoteAdminCommand;
             Exiled.Events.Handlers.Server.RestartingRound += Handler.RunOnRoundRestart;
             Exiled.Events.Handlers.Server.RoundStarted += Handler.RunOnRoundStart;
             Exiled.Events.Handlers.Player.EnteringFemurBreaker += Handler.RunWhenPlayerEntersFemurBreaker;
+            Exiled.Events.Handlers.Warhead.Detonated += Handler.RunWhenWarheadIsDetonated;
         }
 
         public override void OnDisabled()
@@ -42,11 +42,11 @@ namespace CreativeToolbox
             {
                 HarmonyInstance.UnpatchAll();
             }
+            Exiled.Events.Handlers.Warhead.Detonated -= Handler.RunWhenWarheadIsDetonated;
             Exiled.Events.Handlers.Player.EnteringFemurBreaker -= Handler.RunWhenPlayerEntersFemurBreaker;
             Exiled.Events.Handlers.Server.RoundStarted -= Handler.RunOnRoundStart;
             Exiled.Events.Handlers.Server.RestartingRound -= Handler.RunOnRoundRestart;
             Exiled.Events.Handlers.Server.SendingRemoteAdminCommand -= Handler.RunOnRemoteAdminCommand;
-            //Events.PlayerSpawnEvent -= Handler.RunOnPlayerSpawn;
             Exiled.Events.Handlers.Player.Died -= Handler.RunOnPlayerDeath;
             Exiled.Events.Handlers.Player.Hurting -= Handler.RunOnPlayerHurt;
             Exiled.Events.Handlers.Player.MedicalItemUsed -= Handler.RunOnMedItemUsed;
