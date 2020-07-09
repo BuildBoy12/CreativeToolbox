@@ -57,9 +57,9 @@ namespace CreativeToolbox
                     Hub.AdrenalineHealth = CurrentAHP;
                 else
                 {
-                    if (Hub.AdrenalineHealth >= CreativeConfig.AHPValueLimit)
+                    if (Hub.AdrenalineHealth >= CreativeToolbox.ConfigRef.Config.AhpValueLimit)
                     {
-                        Hub.AdrenalineHealth = CreativeConfig.AHPValueLimit;
+                        Hub.AdrenalineHealth = CreativeToolbox.ConfigRef.Config.AhpValueLimit;
                     }
                     CurrentAHP = Hub.AdrenalineHealth;
                 }

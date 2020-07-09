@@ -27,11 +27,11 @@ namespace CreativeToolbox
             while (true)
             {
                 if (ply.Health < ply.MaxHealth)
-                    ply.Health += CreativeConfig.HPRegenerationValue;
+                    ply.Health += CreativeToolbox.ConfigRef.Config.RegenerationValue;
                 else
                     ply.Health = ply.MaxHealth;
 
-                yield return Timing.WaitForSeconds(CreativeConfig.HPRegenerationTimer);
+                yield return Timing.WaitForSeconds(CreativeToolbox.ConfigRef.Config.RegenerationTime);
             }
         }
     }

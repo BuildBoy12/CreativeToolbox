@@ -7,17 +7,19 @@ using System;
 
 namespace CreativeToolbox
 {
-    public class CreativeToolbox : Plugin
+    public class CreativeToolbox : Plugin<Config>
     {
+        private static readonly Lazy<CreativeToolbox> LazyInstance = new Lazy<CreativeToolbox>(() => new CreativeToolbox());
+        private CreativeToolbox() { }
+        public static CreativeToolbox ConfigRef => LazyInstance.Value;
         public static Harmony HarmonyInstance { private set; get; }
-
-        public override IConfig Config { get; } = new CreativeConfig();
 
         public static int harmonyCounter;
         public CreativeToolboxEventHandler Handler;
 
         public override void OnEnabled()
         {
+            base.OnEnabled();
             Handler = new CreativeToolboxEventHandler();
             harmonyCounter++;
             HarmonyInstance = new Harmony($"defytherush.creativetoolbox_{harmonyCounter}");
@@ -33,6 +35,7 @@ namespace CreativeToolbox
             Exiled.Events.Handlers.Server.RoundStarted += Handler.RunOnRoundStart;
             Exiled.Events.Handlers.Player.EnteringFemurBreaker += Handler.RunWhenPlayerEntersFemurBreaker;
             Exiled.Events.Handlers.Warhead.Detonated += Handler.RunWhenWarheadIsDetonated;
+            Exiled.Events.Handlers.Server.RespawningTeam += Handler.RunWhenTeamRespawns;
         }
 
         public override void OnDisabled()
@@ -42,6 +45,7 @@ namespace CreativeToolbox
             {
                 HarmonyInstance.UnpatchAll();
             }
+            Exiled.Events.Handlers.Server.RespawningTeam -= Handler.RunWhenTeamRespawns;
             Exiled.Events.Handlers.Warhead.Detonated -= Handler.RunWhenWarheadIsDetonated;
             Exiled.Events.Handlers.Player.EnteringFemurBreaker -= Handler.RunWhenPlayerEntersFemurBreaker;
             Exiled.Events.Handlers.Server.RoundStarted -= Handler.RunOnRoundStart;

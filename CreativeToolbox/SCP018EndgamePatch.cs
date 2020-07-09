@@ -10,7 +10,7 @@ namespace CreativeToolbox
     {
         public static void Postfix(Scp018Grenade __instance)
         {
-            if (CreativeConfig.EnableSCP018WarheadBounce)
+            if (CreativeToolbox.ConfigRef.Config.EnableScp018WarheadBounce)
             {
                 Warhead.Start();
                 Warhead.DetonationTimer = 0.05f;

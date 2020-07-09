@@ -18,8 +18,8 @@ namespace CreativeToolbox
 					__instance.EnrageTimeLeft += __instance.EnrageTimePerReset;
 				}
 				__instance._targets.Add(hub);
-				if (CreativeConfig.EnableSCP096ShieldModify)
-					__instance.AdjustShield(CreativeConfig.SCP096AHP);
+				if (CreativeToolbox.ConfigRef.Config.EnableCustomScp096Shield)
+					__instance.AdjustShield(CreativeToolbox.ConfigRef.Config.Scp096Ahp);
 				else
 					__instance.AdjustShield(250);
 			}

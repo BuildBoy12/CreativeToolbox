@@ -9,7 +9,7 @@ namespace CreativeToolbox
     {
         public static bool Prefix(FragGrenade __instance)
         {
-            if (CreativeConfig.EnableGrenadeDamagePrevent)
+            if (CreativeToolbox.ConfigRef.Config.EnableGrenadeDamagePrevention)
                 __instance.absoluteDamageFalloff = int.MaxValue;
             return true;
         }

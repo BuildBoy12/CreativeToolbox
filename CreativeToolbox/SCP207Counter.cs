@@ -40,16 +40,27 @@ namespace CreativeToolbox
                 return;
             }
             
-            if (Counter < CreativeConfig.SCP207DrinkLimit)
+            if (Counter < CreativeToolbox.ConfigRef.Config.Scp207DrinkLimit)
             {
                 Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nnumber of drinks consumed: {Counter}", new HintParameter[]
                 {
                     new StringHintParameter("")
                 }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
-                return;
             }
 
-            if (Counter >= CreativeConfig.SCP207DrinkLimit)
+            if (Counter == CreativeToolbox.ConfigRef.Config.Scp207PryGateLimit)
+            {
+                if (!CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Hub.ReferenceHub))
+                {
+                    CreativeToolboxEventHandler.PlayersThatCanPryGates.Add(Hub.ReferenceHub);
+                    Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nyou can now pry gates open", new HintParameter[]
+                    {
+                    new StringHintParameter("")
+                    }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
+                }
+            }
+
+            if (Counter >= CreativeToolbox.ConfigRef.Config.Scp207DrinkLimit)
             {
                 CreativeToolboxEventHandler.SpawnGrenadeOnPlayer(Hub, false);
                 Counter = 0;
@@ -57,7 +68,6 @@ namespace CreativeToolbox
                 {
                     new StringHintParameter("")
                 }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
-                return;
             }
         }
 

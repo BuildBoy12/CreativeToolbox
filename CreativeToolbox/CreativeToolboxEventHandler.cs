@@ -16,7 +16,7 @@ namespace CreativeToolbox
 {
     public class CreativeToolboxEventHandler
     {
-        HashSet<ReferenceHub> PlayersThatCanPryGates = new HashSet<ReferenceHub>();
+        public static HashSet<ReferenceHub> PlayersThatCanPryGates = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithRegen = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithInfiniteAmmo = new HashSet<ReferenceHub>();
         HashSet<String> PlayersWithRetainedScale = new HashSet<String>();
@@ -44,42 +44,42 @@ namespace CreativeToolbox
             PlayersWithInfiniteAmmo.Clear();
             PlayersThatCanPryGates.Clear();
             PlayersWithRetainedScale.Clear();
-            if (CreativeConfig.EnableFallDamagePrevent)
+            if (CreativeToolbox.ConfigRef.Config.EnableFallDamagePrevention)
                 PreventFallDamage = true;
-            if (CreativeConfig.EnableAutoScaling)
+            if (CreativeToolbox.ConfigRef.Config.EnableAutoScaling)
             {
                 foreach (Player Ply in Player.List)
                 {
-                    if (!CreativeConfig.DisableAutoScalingMessage)
-                        Map.Broadcast(5, $"Everyone who joined has their playermodel scale set to {CreativeConfig.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
-                    Ply.Scale = new Vector3(CreativeConfig.AutoScaleValue, CreativeConfig.AutoScaleValue, CreativeConfig.AutoScaleValue);
+                    if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
+                        Map.Broadcast(5, $"Everyone who joined has their playermodel scale set to {CreativeToolbox.ConfigRef.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
+                    Ply.Scale = new Vector3(CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue);
                     PlayersWithRetainedScale.Add(Ply.UserId);
                     AutoScaleOn = true;
                 }
             }
-            if (CreativeConfig.EnableGrenadeSpawnOnDeath)
-                Map.Broadcast(10, $"<color=red>Warning: Grenades spawn after you die, they explode after {CreativeConfig.GrenadeDeathTimer} seconds of them spawning, be careful!</color>", Broadcast.BroadcastFlags.Normal);
-            if (CreativeConfig.KeepAHPShieldForAllUsers)
+            if (CreativeToolbox.ConfigRef.Config.EnableGrenadeOnDeath)
+                Map.Broadcast(10, $"<color=red>Warning: Grenades spawn after you die, they explode after {CreativeToolbox.ConfigRef.Config.GrenadeTimerOnDeath} seconds of them spawning, be careful!</color>", Broadcast.BroadcastFlags.Normal);
+            if (CreativeToolbox.ConfigRef.Config.EnableAhpShield)
             {
                 foreach (Player Ply in Player.List)
                 {
                     Ply.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
                 }
-                Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can go up if you get more AHP through medical items. The AHP Limit is: {CreativeConfig.AHPValueLimit}</color>", Broadcast.BroadcastFlags.Normal);
+                Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can go up if you get more AHP through medical items. The AHP Limit is: {CreativeToolbox.ConfigRef.Config.AhpValueLimit}</color>", Broadcast.BroadcastFlags.Normal);
             }
         }
 
         public void RunOnPlayerJoin(JoinedEventArgs PlyJoin)
         {
-            if (CreativeConfig.EnableAutoScaling && CreativeConfig.EnableRetainingScaling)
+            if (CreativeToolbox.ConfigRef.Config.EnableAutoScaling && CreativeToolbox.ConfigRef.Config.EnableKeepScale)
             {
                 if (PlayersWithRetainedScale.Contains(PlyJoin.Player.UserId)) {
-                    if (!CreativeConfig.DisableAutoScalingMessage)
-                        PlyJoin.Player.Broadcast(5, $"Your playermodel scale was set to {CreativeConfig.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
-                    PlyJoin.Player.Scale = new Vector3(CreativeConfig.AutoScaleValue, CreativeConfig.AutoScaleValue, CreativeConfig.AutoScaleValue);
+                    if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
+                        PlyJoin.Player.Broadcast(5, $"Your playermodel scale was set to {CreativeToolbox.ConfigRef.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
+                    PlyJoin.Player.Scale = new Vector3(CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue);
                 }
             }
-            if (CreativeConfig.KeepAHPShieldForAllUsers)
+            if (CreativeToolbox.ConfigRef.Config.EnableAhpShield)
                 PlyJoin.Player.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
         }
 
@@ -99,12 +99,12 @@ namespace CreativeToolbox
             {
                 IsWarheadDetonated = Warhead.IsDetonated;
                 IsDecontanimationActivated = Map.IsLCZDecontaminated;
-                Timing.CallDelayed(CreativeConfig.RandomRespawnTimer, () => RevivePlayer(PlyDeath.Target));
+                Timing.CallDelayed(CreativeToolbox.ConfigRef.Config.RandomRespawnTimer, () => RevivePlayer(PlyDeath.Target));
             }
-            if (CreativeConfig.EnableGrenadeSpawnOnDeath)
-            {
+            if (CreativeToolbox.ConfigRef.Config.EnableGrenadeOnDeath)
                 SpawnGrenadeOnPlayer(PlyDeath.Target, true);
-            }
+            if (PlyDeath.Killer.Role != RoleType.Scp049)
+                return;
         }
 
         public void RunOnPlayerHurt(HurtingEventArgs PlyHurt)
@@ -116,29 +116,29 @@ namespace CreativeToolbox
 
         public void RunOnMedItemUsed(UsedMedicalItemEventArgs MedUsed)
         {
-            if (CreativeConfig.EnableMedicalItemMod)
+            if (CreativeToolbox.ConfigRef.Config.EnableCustomHealing)
             {
                 switch (MedUsed.Item)
                 {
                     case ItemType.Painkillers:
-                        MedUsed.Player.AdrenalineHealth += (int)CreativeConfig.PainkillerAHPHealthValue;
+                        MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.PainkillerAhpHealthValue;
                         break;
                     case ItemType.Medkit:
-                        MedUsed.Player.AdrenalineHealth += (int)CreativeConfig.MedkitAHPHealthValue;
+                        MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.MedkitAhpHealthValue;
                         break;
                     case ItemType.Adrenaline:
-                        if (!(CreativeConfig.AdrenalineAHPHealthValue <= 0))
-                            MedUsed.Player.AdrenalineHealth += (int)CreativeConfig.AdrenalineAHPHealthValue;
+                        if (!(CreativeToolbox.ConfigRef.Config.AdrenalineAhpHealthValue <= 0))
+                            MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.AdrenalineAhpHealthValue;
                         break;
                     case ItemType.SCP500:
-                        MedUsed.Player.AdrenalineHealth += (int)CreativeConfig.SCP500AHPHealthValue;
+                        MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.Scp500AhpHealthValue;
                         break;
                     case ItemType.SCP207:
-                        MedUsed.Player.AdrenalineHealth += (int)CreativeConfig.SCP207AHPHealthValue;
+                        MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.Scp207AhpHealthValue;
                         break;
                 }
             }
-            if (CreativeConfig.EnableExplodingAfterTooMuchSCP207)
+            if (CreativeToolbox.ConfigRef.Config.EnableExplodingAfterDrinkingScp207)
             {
                 if (MedUsed.Item == ItemType.SCP207)
                 {
@@ -154,21 +154,21 @@ namespace CreativeToolbox
 
         public void RunWhenDoorIsInteractedWith(InteractingDoorEventArgs DoorInter)
         {
-            if (CreativeConfig.EnableDoorMessages)
+            if (CreativeToolbox.ConfigRef.Config.EnableDoorMessages)
             {
                 if (PlayersThatCanPryGates.Contains(DoorInter.Player.ReferenceHub) && GatesThatExist.Contains(DoorInter.Door.DoorName))
                 {
                     DoorInter.Door.PryGate();
                     if (!DoorInter.Player.IsBypassModeEnabled)
                     {
-                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeConfig.PryGatesMessage}", new HintParameter[]
+                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.PryGateMessage}", new HintParameter[]
                         {
                             new StringHintParameter("")
                         }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
                     }
                     else
                     {
-                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeConfig.PryGatesBypassMessage}", new HintParameter[]
+                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.PryGateBypassMessage}", new HintParameter[]
                         {
                             new StringHintParameter("")
                         }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -182,14 +182,14 @@ namespace CreativeToolbox
                         {
                             if (DoorInter.IsAllowed)
                             {
-                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeConfig.UnlockedDoorMessage}", new HintParameter[]
+                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.UnlockedDoorMessage}", new HintParameter[]
                                 {
                                     new StringHintParameter("")
                                 }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
                             }
                             else
                             {
-                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeConfig.LockedDoorMessage}", new HintParameter[]
+                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.LockedDoorMessage}", new HintParameter[]
                                 {
                                     new StringHintParameter("")
                                 }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -197,7 +197,7 @@ namespace CreativeToolbox
                         }
                         else if (!DoorInter.Player.ReferenceHub.ItemInHandIsKeycard() && DoorsThatAreLocked.Contains(DoorInter.Door.DoorName))
                         {
-                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeConfig.NeedKeycardMessage}", new HintParameter[]
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.NeedKeycardMessage}", new HintParameter[]
                             {
                                 new StringHintParameter("")
                             }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -207,14 +207,14 @@ namespace CreativeToolbox
                     {
                         if (DoorInter.Player.ReferenceHub.ItemInHandIsKeycard())
                         {
-                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeConfig.BypassWithKeycardInHandMessage}", new HintParameter[]
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.BypassWithKeycardMessage}", new HintParameter[]
                             {
                                 new StringHintParameter("")
                             }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
                         }
                         else
                         {
-                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeConfig.BypassKeycardMessage}", new HintParameter[]
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.BypassKeycardMessage}", new HintParameter[]
                             {
                                 new StringHintParameter("")
                             }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -226,18 +226,17 @@ namespace CreativeToolbox
 
         public void RunWhenPlayerEntersFemurBreaker(EnteringFemurBreakerEventArgs FemurBreaker)
         {
-            if (CreativeConfig.EnableSCP106AdvancedGodmode)
+            if (CreativeToolbox.ConfigRef.Config.EnableScp106AdvancedGod)
             {
                 foreach (Player Ply in Player.List)
                 {
                     if (!(Ply.Role == RoleType.Scp106))
                         continue;
 
-
                     if (Ply.IsGodModeEnabled)
                     {
                         FemurBreaker.IsAllowed = false;
-                        FemurBreaker.Player.Broadcast((ushort)2, "SCP-106 has advanced godmode, you cannot contain him", Broadcast.BroadcastFlags.Normal);
+                        FemurBreaker.Player.Broadcast(2, "SCP-106 has advanced godmode, you cannot contain him", Broadcast.BroadcastFlags.Normal);
                         return;
                     }
                 }
@@ -246,10 +245,27 @@ namespace CreativeToolbox
 
         public void RunWhenWarheadIsDetonated()
         {
-            foreach (Door door in UnityEngine.Object.FindObjectsOfType<Door>())
+            if (!IsWarheadDetonated)
             {
-                door.Networkdestroyed = true;
-                door.Networklocked = true;
+                foreach (Door door in UnityEngine.Object.FindObjectsOfType<Door>())
+                {
+                    door.Networkdestroyed = true;
+                    door.Networklocked = true;
+                }
+            }
+        }
+
+        public void RunWhenTeamRespawns(RespawningTeamEventArgs TeamRspwn)
+        {
+            if (!TeamRspwn.IsChaos)
+            {
+                List<Player> Respawned = TeamRspwn.Players;
+                foreach (Player Ply in Respawned)
+                {
+                    Vector3 OldPos = Ply.Position;
+                    Ply.SetRole(RoleType.ChaosInsurgency);
+                    Ply.Position = OldPos;
+                }
             }
         }
 
@@ -312,7 +328,7 @@ namespace CreativeToolbox
                                     case "time":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rspwn) && rspwn > 0)
                                         {
-                                            CreativeConfig.RandomRespawnTimer = rspwn;
+                                            CreativeToolbox.ConfigRef.Config.RandomRespawnTimer = rspwn;
                                             RAComEv.Sender.RemoteAdminMessage($"Auto respawning timer is now set to {rspwn} seconds!");
                                             Map.Broadcast(5, $"Auto respawning timer is now set to {rspwn} seconds!", Broadcast.BroadcastFlags.Normal);
                                             return;
@@ -337,7 +353,7 @@ namespace CreativeToolbox
                             return;
                         }
 
-                        if (!CreativeConfig.EnableAutoScaling)
+                        if (!CreativeToolbox.ConfigRef.Config.EnableAutoScaling)
                         {
                             RAComEv.Sender.RemoteAdminMessage("Auto scaling cannot be modified!");
                             return;
@@ -349,7 +365,7 @@ namespace CreativeToolbox
                             {
                                 Ply.Scale = Vector3.one;
                             }
-                            if (!CreativeConfig.DisableAutoScalingMessage)
+                            if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
                                 Map.Broadcast(5, "Everyone has been restored to their normal size!", Broadcast.BroadcastFlags.Normal);
                             PlayersWithRetainedScale.Clear();
                             AutoScaleOn = false;
@@ -358,11 +374,11 @@ namespace CreativeToolbox
                         {
                             foreach (Player Ply in Player.List)
                             {
-                                Ply.Scale = new Vector3(CreativeConfig.AutoScaleValue, CreativeConfig.AutoScaleValue, CreativeConfig.AutoScaleValue);
+                                Ply.Scale = new Vector3(CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue);
                                 PlayersWithRetainedScale.Add(Ply.UserId);
                             }
-                            if (!CreativeConfig.DisableAutoScalingMessage)
-                                Map.Broadcast(5, $"Everyone has their playermodel scale set to {CreativeConfig.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
+                            if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
+                                Map.Broadcast(5, $"Everyone has their playermodel scale set to {CreativeToolbox.ConfigRef.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
                             AutoScaleOn = true;
                         }
                         break;
@@ -430,7 +446,7 @@ namespace CreativeToolbox
                             return;
                         }
 
-                        if (CreativeConfig.LockFallDamageMod)
+                        if (CreativeToolbox.ConfigRef.Config.DisableFallModification)
                         {
                             RAComEv.Sender.RemoteAdminMessage("Fall damage cannot be modified!");
                             return;
@@ -611,7 +627,7 @@ namespace CreativeToolbox
                             return;
                         }
 
-                        if (!CreativeConfig.EnableGrenadeTimeMod)
+                        if (!CreativeToolbox.ConfigRef.Config.EnableCustomGrenadeTime)
                         {
                             RAComEv.Sender.RemoteAdminMessage("You cannot modify grenades as it is disabled!");
                             return;
@@ -631,7 +647,7 @@ namespace CreativeToolbox
                                     case "frag":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float value) && value > 0)
                                         {
-                                            CreativeConfig.FragGrenadeFuseTimer = value;
+                                            CreativeToolbox.ConfigRef.Config.FragGrenadeFuseTimer = value;
                                             RAComEv.Sender.RemoteAdminMessage($"Frag grenade fuse timer set to {value}");
                                             return;
                                         }
@@ -640,7 +656,7 @@ namespace CreativeToolbox
                                     case "flash":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float val) && val > 0)
                                         {
-                                            CreativeConfig.FlashGrenadeFuseTimer = val;
+                                            CreativeToolbox.ConfigRef.Config.FlashGrenadeFuseTimer = val;
                                             RAComEv.Sender.RemoteAdminMessage($"Flash grenade fuse timer set to {val}");
                                             return;
                                         }
@@ -1010,7 +1026,7 @@ namespace CreativeToolbox
                                     case "time":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rgn_t) && rgn_t > 0)
                                         {
-                                            CreativeConfig.HPRegenerationTimer = rgn_t;
+                                            CreativeToolbox.ConfigRef.Config.RegenerationTime = rgn_t;
                                             RAComEv.Sender.RemoteAdminMessage($"Players with regeneration gain health every {rgn_t} seconds!");
                                             return;
                                         }
@@ -1019,8 +1035,8 @@ namespace CreativeToolbox
                                     case "value":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rgn_v) && rgn_v > 0)
                                         {
-                                            CreativeConfig.HPRegenerationValue = rgn_v;
-                                            RAComEv.Sender.RemoteAdminMessage($"Players with regeneration gain {rgn_v} health every {CreativeConfig.HPRegenerationTimer} seconds!");
+                                            CreativeToolbox.ConfigRef.Config.RegenerationValue = rgn_v;
+                                            RAComEv.Sender.RemoteAdminMessage($"Players with regeneration gain {rgn_v} health every {CreativeToolbox.ConfigRef.Config.RegenerationTime} seconds!");
                                             return;
                                         }
                                         RAComEv.Sender.RemoteAdminMessage($"Invalid value for regeneration healing! Value: {RAComEv.Arguments[1].ToLower()}");
@@ -1112,11 +1128,9 @@ namespace CreativeToolbox
             GrenadeManager gm = PlayerToSpawnGrenade.ReferenceHub.gameObject.GetComponent<GrenadeManager>();
             Grenade gnade = UnityEngine.Object.Instantiate(gm.availableGrenades[0].grenadeInstance.GetComponent<Grenade>());
             if (UseCustomTimer)
-                gnade.fuseDuration = CreativeConfig.GrenadeDeathTimer;
+                gnade.fuseDuration = CreativeToolbox.ConfigRef.Config.GrenadeTimerOnDeath;
             else
-            {
                 gnade.fuseDuration = 0.01f;
-            }
             gnade.FullInitData(gm, PlayerToSpawnGrenade.Position, Quaternion.Euler(gnade.throwStartAngle), gnade.throwLinearVelocityOffset, gnade.throwAngularVelocity);
             NetworkServer.Spawn(gnade.gameObject);
         }

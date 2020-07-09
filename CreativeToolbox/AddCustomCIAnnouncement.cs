@@ -9,8 +9,8 @@ namespace CreativeToolbox
     {
         public static void Prefix(MTFRespawn __instance)
         {
-            if (CreativeConfig.EnableCustomAnnouncement && !String.IsNullOrWhiteSpace(CreativeConfig.MTFAnnouncement))
-                PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement($"{CreativeConfig.CIAnnouncement}", false, false);
+            if (CreativeToolbox.ConfigRef.Config.EnableCustomAnnouncements && !String.IsNullOrWhiteSpace(CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncement))
+                PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement($"{CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncement}", false, false);
         }
     }
 }

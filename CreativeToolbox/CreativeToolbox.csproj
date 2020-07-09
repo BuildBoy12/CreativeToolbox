@@ -33,30 +33,35 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="0Harmony">
       <HintPath>..\..\..\EXILED BETAS\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Plugins\dependencies\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass_publicized">
-      <HintPath>..\..\..\SCPSL_Server\SCPSL_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>..\..\..\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\Assembly-CSharp_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.API">
-      <HintPath>..\..\..\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Exiled.API.dll</HintPath>
+    <Reference Include="Exiled.API, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\dependencies\Exiled.API.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Events">
-      <HintPath>..\..\..\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Events.dll</HintPath>
+    <Reference Include="Exiled.Events, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Events.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Loader">
-      <HintPath>..\..\..\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Exiled.Loader.dll</HintPath>
+    <Reference Include="Exiled.Loader, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Exiled.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Permissions">
-      <HintPath>..\..\..\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Permissions.dll</HintPath>
+    <Reference Include="Exiled.Permissions, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Permissions.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Updater">
-      <HintPath>..\..\..\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Updater.dll</HintPath>
+    <Reference Include="Exiled.Updater, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Updater.dll</HintPath>
     </Reference>
     <Reference Include="Mirror">
       <HintPath>..\..\..\..\..\SCPSL_Server\SCPSL_Data\Managed\Mirror.dll</HintPath>
@@ -84,13 +89,16 @@
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\..\..\..\SCPSL_Server\SCPSL_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
+    <Reference Include="YamlDotNet">
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled_2.0.0\EXILED-PTB\Plugins\dependencies\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddCustomCIAnnouncement.cs" />
     <Compile Include="AddCustomMTFAnnouncement.cs" />
     <Compile Include="ModifySCP096ShieldPatch.cs" />
     <Compile Include="CreateCustomGrenadePatch.cs" />
-    <Compile Include="CreativeConfig.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="CreativeToolbox.cs" />
     <Compile Include="CreativeToolboxEventHandler.cs" />
     <Compile Include="Extensions.cs" />
