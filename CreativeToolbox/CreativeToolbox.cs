@@ -20,9 +20,9 @@ namespace CreativeToolbox
         public override void OnEnabled()
         {
             base.OnEnabled();
-            Handler = new CreativeToolboxEventHandler();
+            Handler = new CreativeToolboxEventHandler(this);
             harmonyCounter++;
-            HarmonyInstance = new Harmony($"defytherush.creativetoolbox_{harmonyCounter}");
+            HarmonyInstance = new Harmony($"koukococoa.creativetoolbox_{harmonyCounter}");
             HarmonyInstance.PatchAll();
             Exiled.Events.Handlers.Player.InteractingDoor += Handler.RunWhenDoorIsInteractedWith;
             Exiled.Events.Handlers.Player.Joined += Handler.RunOnPlayerJoin;

@@ -8,8 +8,6 @@ using Grenades;
 using Hints;
 using MEC;
 using Mirror;
-using PlayableScps;
-using Targeting;
 using UnityEngine;
 
 namespace CreativeToolbox
@@ -22,7 +20,7 @@ namespace CreativeToolbox
         HashSet<String> PlayersWithRetainedScale = new HashSet<String>();
         string[] DoorsThatAreLocked = { "012", "049_ARMORY", "079_FIRST", "079_SECOND", "096", "106_BOTTOM", 
             "106_PRIMARY", "106_SECONDARY", "173_ARMORY", "914", "CHECKPOINT_ENT", "CHECKPOINT_LCZ_A", "CHECKPOINT_LCZ_B",
-            "GATE_A", "GATE_B", "HCZ_ARMORY", "HID", "INTERCOM", "LCZ_ARMORY", "NUKE_ARMORY" };
+            "GATE_A", "GATE_B", "HCZ_ARMORY", "HID", "INTERCOM", "LCZ_ARMORY", "NUKE_ARMORY", "NUKE_SURFACE" };
         string[] GatesThatExist = { "914", "GATE_A", "GATE_B", "079_FIRST", "079_SECOND" };
         System.Random RandNum = new System.Random();
         bool IsWarheadDetonated;
@@ -31,6 +29,10 @@ namespace CreativeToolbox
         bool PreventFallDamage = false;
         bool WasDeconCommandRun = false;
         bool AutoScaleOn = false;
+        CoroutineHandle ChaosRespawnHandle;
+
+        public CreativeToolbox plugin;
+        public CreativeToolboxEventHandler(CreativeToolbox plugin) => this.plugin = plugin;
 
         public void RunOnRoundRestart()
         {
@@ -44,42 +46,44 @@ namespace CreativeToolbox
             PlayersWithInfiniteAmmo.Clear();
             PlayersThatCanPryGates.Clear();
             PlayersWithRetainedScale.Clear();
-            if (CreativeToolbox.ConfigRef.Config.EnableFallDamagePrevention)
+            if (plugin.Config.EnableFallDamagePrevention)
                 PreventFallDamage = true;
-            if (CreativeToolbox.ConfigRef.Config.EnableAutoScaling)
+            if (plugin.Config.EnableAutoScaling)
             {
                 foreach (Player Ply in Player.List)
                 {
-                    if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
-                        Map.Broadcast(5, $"Everyone who joined has their playermodel scale set to {CreativeToolbox.ConfigRef.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
-                    Ply.Scale = new Vector3(CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue);
+                    if (!plugin.Config.DisableAutoScaleMessages)
+                        Map.Broadcast(5, $"Everyone who joined has their playermodel scale set to {plugin.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
+                    Ply.Scale = new Vector3(plugin.Config.AutoScaleValue, plugin.Config.AutoScaleValue, plugin.Config.AutoScaleValue);
                     PlayersWithRetainedScale.Add(Ply.UserId);
                     AutoScaleOn = true;
                 }
             }
-            if (CreativeToolbox.ConfigRef.Config.EnableGrenadeOnDeath)
-                Map.Broadcast(10, $"<color=red>Warning: Grenades spawn after you die, they explode after {CreativeToolbox.ConfigRef.Config.GrenadeTimerOnDeath} seconds of them spawning, be careful!</color>", Broadcast.BroadcastFlags.Normal);
-            if (CreativeToolbox.ConfigRef.Config.EnableAhpShield)
+            if (plugin.Config.EnableGrenadeOnDeath)
+                Map.Broadcast(10, $"<color=red>Warning: Grenades spawn after you die, they explode after {plugin.Config.GrenadeTimerOnDeath} seconds of them spawning, be careful!</color>", Broadcast.BroadcastFlags.Normal);
+            if (plugin.Config.EnableAhpShield)
             {
                 foreach (Player Ply in Player.List)
                 {
                     Ply.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
                 }
-                Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can go up if you get more AHP through medical items. The AHP Limit is: {CreativeToolbox.ConfigRef.Config.AhpValueLimit}</color>", Broadcast.BroadcastFlags.Normal);
+                if (plugin.Config.AhpValueLimit > 75f)
+                    plugin.Config.AhpValueLimit = 75f;
+                Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can go up if you get more AHP through medical items. The AHP Limit is: {plugin.Config.AhpValueLimit}</color>", Broadcast.BroadcastFlags.Normal);
             }
         }
 
         public void RunOnPlayerJoin(JoinedEventArgs PlyJoin)
         {
-            if (CreativeToolbox.ConfigRef.Config.EnableAutoScaling && CreativeToolbox.ConfigRef.Config.EnableKeepScale)
+            if (plugin.Config.EnableAutoScaling && plugin.Config.EnableKeepScale)
             {
                 if (PlayersWithRetainedScale.Contains(PlyJoin.Player.UserId)) {
-                    if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
-                        PlyJoin.Player.Broadcast(5, $"Your playermodel scale was set to {CreativeToolbox.ConfigRef.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
-                    PlyJoin.Player.Scale = new Vector3(CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue);
+                    if (!plugin.Config.DisableAutoScaleMessages)
+                        PlyJoin.Player.Broadcast(5, $"Your playermodel scale was set to {plugin.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
+                    PlyJoin.Player.Scale = new Vector3(plugin.Config.AutoScaleValue, plugin.Config.AutoScaleValue, plugin.Config.AutoScaleValue);
                 }
             }
-            if (CreativeToolbox.ConfigRef.Config.EnableAhpShield)
+            if (plugin.Config.EnableAhpShield)
                 PlyJoin.Player.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
         }
 
@@ -99,9 +103,9 @@ namespace CreativeToolbox
             {
                 IsWarheadDetonated = Warhead.IsDetonated;
                 IsDecontanimationActivated = Map.IsLCZDecontaminated;
-                Timing.CallDelayed(CreativeToolbox.ConfigRef.Config.RandomRespawnTimer, () => RevivePlayer(PlyDeath.Target));
+                Timing.CallDelayed(plugin.Config.RandomRespawnTimer, () => RevivePlayer(PlyDeath.Target));
             }
-            if (CreativeToolbox.ConfigRef.Config.EnableGrenadeOnDeath)
+            if (plugin.Config.EnableGrenadeOnDeath)
                 SpawnGrenadeOnPlayer(PlyDeath.Target, true);
             if (PlyDeath.Killer.Role != RoleType.Scp049)
                 return;
@@ -116,29 +120,29 @@ namespace CreativeToolbox
 
         public void RunOnMedItemUsed(UsedMedicalItemEventArgs MedUsed)
         {
-            if (CreativeToolbox.ConfigRef.Config.EnableCustomHealing)
+            if (plugin.Config.EnableCustomHealing)
             {
                 switch (MedUsed.Item)
                 {
                     case ItemType.Painkillers:
-                        MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.PainkillerAhpHealthValue;
+                        MedUsed.Player.AdrenalineHealth += (int)plugin.Config.PainkillerAhpHealthValue;
                         break;
                     case ItemType.Medkit:
-                        MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.MedkitAhpHealthValue;
+                        MedUsed.Player.AdrenalineHealth += (int)plugin.Config.MedkitAhpHealthValue;
                         break;
                     case ItemType.Adrenaline:
-                        if (!(CreativeToolbox.ConfigRef.Config.AdrenalineAhpHealthValue <= 0))
-                            MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.AdrenalineAhpHealthValue;
+                        if (!(plugin.Config.AdrenalineAhpHealthValue <= 0))
+                            MedUsed.Player.AdrenalineHealth += (int)plugin.Config.AdrenalineAhpHealthValue;
                         break;
                     case ItemType.SCP500:
-                        MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.Scp500AhpHealthValue;
+                        MedUsed.Player.AdrenalineHealth += (int)plugin.Config.Scp500AhpHealthValue;
                         break;
                     case ItemType.SCP207:
-                        MedUsed.Player.AdrenalineHealth += (int)CreativeToolbox.ConfigRef.Config.Scp207AhpHealthValue;
+                        MedUsed.Player.AdrenalineHealth += (int)plugin.Config.Scp207AhpHealthValue;
                         break;
                 }
             }
-            if (CreativeToolbox.ConfigRef.Config.EnableExplodingAfterDrinkingScp207)
+            if (plugin.Config.EnableExplodingAfterDrinkingScp207)
             {
                 if (MedUsed.Item == ItemType.SCP207)
                 {
@@ -154,21 +158,21 @@ namespace CreativeToolbox
 
         public void RunWhenDoorIsInteractedWith(InteractingDoorEventArgs DoorInter)
         {
-            if (CreativeToolbox.ConfigRef.Config.EnableDoorMessages)
+            if (plugin.Config.EnableDoorMessages && !DoorInter.Player.Role.IsSCP())
             {
                 if (PlayersThatCanPryGates.Contains(DoorInter.Player.ReferenceHub) && GatesThatExist.Contains(DoorInter.Door.DoorName))
                 {
                     DoorInter.Door.PryGate();
                     if (!DoorInter.Player.IsBypassModeEnabled)
                     {
-                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.PryGateMessage}", new HintParameter[]
+                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{plugin.Config.PryGateMessage}", new HintParameter[]
                         {
                             new StringHintParameter("")
                         }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
                     }
                     else
                     {
-                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.PryGateBypassMessage}", new HintParameter[]
+                        DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{plugin.Config.PryGateBypassMessage}", new HintParameter[]
                         {
                             new StringHintParameter("")
                         }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -182,14 +186,14 @@ namespace CreativeToolbox
                         {
                             if (DoorInter.IsAllowed)
                             {
-                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.UnlockedDoorMessage}", new HintParameter[]
+                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{plugin.Config.UnlockedDoorMessage}", new HintParameter[]
                                 {
                                     new StringHintParameter("")
                                 }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
                             }
                             else
                             {
-                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.LockedDoorMessage}", new HintParameter[]
+                                DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{plugin.Config.LockedDoorMessage}", new HintParameter[]
                                 {
                                     new StringHintParameter("")
                                 }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -197,7 +201,7 @@ namespace CreativeToolbox
                         }
                         else if (!DoorInter.Player.ReferenceHub.ItemInHandIsKeycard() && DoorsThatAreLocked.Contains(DoorInter.Door.DoorName))
                         {
-                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.NeedKeycardMessage}", new HintParameter[]
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{plugin.Config.NeedKeycardMessage}", new HintParameter[]
                             {
                                 new StringHintParameter("")
                             }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -207,14 +211,14 @@ namespace CreativeToolbox
                     {
                         if (DoorInter.Player.ReferenceHub.ItemInHandIsKeycard())
                         {
-                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.BypassWithKeycardMessage}", new HintParameter[]
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{plugin.Config.BypassWithKeycardMessage}", new HintParameter[]
                             {
                                 new StringHintParameter("")
                             }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
                         }
                         else
                         {
-                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{CreativeToolbox.ConfigRef.Config.BypassKeycardMessage}", new HintParameter[]
+                            DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{plugin.Config.BypassKeycardMessage}", new HintParameter[]
                             {
                                 new StringHintParameter("")
                             }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -226,7 +230,7 @@ namespace CreativeToolbox
 
         public void RunWhenPlayerEntersFemurBreaker(EnteringFemurBreakerEventArgs FemurBreaker)
         {
-            if (CreativeToolbox.ConfigRef.Config.EnableScp106AdvancedGod)
+            if (plugin.Config.EnableScp106AdvancedGod)
             {
                 foreach (Player Ply in Player.List)
                 {
@@ -245,7 +249,7 @@ namespace CreativeToolbox
 
         public void RunWhenWarheadIsDetonated()
         {
-            if (!IsWarheadDetonated)
+            if (!IsWarheadDetonated && plugin.Config.EnableDoorsDestroyedWithWarhead)
             {
                 foreach (Door door in UnityEngine.Object.FindObjectsOfType<Door>())
                 {
@@ -257,16 +261,8 @@ namespace CreativeToolbox
 
         public void RunWhenTeamRespawns(RespawningTeamEventArgs TeamRspwn)
         {
-            if (!TeamRspwn.IsChaos)
-            {
-                List<Player> Respawned = TeamRspwn.Players;
-                foreach (Player Ply in Respawned)
-                {
-                    Vector3 OldPos = Ply.Position;
-                    Ply.SetRole(RoleType.ChaosInsurgency);
-                    Ply.Position = OldPos;
-                }
-            }
+            if (plugin.Config.EnableReverseRoleRespawnWaves)
+                Timing.CallDelayed(0.1f, () => ChaosRespawnHandle = Timing.RunCoroutine(SpawnReverseOfWave(TeamRspwn.Players, TeamRspwn.IsChaos)));
         }
 
         public void RunOnRemoteAdminCommand(SendingRemoteAdminCommandEventArgs RAComEv)
@@ -328,7 +324,7 @@ namespace CreativeToolbox
                                     case "time":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rspwn) && rspwn > 0)
                                         {
-                                            CreativeToolbox.ConfigRef.Config.RandomRespawnTimer = rspwn;
+                                            plugin.Config.RandomRespawnTimer = rspwn;
                                             RAComEv.Sender.RemoteAdminMessage($"Auto respawning timer is now set to {rspwn} seconds!");
                                             Map.Broadcast(5, $"Auto respawning timer is now set to {rspwn} seconds!", Broadcast.BroadcastFlags.Normal);
                                             return;
@@ -353,7 +349,7 @@ namespace CreativeToolbox
                             return;
                         }
 
-                        if (!CreativeToolbox.ConfigRef.Config.EnableAutoScaling)
+                        if (!plugin.Config.EnableAutoScaling)
                         {
                             RAComEv.Sender.RemoteAdminMessage("Auto scaling cannot be modified!");
                             return;
@@ -365,7 +361,7 @@ namespace CreativeToolbox
                             {
                                 Ply.Scale = Vector3.one;
                             }
-                            if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
+                            if (!plugin.Config.DisableAutoScaleMessages)
                                 Map.Broadcast(5, "Everyone has been restored to their normal size!", Broadcast.BroadcastFlags.Normal);
                             PlayersWithRetainedScale.Clear();
                             AutoScaleOn = false;
@@ -374,11 +370,11 @@ namespace CreativeToolbox
                         {
                             foreach (Player Ply in Player.List)
                             {
-                                Ply.Scale = new Vector3(CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue, CreativeToolbox.ConfigRef.Config.AutoScaleValue);
+                                Ply.Scale = new Vector3(plugin.Config.AutoScaleValue, plugin.Config.AutoScaleValue, plugin.Config.AutoScaleValue);
                                 PlayersWithRetainedScale.Add(Ply.UserId);
                             }
-                            if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
-                                Map.Broadcast(5, $"Everyone has their playermodel scale set to {CreativeToolbox.ConfigRef.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
+                            if (!plugin.Config.DisableAutoScaleMessages)
+                                Map.Broadcast(5, $"Everyone has their playermodel scale set to {plugin.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
                             AutoScaleOn = true;
                         }
                         break;
@@ -427,10 +423,10 @@ namespace CreativeToolbox
                                 {
                                     case RoleType.Spectator:
                                     case RoleType.None:
-                                        RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\" is not a valid class to explode, not this time!");
+                                        RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.Nickname}\" is not a valid class to explode, not this time!");
                                         break;
                                     default:
-                                        RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\" game ended (exploded)");
+                                        RAComEv.Sender.RemoteAdminMessage($"Player \"{ChosenPlayer.Nickname}\" game ended (exploded)");
                                         ChosenPlayer.Kill();
                                         SpawnGrenadeOnPlayer(ChosenPlayer, false);
                                         break;
@@ -446,7 +442,7 @@ namespace CreativeToolbox
                             return;
                         }
 
-                        if (CreativeToolbox.ConfigRef.Config.DisableFallModification)
+                        if (plugin.Config.DisableFallModification)
                         {
                             RAComEv.Sender.RemoteAdminMessage("Fall damage cannot be modified!");
                             return;
@@ -503,7 +499,7 @@ namespace CreativeToolbox
 
                         if (RAComEv.Arguments.Count < 3)
                         {
-                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: giveam (*/all/(id or name)) (5/7/9) (amount)");
+                            RAComEv.Sender.RemoteAdminMessage("Invalid parameters! Syntax: giveammo (*/all/(id or name)) (5/7/9) (amount)");
                             return;
                         }
 
@@ -581,7 +577,7 @@ namespace CreativeToolbox
                                                 if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int FiveMM) && FiveMM >= 0)
                                                 {
                                                     ChosenPlayer.SetAmmo(Exiled.API.Enums.AmmoType.Nato556, (uint) (ChosenPlayer.GetAmmo(Exiled.API.Enums.AmmoType.Nato556) + FiveMM));
-                                                    RAComEv.Sender.RemoteAdminMessage($"{FiveMM} 5.56mm ammo given to \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                                    RAComEv.Sender.RemoteAdminMessage($"{FiveMM} 5.56mm ammo given to \"{ChosenPlayer.Nickname}\"!");
                                                     Player.Get(RAComEv.Arguments[0])?.Broadcast(3, $"You were given {FiveMM} of 5.56mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
@@ -591,7 +587,7 @@ namespace CreativeToolbox
                                                 if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int SevenMM) && SevenMM >= 0)
                                                 {
                                                     ChosenPlayer.SetAmmo(Exiled.API.Enums.AmmoType.Nato762, (uint) (ChosenPlayer.GetAmmo(Exiled.API.Enums.AmmoType.Nato762) + SevenMM));
-                                                    RAComEv.Sender.RemoteAdminMessage($"{SevenMM} 7.62mm ammo given to \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                                    RAComEv.Sender.RemoteAdminMessage($"{SevenMM} 7.62mm ammo given to \"{ChosenPlayer.Nickname}\"!");
                                                     Player.Get(RAComEv.Arguments[0])?.Broadcast(3, $"You were given {SevenMM} of 7.62mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
@@ -601,7 +597,7 @@ namespace CreativeToolbox
                                                 if (int.TryParse(RAComEv.Arguments[2].ToLower(), out int NineMM) && NineMM >= 0)
                                                 {
                                                     ChosenPlayer.SetAmmo(Exiled.API.Enums.AmmoType.Nato9, (uint) (ChosenPlayer.GetAmmo(Exiled.API.Enums.AmmoType.Nato9) + NineMM));
-                                                    RAComEv.Sender.RemoteAdminMessage($"{NineMM} 9.00mm ammo given to \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                                    RAComEv.Sender.RemoteAdminMessage($"{NineMM} 9.00mm ammo given to \"{ChosenPlayer.Nickname}\"!");
                                                     Player.Get(RAComEv.Arguments[0])?.Broadcast(3, $"You were given {NineMM} of 9.00mm ammo!", Broadcast.BroadcastFlags.Normal);
                                                     return;
                                                 }
@@ -627,7 +623,7 @@ namespace CreativeToolbox
                             return;
                         }
 
-                        if (!CreativeToolbox.ConfigRef.Config.EnableCustomGrenadeTime)
+                        if (!plugin.Config.EnableCustomGrenadeTime)
                         {
                             RAComEv.Sender.RemoteAdminMessage("You cannot modify grenades as it is disabled!");
                             return;
@@ -647,7 +643,7 @@ namespace CreativeToolbox
                                     case "frag":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float value) && value > 0)
                                         {
-                                            CreativeToolbox.ConfigRef.Config.FragGrenadeFuseTimer = value;
+                                            plugin.Config.FragGrenadeFuseTimer = value;
                                             RAComEv.Sender.RemoteAdminMessage($"Frag grenade fuse timer set to {value}");
                                             return;
                                         }
@@ -656,7 +652,7 @@ namespace CreativeToolbox
                                     case "flash":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float val) && val > 0)
                                         {
-                                            CreativeToolbox.ConfigRef.Config.FlashGrenadeFuseTimer = val;
+                                            plugin.Config.FlashGrenadeFuseTimer = val;
                                             RAComEv.Sender.RemoteAdminMessage($"Flash grenade fuse timer set to {val}");
                                             return;
                                         }
@@ -739,14 +735,14 @@ namespace CreativeToolbox
                                         }
                                         if (!ChosenPlayer.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent inf))
                                         {
-                                            RAComEv.Sender.RemoteAdminMessage($"Infinite ammo enabled for \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                            RAComEv.Sender.RemoteAdminMessage($"Infinite ammo enabled for \"{ChosenPlayer.Nickname}\"!");
                                             Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Infinite ammo is enabled for you!", Broadcast.BroadcastFlags.Normal);
                                             PlayersWithInfiniteAmmo.Add(ChosenPlayer.ReferenceHub);
                                             ChosenPlayer.ReferenceHub.gameObject.AddComponent<InfiniteAmmoComponent>();
                                         }
                                         else
                                         {
-                                            RAComEv.Sender.RemoteAdminMessage($"Infinite ammo disabled for \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                            RAComEv.Sender.RemoteAdminMessage($"Infinite ammo disabled for \"{ChosenPlayer.Nickname}\"!");
                                             Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Infinite ammo is disabled for you!", Broadcast.BroadcastFlags.Normal);
                                             PlayersWithInfiniteAmmo.Remove(ChosenPlayer.ReferenceHub);
                                             UnityEngine.Object.Destroy(inf);
@@ -840,7 +836,7 @@ namespace CreativeToolbox
                                     case "start":
                                         if (!float.TryParse(RAComEv.Arguments[1].ToLower(), out float timer) || (timer >= 143 || timer < 0.05))
                                         {
-                                            RAComEv.Sender.RemoteAdminMessage($"Invalid value for timer: {RAComEv.Arguments[1]}, highest is 143, lowest is 0.05");
+                                            RAComEv.Sender.RemoteAdminMessage($"Invalid value for timer: {RAComEv.Arguments[1]}, highest is 142, lowest is 0.05");
                                             return;
                                         }
                                         Warhead.Start();
@@ -913,13 +909,13 @@ namespace CreativeToolbox
                                         }
                                         if (!PlayersThatCanPryGates.Contains(ChosenPlayer.ReferenceHub))
                                         {
-                                            RAComEv.Sender.RemoteAdminMessage($"Pry gates ability enabled for \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                            RAComEv.Sender.RemoteAdminMessage($"Pry gates ability enabled for \"{ChosenPlayer.Nickname}\"!");
                                             Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Pry gates ability is enabled for you!", Broadcast.BroadcastFlags.Normal);
                                             PlayersThatCanPryGates.Add(ChosenPlayer.ReferenceHub);
                                         }
                                         else
                                         {
-                                            RAComEv.Sender.RemoteAdminMessage($"Pry gates ability disabled for \"{ChosenPlayer.ReferenceHub.nicknameSync.MyNick}\"!");
+                                            RAComEv.Sender.RemoteAdminMessage($"Pry gates ability disabled for \"{ChosenPlayer.Nickname}\"!");
                                             Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Pry gates ability is disabled for you!", Broadcast.BroadcastFlags.Normal);
                                             PlayersThatCanPryGates.Remove(ChosenPlayer.ReferenceHub);
                                         }
@@ -997,24 +993,24 @@ namespace CreativeToolbox
                                         RAComEv.Sender.RemoteAdminMessage("Missing value for health!");
                                         break;
                                     default:
-                                        ReferenceHub ChosenPlayer = Player.Get(RAComEv.Arguments[0]).ReferenceHub;
+                                        Player ChosenPlayer = Player.Get(RAComEv.Arguments[0]);
                                         if (ChosenPlayer == null)
                                         {
                                             RAComEv.Sender.RemoteAdminMessage($"Player \"{RAComEv.Arguments[0]}\" not found");
                                             return;
                                         }
-                                        if (!ChosenPlayer.TryGetComponent(out RegenerationComponent rgn))
+                                        if (!ChosenPlayer.ReferenceHub.TryGetComponent(out RegenerationComponent rgn))
                                         {
-                                            RAComEv.Sender.RemoteAdminMessage($"Regeneration enabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
+                                            RAComEv.Sender.RemoteAdminMessage($"Regeneration enabled for \"{ChosenPlayer.Nickname}\"!");
                                             Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Regeneration is enabled for you!", Broadcast.BroadcastFlags.Normal);
-                                            PlayersWithRegen.Add(ChosenPlayer);
-                                            ChosenPlayer.gameObject.AddComponent<RegenerationComponent>();
+                                            PlayersWithRegen.Add(ChosenPlayer.ReferenceHub);
+                                            ChosenPlayer.ReferenceHub.gameObject.AddComponent<RegenerationComponent>();
                                         }
                                         else
                                         {
-                                            RAComEv.Sender.RemoteAdminMessage($"Regeneration disabled for \"{ChosenPlayer.nicknameSync.MyNick}\"!");
+                                            RAComEv.Sender.RemoteAdminMessage($"Regeneration disabled for \"{ChosenPlayer.Nickname}\"!");
                                             Player.Get(RAComEv.Arguments[0])?.Broadcast(3, "Regeneration is disabled for you!", Broadcast.BroadcastFlags.Normal);
-                                            PlayersWithRegen.Remove(ChosenPlayer);
+                                            PlayersWithRegen.Remove(ChosenPlayer.ReferenceHub);
                                             UnityEngine.Object.Destroy(rgn);
                                         }
                                         break;
@@ -1026,7 +1022,7 @@ namespace CreativeToolbox
                                     case "time":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rgn_t) && rgn_t > 0)
                                         {
-                                            CreativeToolbox.ConfigRef.Config.RegenerationTime = rgn_t;
+                                            plugin.Config.RegenerationTime = rgn_t;
                                             RAComEv.Sender.RemoteAdminMessage($"Players with regeneration gain health every {rgn_t} seconds!");
                                             return;
                                         }
@@ -1035,8 +1031,8 @@ namespace CreativeToolbox
                                     case "value":
                                         if (float.TryParse(RAComEv.Arguments[1].ToLower(), out float rgn_v) && rgn_v > 0)
                                         {
-                                            CreativeToolbox.ConfigRef.Config.RegenerationValue = rgn_v;
-                                            RAComEv.Sender.RemoteAdminMessage($"Players with regeneration gain {rgn_v} health every {CreativeToolbox.ConfigRef.Config.RegenerationTime} seconds!");
+                                            plugin.Config.RegenerationValue = rgn_v;
+                                            RAComEv.Sender.RemoteAdminMessage($"Players with regeneration gain {rgn_v} health every {plugin.Config.RegenerationTime} seconds!");
                                             return;
                                         }
                                         RAComEv.Sender.RemoteAdminMessage($"Invalid value for regeneration healing! Value: {RAComEv.Arguments[1].ToLower()}");
@@ -1050,9 +1046,6 @@ namespace CreativeToolbox
                                 RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}, Expected 3");
                                 break;
                         }
-                        break;
-                    case "scp096target":
-                        RAComEv.IsAllowed = false;
                         break;
                     case "sdecon":
                         RAComEv.IsAllowed = false;
@@ -1088,37 +1081,37 @@ namespace CreativeToolbox
             switch (num)
             {
                 case 0:
-                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfCadet, ply.ReferenceHub.gameObject);
+                    ply.Role = RoleType.NtfCadet;
                     break;
                 case 1:
                     if (!IsWarheadDetonated && !IsDecontanimationActivated)
-                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.ClassD, ply.ReferenceHub.gameObject);
+                        ply.Role = RoleType.ClassD;
                     else
-                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.ChaosInsurgency, ply.ReferenceHub.gameObject);
+                        ply.Role = RoleType.ChaosInsurgency;
                     break;
                 case 2:
                     if (!IsWarheadDetonated)
-                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.FacilityGuard, ply.ReferenceHub.gameObject);
+                        ply.Role = RoleType.FacilityGuard;
                     else
-                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfCommander, ply.ReferenceHub.gameObject);
+                        ply.Role = RoleType.NtfCommander;
                     break;
                 case 3:
-                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfLieutenant, ply.ReferenceHub.gameObject);
+                    ply.Role = RoleType.NtfLieutenant;
                     break;
                 case 4:
-                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfScientist, ply.ReferenceHub.gameObject);
+                    ply.Role = RoleType.NtfScientist;
                     break;
                 case 5:
-                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.ChaosInsurgency, ply.ReferenceHub.gameObject);
+                    ply.Role = RoleType.ChaosInsurgency;
                     break;
                 case 6:
                     if (!IsWarheadDetonated && !IsDecontanimationActivated)
-                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.Scientist, ply.ReferenceHub.gameObject);
+                        ply.Role = RoleType.Scientist;
                     else
-                        ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfLieutenant, ply.ReferenceHub.gameObject);
+                        ply.Role = RoleType.NtfLieutenant;
                     break;
                 case 7:
-                    ply.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfCommander, ply.ReferenceHub.gameObject);
+                    ply.Role = RoleType.NtfCommander;
                     break;
             }
         }
@@ -1133,6 +1126,28 @@ namespace CreativeToolbox
                 gnade.fuseDuration = 0.01f;
             gnade.FullInitData(gm, PlayerToSpawnGrenade.Position, Quaternion.Euler(gnade.throwStartAngle), gnade.throwLinearVelocityOffset, gnade.throwAngularVelocity);
             NetworkServer.Spawn(gnade.gameObject);
+        }
+
+        public IEnumerator<float> SpawnReverseOfWave(List<Player> RespawnedPlayers, bool Chaos)
+        {
+            List<Vector3> StoredPositions = new List<Vector3>();
+            foreach(Player Ply in RespawnedPlayers)
+            {
+                StoredPositions.Add(Ply.Position);
+                if (Chaos)
+                    Ply.Role = (RoleType)Enum.Parse(typeof(RoleType), RandNum.Next(11, 13).ToString());
+                else
+                    Ply.Role = RoleType.ChaosInsurgency;
+            }
+            yield return Timing.WaitForSeconds(0.2f);
+            int index = 0;
+            foreach (Player Ply in RespawnedPlayers)
+            {
+                Ply.Position = StoredPositions[index];
+                index++;
+            }
+
+            Timing.KillCoroutines(ChaosRespawnHandle);
         }
     }
 }

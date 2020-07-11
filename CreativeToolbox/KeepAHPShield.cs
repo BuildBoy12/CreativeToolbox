@@ -18,10 +18,12 @@ namespace CreativeToolbox
             Hub = Player.Get(gameObject);
             Handle = Timing.RunCoroutine(RetainAHP());
             Exiled.Events.Handlers.Player.Hurting += RunWhenPlayerIsHurt;
+            Exiled.Events.Handlers.Player.ChangingRole += RunWhenPlayerChangesClass;
         }
 
         public void OnDestroy()
         {
+            Exiled.Events.Handlers.Player.ChangingRole -= RunWhenPlayerChangesClass;
             Exiled.Events.Handlers.Player.Hurting -= RunWhenPlayerIsHurt;
             Hub = null;
             Timing.KillCoroutines(Handle);
@@ -40,19 +42,25 @@ namespace CreativeToolbox
 
         public void RunWhenPlayerChangesClass(ChangingRoleEventArgs ChangedRole)
         {
-            if (ChangedRole.Player != Hub || (ChangedRole.NewRole == RoleType.Spectator || ChangedRole.NewRole == RoleType.None))
-                IsNotAlive = true;
+            if (ChangedRole.Player != Hub)
+                return;
+    
+            if (ChangedRole.NewRole == RoleType.Spectator || ChangedRole.NewRole == RoleType.None || ChangedRole.NewRole.IsSCP())
+            {
+                Timing.KillCoroutines(Handle);
+                if (ChangedRole.NewRole == RoleType.Scp096)
+                    Hub.AdrenalineHealth = 500f;
+                else
+                    Hub.AdrenalineHealth = 0f;
+            }
             else
-                IsNotAlive = false;
+                Timing.RunCoroutine(RetainAHP());
         }
 
         public IEnumerator<float> RetainAHP()
         {
             while (true)
             {
-                if (!IsNotAlive)
-                    yield return Timing.WaitForSeconds(0.05f);
-
                 if (Hub.AdrenalineHealth <= CurrentAHP)
                     Hub.AdrenalineHealth = CurrentAHP;
                 else

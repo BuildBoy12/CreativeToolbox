@@ -24,6 +24,8 @@ namespace CreativeToolbox
         public bool EnableScp106AdvancedGod { get; set; } = false;
         public bool EnableCustomAnnouncements { get; set; } = false;
         public bool EnableCustomScp096Shield { get; set; } = false;
+        public bool EnableReverseRoleRespawnWaves { get; set; } = false;
+        public bool EnableDoorsDestroyedWithWarhead { get; set; } = false;
         public bool DisableAutoScaleMessages { get; set; } = false;
         public bool DisableFallModification { get; set; } = false;
         public string LockedDoorMessage { get; set; } = "you need a better keycard to open this door!";
@@ -37,8 +39,8 @@ namespace CreativeToolbox
         public string NineTailedFoxAnnouncement { get; set; } = "";
         public int Scp096Ahp { get; set; } = 250;
         public float GrenadeTimerOnDeath { get; set; } = 10f;
-        public float RegenerationTime { get; set; } = 0f;
-        public float RegenerationValue { get; set; } = 0f;
+        public float RegenerationTime { get; set; } = 1f;
+        public float RegenerationValue { get; set; } = 5f;
         public float RandomRespawnTimer { get; set; } = 0.05f;
         public float FragGrenadeFuseTimer { get; set; } = 5f;
         public float FlashGrenadeFuseTimer { get; set; } = 3f;
@@ -50,6 +52,6 @@ namespace CreativeToolbox
         public int Scp207DrinkLimit { get; set; } = 5;
         public int Scp207PryGateLimit { get; set; } = 3;
         public float AutoScaleValue { get; set; } = 1f;
-        public float AhpValueLimit { get; set; } = 200f;
+        public float AhpValueLimit { get; set; } = 75f;
     }
 }
