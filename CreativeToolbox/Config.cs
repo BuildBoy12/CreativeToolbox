@@ -38,7 +38,7 @@ namespace CreativeToolbox
         public string ChaosInsurgencyAnnouncement { get; set; } = "";
         public string NineTailedFoxAnnouncement { get; set; } = "";
         public int Scp096Ahp { get; set; } = 250;
-        public float GrenadeTimerOnDeath { get; set; } = 10f;
+        public float GrenadeTimerOnDeath { get; set; } = 5f;
         public float RegenerationTime { get; set; } = 1f;
         public float RegenerationValue { get; set; } = 5f;
         public float RandomRespawnTimer { get; set; } = 0.05f;
