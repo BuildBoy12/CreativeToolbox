@@ -1,8 +1,6 @@
-﻿using EXILED.Extensions;
+﻿using System;
 using Grenades;
-using Harmony;
-using Mirror;
-using UnityEngine;
+using HarmonyLib;
 
 namespace CreativeToolbox
 {
@@ -11,12 +9,12 @@ namespace CreativeToolbox
     {
         public static bool Prefix(Grenade __instance)
         {
-            if (CreativeToolbox.EnableGrenadeTimeMod)
+            if (CreativeToolbox.ConfigRef.Config.EnableCustomGrenadeTime)
             {
                 if (__instance.GetType() == typeof(FragGrenade))
-                        __instance.fuseDuration = CreativeToolbox.FragGrenadeFuseTimer;
+                        __instance.fuseDuration = CreativeToolbox.ConfigRef.Config.FragGrenadeFuseTimer;
                 else if (__instance.GetType() == typeof(FlashGrenade))
-                    __instance.fuseDuration = CreativeToolbox.FlashGrenadeFuseTimer;
+                    __instance.fuseDuration = CreativeToolbox.ConfigRef.Config.FlashGrenadeFuseTimer;
             }
             return true;
         }

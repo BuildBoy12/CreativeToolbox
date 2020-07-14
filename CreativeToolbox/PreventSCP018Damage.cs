@@ -1,7 +1,6 @@
 ﻿using System;
 using Grenades;
-using Harmony;
-using UnityEngine;
+using HarmonyLib;
 
 namespace CreativeToolbox
 {
@@ -10,7 +9,7 @@ namespace CreativeToolbox
     {
         public static bool Prefix(Scp018Grenade __instance)
         {
-            if (CreativeToolbox.EnableGrenadeDamagePrevent)
+            if (CreativeToolbox.ConfigRef.Config.EnableGrenadeDamagePrevention)
             {
                 __instance.damageHurt = 0;
                 __instance.damageScpMultiplier = 0;

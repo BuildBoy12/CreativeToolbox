@@ -34,25 +34,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>C:\Users\user\AppData\Roaming\Plugins\dependencies\0Harmony.dll</HintPath>
+      <HintPath>..\..\..\EXILED BETAS\EXILED 2.0 - Fixed\Again 2\Exiled-2.0\EXILED-PTB\Plugins\dependencies\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\..\..\SCPSL_Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>..\..\..\..\..\SCPSL_Server\SCPSL_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="EXILED_Events">
-      <HintPath>C:\Users\user\AppData\Roaming\Plugins\EXILED_Events.dll</HintPath>
+    <Reference Include="Exiled.API">
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\dependencies\Exiled.API.dll</HintPath>
     </Reference>
-    <Reference Include="EXILED_Permissions">
-      <HintPath>C:\Users\user\AppData\Roaming\Plugins\EXILED_Permissions.dll</HintPath>
+    <Reference Include="Exiled.Events">
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Events.dll</HintPath>
     </Reference>
-    <Reference Include="EXILED_publicized">
-      <HintPath>C:\Users\user\AppData\Roaming\EXILED\publicized_assemblies\EXILED_publicized.dll</HintPath>
+    <Reference Include="Exiled.Loader">
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Exiled.Loader.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.Permissions">
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.Updater">
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Updater.dll</HintPath>
     </Reference>
     <Reference Include="Mirror">
-      <HintPath>..\..\..\..\..\SCPSL_Server\SCPSL_Data\Managed\Mirror.dll</HintPath>
+      <HintPath>..\..\..\SCPSL_New_Server\SCPSL_Data\Managed\Mirror.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -62,30 +68,41 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\SCPSL_Server\SCPSL_Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SCPSL_New_Server\SCPSL_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\..\SCPSL_New_Server\SCPSL_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\..\SCPSL_Server\SCPSL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\..\SCPSL_New_Server\SCPSL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\SCPSL_Server\SCPSL_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\..\SCPSL_New_Server\SCPSL_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="YamlDotNet">
+      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled_2.0.0\EXILED-PTB\Plugins\dependencies\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddCustomCIAnnouncement.cs" />
+    <Compile Include="AddCustomMTFAnnouncement.cs" />
+    <Compile Include="ModifySCP096ShieldPatch.cs" />
     <Compile Include="CreateCustomGrenadePatch.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="CreativeToolbox.cs" />
     <Compile Include="CreativeToolboxEventHandler.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="InfiniteAmmoComponent.cs" />
     <Compile Include="InfiniteAmmoMicroHIDPatch.cs" />
-    <Compile Include="InvisibleComponent.cs" />
+    <Compile Include="KeepAHPShield.cs" />
     <Compile Include="PreventExplosionDamage.cs" />
     <Compile Include="PreventSCP018Damage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegenerationComponent.cs" />
-    <Compile Include="SpeedComponent.cs" />
+    <Compile Include="SCP018EndgamePatch.cs" />
+    <Compile Include="SCP207Counter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

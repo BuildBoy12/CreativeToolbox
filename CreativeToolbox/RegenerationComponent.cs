@@ -1,18 +1,18 @@
 ﻿using System;
-using EXILED.Extensions;
 using UnityEngine;
 using MEC;
 using System.Collections.Generic;
+using Exiled.API.Features;
 
 namespace CreativeToolbox
 {
     public class RegenerationComponent : MonoBehaviour
     {
-        public ReferenceHub Hub;
+        private Player Hub;
         CoroutineHandle Handle;
         public void Awake()
         {
-            Hub = gameObject.GetPlayer();
+            Hub = Player.Get(gameObject);
             Handle = Timing.RunCoroutine(HealHealth(Hub));
         }
 
@@ -22,16 +22,16 @@ namespace CreativeToolbox
             Timing.KillCoroutines(Handle);
         }
 
-        public IEnumerator<float> HealHealth(ReferenceHub player)
+        public IEnumerator<float> HealHealth(Player ply)
         {
             while (true)
             {
-                if (player.GetHealth() < player.playerStats.maxHP)
-                    player.AddHealth(CreativeToolbox.HPRegenerationValue);
+                if (ply.Health < ply.MaxHealth)
+                    ply.Health += CreativeToolbox.ConfigRef.Config.RegenerationValue;
                 else
-                    player.SetHealth(player.playerStats.maxHP);
+                    ply.Health = ply.MaxHealth;
 
-                yield return Timing.WaitForSeconds(CreativeToolbox.HPRegenerationTimer);
+                yield return Timing.WaitForSeconds(CreativeToolbox.ConfigRef.Config.RegenerationTime);
             }
         }
     }
