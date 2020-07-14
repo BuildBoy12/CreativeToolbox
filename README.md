@@ -2,7 +2,7 @@
 An SCP:SL EXILED plugin that makes your servers creative with a variety of customizable options!
 
 ### Features
-- Scopotophobia Support
+- Scopophobia Support
 - Players can have regeneration
 - Players can have infinite ammo
 - Players can pry gates open
