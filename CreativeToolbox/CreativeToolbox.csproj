@@ -40,7 +40,7 @@
       <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>..\..\..\Exiled 2.0 Official\EXILED\Assembly-CSharp_publicized.dll</HintPath>
+      <HintPath>..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED (1)\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.API">
       <HintPath>..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED\EXILED-PTB\Plugins\dependencies\Exiled.API.dll</HintPath>
@@ -85,7 +85,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddCustomMTFAnnouncement.cs" />
+    <Compile Include="AddCustomCIAnnouncement.cs" />
     <Compile Include="ModifySCP096ShieldPatch.cs" />
     <Compile Include="CreateCustomGrenadePatch.cs" />
     <Compile Include="Config.cs" />
@@ -101,6 +101,7 @@
     <Compile Include="RegenerationComponent.cs" />
     <Compile Include="SCP018EndgamePatch.cs" />
     <Compile Include="SCP207Counter.cs" />
+    <Compile Include="AddCustomNTFAnnouncement.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

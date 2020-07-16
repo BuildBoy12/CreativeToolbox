@@ -24,6 +24,7 @@ namespace CreativeToolbox
         public bool EnableCustomScp096Shield { get; set; } = false;
         public bool EnableReverseRoleRespawnWaves { get; set; } = false;
         public bool EnableDoorsDestroyedWithWarhead { get; set; } = false;
+        public bool EnableRandomChaosInsurgencyAnnouncementChance { get; set; } = false;
         public bool DisableAutoScaleMessages { get; set; } = false;
         public bool DisableFallModification { get; set; } = false;
         public string LockedDoorMessage { get; set; } = "you need a better keycard to open this door!";
@@ -33,7 +34,7 @@ namespace CreativeToolbox
         public string BypassWithKeycardMessage { get; set; } = "you bypassed the reader, but you did not need a keycard";
         public string PryGateMessage { get; set; } = "you pried the gate open";
         public string PryGateBypassMessage { get; set; } = "you pried the gate open, but you could bypass it";
-        public string ChaosInsurgencyAnnouncement { get; set; } = "";
+        public string ChaosInsurgencyAnnouncement { get; set; } = "The ChaosInsurgency have entered the facility";
         public string NineTailedFoxAnnouncement { get; set; } = "";
         public int Scp096Ahp { get; set; } = 250;
         public float GrenadeTimerOnDeath { get; set; } = 5f;
@@ -53,5 +54,8 @@ namespace CreativeToolbox
         public float AhpValueLimit { get; set; } = 75f;
         public float ChaosInsurgencyAnnouncementGlitchChance { get; set;  } = 0f;
         public float ChaosInsurgencyAnnouncementJamChance { get; set; } = 0f;
+        public float NineTailedFoxAnnouncementGlitchChance { get; set; } = 0f;
+        public float NineTailedFoxAnnouncementJamChance { get; set; } = 0f;
+        public double ChaosInsurgencyAnnouncementChance { get; set; } = 50;
     }
 }
