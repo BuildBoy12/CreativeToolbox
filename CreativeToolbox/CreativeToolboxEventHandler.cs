@@ -75,7 +75,7 @@ namespace CreativeToolbox
 
         public void RunOnPlayerJoin(JoinedEventArgs PlyJoin)
         {
-            if (plugin.Config.EnableAutoScaling && plugin.Config.EnableKeepScale)
+            if (AutoScaleOn && plugin.Config.EnableKeepScale)
             {
                 if (PlayersWithRetainedScale.Contains(PlyJoin.Player.UserId)) {
                     if (!plugin.Config.DisableAutoScaleMessages)
@@ -263,8 +263,6 @@ namespace CreativeToolbox
         {
             if (plugin.Config.EnableReverseRoleRespawnWaves)
                 Timing.CallDelayed(0.1f, () => ChaosRespawnHandle = Timing.RunCoroutine(SpawnReverseOfWave(TeamRspwn.Players, TeamRspwn.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)));
-            if (CreativeToolbox.ConfigRef.Config.EnableCustomAnnouncements && !String.IsNullOrWhiteSpace(CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncement) && TeamRspwn.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
-                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncement, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementGlitchChance, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementJamChance);
         }
 
         public void RunOnRemoteAdminCommand(SendingRemoteAdminCommandEventArgs RAComEv)
@@ -351,33 +349,59 @@ namespace CreativeToolbox
                             return;
                         }
 
-                        if (!plugin.Config.EnableAutoScaling)
+                        switch (RAComEv.Arguments.Count)
                         {
-                            RAComEv.Sender.RemoteAdminMessage("Auto scaling cannot be modified!");
-                            return;
-                        }
-
-                        if (AutoScaleOn)
-                        {
-                            foreach (Player Ply in Player.List)
-                            {
-                                Ply.Scale = Vector3.one;
-                            }
-                            if (!plugin.Config.DisableAutoScaleMessages)
-                                Map.Broadcast(5, "Everyone has been restored to their normal size!", Broadcast.BroadcastFlags.Normal);
-                            PlayersWithRetainedScale.Clear();
-                            AutoScaleOn = false;
-                        }
-                        else
-                        {
-                            foreach (Player Ply in Player.List)
-                            {
-                                Ply.Scale = new Vector3(plugin.Config.AutoScaleValue, plugin.Config.AutoScaleValue, plugin.Config.AutoScaleValue);
-                                PlayersWithRetainedScale.Add(Ply.UserId);
-                            }
-                            if (!plugin.Config.DisableAutoScaleMessages)
-                                Map.Broadcast(5, $"Everyone has their playermodel scale set to {plugin.Config.AutoScaleValue}x!", Broadcast.BroadcastFlags.Normal);
-                            AutoScaleOn = true;
+                            case 1:
+                                switch (RAComEv.Arguments[0].ToLower())
+                                {
+                                    case "off":
+                                        if (AutoScaleOn)
+                                        {
+                                            foreach (Player Ply in Player.List)
+                                            {
+                                                Ply.Scale = Vector3.one;
+                                            }
+                                            if (!plugin.Config.DisableAutoScaleMessages)
+                                                Map.Broadcast(5, "Everyone has been restored to their normal size!", Broadcast.BroadcastFlags.Normal);
+                                            PlayersWithRetainedScale.Clear();
+                                            RAComEv.Sender.RemoteAdminMessage("Everyone's player scale has been reset");
+                                            AutoScaleOn = false;
+                                            return;
+                                        }
+                                        RAComEv.Sender.RemoteAdminMessage("Auto scaling is already off!");
+                                        break;
+                                    default:
+                                        RAComEv.Sender.RemoteAdminMessage("Please enter only \"on\" (value) or \"off\"!");
+                                        break;
+                                }
+                                break;
+                            case 2:
+                                switch (RAComEv.Arguments[0].ToLower())
+                                {
+                                    case "on":
+                                        if (!float.TryParse(RAComEv.Arguments[1], out float value))
+                                        {
+                                            RAComEv.Sender.RemoteAdminMessage($"Invalid value for scale: {RAComEv.Arguments[1]}");
+                                            return;
+                                        }
+                                        foreach (Player Ply in Player.List)
+                                        {
+                                            Ply.Scale = new Vector3(value, value, value);
+                                            PlayersWithRetainedScale.Add(Ply.UserId);
+                                        }
+                                        AutoScaleOn = true;
+                                        RAComEv.Sender.RemoteAdminMessage($"Everyone's player scale is {RAComEv.Arguments[1]} now");
+                                        if (!plugin.Config.DisableAutoScaleMessages)
+                                            Map.Broadcast(5, $"Everyone has their playermodel scale set to {value}x!", Broadcast.BroadcastFlags.Normal);
+                                        break;
+                                    default:
+                                        RAComEv.Sender.RemoteAdminMessage("Please enter only \"on\" (value)!");
+                                        break;
+                                }
+                                break;
+                            default:
+                                RAComEv.Sender.RemoteAdminMessage($"Invalid number of parameters! Value: {RAComEv.Arguments.Count}");
+                                break;
                         }
                         break;
                     case "explode":
