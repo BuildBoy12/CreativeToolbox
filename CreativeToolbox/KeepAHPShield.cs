@@ -11,7 +11,6 @@ namespace CreativeToolbox
     {
         private Player Hub;
         private float CurrentAHP = 0;
-        private bool IsNotAlive = false;
         CoroutineHandle Handle;
         public void Awake()
         {
@@ -45,7 +44,7 @@ namespace CreativeToolbox
             if (ChangedRole.Player != Hub)
                 return;
     
-            if (ChangedRole.NewRole == RoleType.Spectator || ChangedRole.NewRole == RoleType.None || ChangedRole.NewRole.IsSCP())
+            if (ChangedRole.NewRole.IsNotHuman())
             {
                 Timing.KillCoroutines(Handle);
                 if (ChangedRole.NewRole == RoleType.Scp096)

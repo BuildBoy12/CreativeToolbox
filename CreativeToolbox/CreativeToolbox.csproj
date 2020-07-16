@@ -40,22 +40,22 @@
       <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\Assembly-CSharp_publicized.dll</HintPath>
+      <HintPath>..\..\..\Exiled 2.0 Official\EXILED\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.API">
-      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\dependencies\Exiled.API.dll</HintPath>
+      <HintPath>..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED\EXILED-PTB\Plugins\dependencies\Exiled.API.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.Events">
-      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Events.dll</HintPath>
+      <HintPath>..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED\EXILED-PTB\Plugins\Exiled.Events.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.Loader">
-      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Exiled.Loader.dll</HintPath>
+      <HintPath>..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED\EXILED-PTB\Exiled.Loader.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.Permissions">
-      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Permissions.dll</HintPath>
+      <HintPath>..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED\EXILED-PTB\Plugins\Exiled.Permissions.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.Updater">
-      <HintPath>..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0\EXILED-PTB\Plugins\Exiled.Updater.dll</HintPath>
+      <HintPath>..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED\EXILED-PTB\Plugins\Exiled.Updater.dll</HintPath>
     </Reference>
     <Reference Include="Mirror">
       <HintPath>..\..\..\SCPSL_New_Server\SCPSL_Data\Managed\Mirror.dll</HintPath>
@@ -68,8 +68,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnityEngine">
       <HintPath>..\..\..\SCPSL_New_Server\SCPSL_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
@@ -86,7 +85,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddCustomCIAnnouncement.cs" />
     <Compile Include="AddCustomMTFAnnouncement.cs" />
     <Compile Include="ModifySCP096ShieldPatch.cs" />
     <Compile Include="CreateCustomGrenadePatch.cs" />

@@ -33,7 +33,7 @@ namespace CreativeToolbox
             }
         }
 
-        public static bool IsSCP(this RoleType role)
+        public static bool IsNotHuman(this RoleType role)
         {
             switch (role)
             {
@@ -45,6 +45,8 @@ namespace CreativeToolbox
                 case RoleType.Scp173:
                 case RoleType.Scp93953:
                 case RoleType.Scp93989:
+                case RoleType.Spectator:
+                case RoleType.None:
                     return true;
                 default:
                     return false;
