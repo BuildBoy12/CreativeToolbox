@@ -75,6 +75,8 @@ scp207_ahp_health_value | Float | 0 | The amount of AHP given if a player uses S
 scp207_drink_limit| Float | 5 | The number of drinks it takes for a user to explode
 scp207_pry_gate_limit | Float | 3 | The number of drinks it takes for a user to be able to pry gates
 auto_scale_value | Float | 1 | The scale factor players are set to with auto-scaling
+chaos_insurgency_announcement_glitch_chance | Float | 0 | The chance that CASSIE will glitch during a CI Announcement
+chaos_insurgency_announcement_jam_chance | Float | 0 | The chance that CASSIE will jam during a CI Announcement
 
 ### Permission Values
 - ct.* (all permissions)
