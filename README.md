@@ -28,7 +28,7 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 
 ### Notes
 - These values can be changed in game / overridden for only one round if people want to do events, if these plugins are enabled that is
-- You must put the included 0harmony.dll file inside the "dependencies" folder within (%appdata%/plugins/dependencies for Windows or ~/.config/plugins/dependencies) for this plugin to work.
+- You must put the included 0harmony.dll file inside the "dependencies" folder within (%appdata%/exiled-ptb/plugins/dependencies for Windows or ~/.config/exiled-ptb/plugins/dependencies) for this plugin to work.
 
 ### Configuration Settings
 Configuration Option | Configuration Data Type | Default Value | Description
