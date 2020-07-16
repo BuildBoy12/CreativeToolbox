@@ -158,7 +158,7 @@ namespace CreativeToolbox
 
         public void RunWhenDoorIsInteractedWith(InteractingDoorEventArgs DoorInter)
         {
-            if (plugin.Config.EnableDoorMessages && !DoorInter.Player.Role.IsSCP())
+            if (plugin.Config.EnableDoorMessages && !DoorInter.Player.Role.IsNotHuman())
             {
                 if (PlayersThatCanPryGates.Contains(DoorInter.Player.ReferenceHub) && GatesThatExist.Contains(DoorInter.Door.DoorName))
                 {
@@ -262,7 +262,9 @@ namespace CreativeToolbox
         public void RunWhenTeamRespawns(RespawningTeamEventArgs TeamRspwn)
         {
             if (plugin.Config.EnableReverseRoleRespawnWaves)
-                Timing.CallDelayed(0.1f, () => ChaosRespawnHandle = Timing.RunCoroutine(SpawnReverseOfWave(TeamRspwn.Players, TeamRspwn.IsChaos)));
+                Timing.CallDelayed(0.1f, () => ChaosRespawnHandle = Timing.RunCoroutine(SpawnReverseOfWave(TeamRspwn.Players, TeamRspwn.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)));
+            if (CreativeToolbox.ConfigRef.Config.EnableCustomAnnouncements && !String.IsNullOrWhiteSpace(CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncement) && TeamRspwn.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
+                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncement, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementGlitchChance, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementJamChance);
         }
 
         public void RunOnRemoteAdminCommand(SendingRemoteAdminCommandEventArgs RAComEv)
@@ -1131,7 +1133,7 @@ namespace CreativeToolbox
         public IEnumerator<float> SpawnReverseOfWave(List<Player> RespawnedPlayers, bool Chaos)
         {
             List<Vector3> StoredPositions = new List<Vector3>();
-            foreach(Player Ply in RespawnedPlayers)
+            foreach (Player Ply in RespawnedPlayers)
             {
                 StoredPositions.Add(Ply.Position);
                 if (Chaos)
@@ -1146,7 +1148,6 @@ namespace CreativeToolbox
                 Ply.Position = StoredPositions[index];
                 index++;
             }
-
             Timing.KillCoroutines(ChaosRespawnHandle);
         }
     }

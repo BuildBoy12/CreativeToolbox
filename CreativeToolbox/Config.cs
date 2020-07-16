@@ -16,10 +16,8 @@ namespace CreativeToolbox
         public bool EnableKeepScale { get; set; } = false;
         public bool EnableGrenadeOnDeath { get; set; } = false;
         public bool EnableDoorMessages { get; set; } = false;
-        public bool EnableDamageMessage { get; set; } = false;
         public bool EnableExplodingAfterDrinkingScp207 { get; set; } = false;
         public bool EnableScp018WarheadBounce { get; set; } = false;
-        public bool EnableSameClassRespawn { get; set; } = false;
         public bool EnableAhpShield { get; set; } = false;
         public bool EnableScp106AdvancedGod { get; set; } = false;
         public bool EnableCustomAnnouncements { get; set; } = false;
@@ -53,5 +51,7 @@ namespace CreativeToolbox
         public int Scp207PryGateLimit { get; set; } = 3;
         public float AutoScaleValue { get; set; } = 1f;
         public float AhpValueLimit { get; set; } = 75f;
+        public float ChaosInsurgencyAnnouncementGlitchChance { get; set;  } = 0f;
+        public float ChaosInsurgencyAnnouncementJamChance { get; set; } = 0f;
     }
 }

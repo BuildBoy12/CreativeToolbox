@@ -2,49 +2,64 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Text;
 using Exiled.API.Features;
 using HarmonyLib;
+using Respawning.NamingRules;
 using UnityEngine;
 
 namespace CreativeToolbox
 {
-    [HarmonyPatch(typeof(NineTailedFoxAnnouncer), nameof(NineTailedFoxAnnouncer.AnnounceNtfEntrance))]
+    [HarmonyPatch(typeof(NineTailedFoxNamingRule), nameof(NineTailedFoxNamingRule.PlayEntranceAnnouncement))]
     class AddCustomMTFAnnouncement
     {
-        public static bool Prefix(NineTailedFoxAnnouncer __instance, int _scpsLeft, int _mtfNumber, char _mtfLetter)
+        public static bool Prefix(NineTailedFoxNamingRule __instance, string regular)
         {
-			string text = string.Empty;
-			string[] array = new string[]
+			string cassieUnitName = __instance.GetCassieUnitName(regular);
+			int num = (from x in global::ReferenceHub.GetAllHubs().Values
+					   where x.characterClassManager.CurRole.team == global::Team.SCP && x.characterClassManager.CurClass != global::RoleType.Scp0492
+					   select x).Count<global::ReferenceHub>();
+			StringBuilder stringBuilder = global::StringBuilderPool.Rent();
+			if (global::ClutterSpawner.IsHolidayActive(global::Holidays.Christmas))
 			{
-				_mtfNumber.ToString("00")[0].ToString(),
-				_mtfNumber.ToString("00")[1].ToString()
-			};
-			if (ClutterSpawner.IsHolidayActive(Holidays.Christmas))
+				stringBuilder.Append("XMAS_EPSILON11 ");
+				stringBuilder.Append(cassieUnitName);
+				stringBuilder.Append("XMAS_HASENTERED ");
+				stringBuilder.Append(num);
+				stringBuilder.Append(" XMAS_SCPSUBJECTS");
+			}
+			else
 			{
-				text += "XMAS_EPSILON11 ";
-				text = text + "NATO_" + _mtfLetter.ToString() + " ";
-				text = text + array[0] + array[1] + " ";
-				text = string.Concat(new object[]
+				stringBuilder.Append("MTFUNIT EPSILON 11 DESIGNATED ");
+				stringBuilder.Append(cassieUnitName);
+				stringBuilder.Append(" HASENTERED ALLREMAINING ");
+				if (num == 0)
 				{
-					text,
-					"XMAS_HASENTERED ",
-					_scpsLeft,
-					" XMAS_SCPSUBJECTS"
-				});
+					stringBuilder.Append("NOSCPSLEFT");
+				}
+				else
+				{
+					stringBuilder.Append("AWAITINGRECONTAINMENT ");
+					stringBuilder.Append(num);
+					if (num == 1)
+					{
+						stringBuilder.Append(" SCPSUBJECT");
+					}
+					else
+					{
+						stringBuilder.Append(" SCPSUBJECTS");
+					}
+				}
 			}
-			else
-			{
-				text += "MTFUNIT EPSILON 11 DESIGNATED ";
-				text = text + "NATO_" + _mtfLetter.ToString() + " ";
-				text = text + array[0] + array[1] + " ";
-				text += "HASENTERED ALLREMAINING ";
-				text += ((_scpsLeft <= 0) ? "NOSCPSLEFT" : ("AWAITINGRECONTAINMENT " + _scpsLeft + ((_scpsLeft == 1) ? " SCPSUBJECT" : " SCPSUBJECTS")));
-			}
-			float num = (global::AlphaWarheadController.Host.timeToDetonation <= 0f) ? 2.5f : 1f;
 			if (CreativeToolbox.ConfigRef.Config.EnableCustomAnnouncements)
-				__instance.ServerOnlyAddGlitchyPhrase(CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncement, UnityEngine.Random.Range(0.08f, 0.1f) * num, UnityEngine.Random.Range(0.07f, 0.09f) * num);
+			{
+				stringBuilder.Clear();
+				stringBuilder.Append(CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncement);
+				__instance.ConfirmAnnouncement(ref stringBuilder);
+			}
 			else
-				__instance.ServerOnlyAddGlitchyPhrase(text, UnityEngine.Random.Range(0.08f, 0.1f) * num, UnityEngine.Random.Range(0.07f, 0.09f) * num);
+				__instance.ConfirmAnnouncement(ref stringBuilder);
+			StringBuilderPool.Return(stringBuilder);
 			return false;
 		}
     }
