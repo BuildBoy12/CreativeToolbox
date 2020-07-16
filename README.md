@@ -25,6 +25,8 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 - SCP-018 can make the warhead set off every time it bounces
 - SCP-096 can gain a custom amount of Hume Shield when each target looks at them or shoots at them
 - Custom announcement messages for Mobile Task Force / Chaos Insurgency respawn waves
+- Custom jamming and glitch chances for custom announcement messages
+- Random chance for Chaos Insurgency Announcment
 
 ### Notes
 - These values can be changed in game / overridden for only one round if people want to do events, if these plugins are enabled that is
@@ -50,6 +52,7 @@ enable_custom_announcements | Boolean | false | Whether CASSIE will say custom a
 enable_custom_scp096_shield | Boolean | false | Whether SCP-096 will get custom AHP Shield added for every target or not
 enable_reverse_role_respawn_waves | Boolean | false | Whether respawn waves will be reversed or not (MTF in Van, CI in Heli)
 enable_doors_destroyed_with_warhead | Boolean | false | Whether doors are destroyed after the warhead explodes or not (WARNING: It WILL lag players, potentially crash!)
+enable_random_chaos_insurgency_announcement_chance | Boolean | false | Whether the Chaos Insurgency Announcement will be played by a chance
 disable_autoscale_messages | Boolean | false | Whether to disable auto-scale related messages or not
 disable_fall_modification | Boolean | false | Whether people with RA access and permissions can modify fall damage
 locked_door_message | String | you need a better keycard to open this door! | The message displayed when the user tries to open a locked door with a lower keycard
@@ -77,6 +80,8 @@ scp207_pry_gate_limit | Float | 3 | The number of drinks it takes for a user to 
 auto_scale_value | Float | 1 | The scale factor players are set to with auto-scaling
 chaos_insurgency_announcement_glitch_chance | Float | 0 | The chance that CASSIE will glitch during a CI Announcement
 chaos_insurgency_announcement_jam_chance | Float | 0 | The chance that CASSIE will jam during a CI Announcement
+nine_tailed_fox_announcement_glitch_chance | Float | 0 | The chance that CASSIE will glitch during a NTF Announcement
+nine_tailed_fox_announcement_jamh_chance | Float | 0 | The chance that CASSIE will jam during a NTF Announcement
 
 ### Permission Values
 - ct.* (all permissions)
@@ -98,7 +103,8 @@ chaos_insurgency_announcement_jam_chance | Float | 0 | The chance that CASSIE wi
   - on/off (Enables or disables randomly auto respawning)
   - time (value) (Changes the number (in seconds) it takes to respawn a player)
 - autoscale (on/off)
-  - on/off (Enables or disables auto-scaling in the game)
+  - on (value) (Enables auto-scaling and sets everyone to the value that is set)
+  - off (Turns off auto-scaling)
 - explode ((id/name)/(asterisk)/all)
   - id/name (Explodes the specified user)
   - (asterisk)/all (Explodes everyone)
