@@ -64,6 +64,7 @@ pry_gate_message | String | you pried the gate open | The message displayed when
 pry_gate_bypass_message | String | you pried the gate open, but you could bypass it | The message displayed when the user pries open a gate with a keycard in their hand
 chaos_insurgency_announcement | String | The ChaosInsurgency have entered the facility | The message that is broadcaster by CASSIE when Chaos Insurgency respawn
 nine_tailed_fox_announcement | String | '' | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
+scp096_ahp | Integer | 250 | The amount of Shield SCP-096 gets when targets look or shoot at him
 grenade_timer_on_death | Float | 5 | The amount (in seconds) it takes to regenerate health for a given player
 regeneration_time | Float | 1 | The amount (in seconds) it takes to regenerate health for a given player
 regeneration_value | Float | 5 | The amount of health regenerated per interval for a given player
@@ -75,8 +76,8 @@ medkit_ahp_health_value | Float | 0 | The amount of AHP given if a player uses M
 adrenaline_ahp_health_value | Float | 0 | The amount of AHP given if a player uses Adrenaline
 scp500_ahp_health_value | Float | 0 | The amount of AHP given if a player uses SCP-500
 scp207_ahp_health_value | Float | 0 | The amount of AHP given if a player uses SCP-207
-scp207_drink_limit| Float | 5 | The number of drinks it takes for a user to explode
-scp207_pry_gate_limit | Float | 3 | The number of drinks it takes for a user to be able to pry gates
+scp207_drink_limit| Integer | 5 | The number of drinks it takes for a user to explode
+scp207_pry_gate_limit | Integer | 3 | The number of drinks it takes for a user to be able to pry gates
 auto_scale_value | Float | 1 | The scale factor players are set to with auto-scaling
 chaos_insurgency_announcement_glitch_chance | Float | 0 | The chance that CASSIE will glitch during a CI Announcement
 chaos_insurgency_announcement_jam_chance | Float | 0 | The chance that CASSIE will jam during a CI Announcement
