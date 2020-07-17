@@ -14,7 +14,7 @@ namespace CreativeToolbox
         private static int harmonyCounter;
         public CreativeToolboxEventHandler Handler { get; private set; }
 
-        private CreativeToolbox()
+        public CreativeToolbox()
         {
             ConfigRef = this;
         }
