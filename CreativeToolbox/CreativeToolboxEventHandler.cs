@@ -67,8 +67,6 @@ namespace CreativeToolbox
                 {
                     Ply.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
                 }
-                if (plugin.Config.AhpValueLimit > 75f)
-                    plugin.Config.AhpValueLimit = 75f;
                 Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can go up if you get more AHP through medical items. The AHP Limit is: {plugin.Config.AhpValueLimit}</color>", Broadcast.BroadcastFlags.Normal);
             }
         }

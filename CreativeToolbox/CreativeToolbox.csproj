@@ -12,6 +12,10 @@
     <SLManagedPath Condition="$(SLManagedPath) == ''">..\..\..\SCPSL_New_Server\SCPSL_Data\Managed</SLManagedPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="EXILED" Version="2.0.1" Private="false" PrivateAssets="All" />
     <PackageReference Include="Lib.Harmony" Version="2.0.1" Private="false" PrivateAssets="All" />

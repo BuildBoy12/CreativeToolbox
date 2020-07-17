@@ -21,8 +21,6 @@ namespace CreativeToolbox
 
         public override void OnEnabled()
         {
-            base.OnEnabled();
-
             if (Handler == null)
                 Handler = new CreativeToolboxEventHandler(this);
 
@@ -45,8 +43,6 @@ namespace CreativeToolbox
 
         public override void OnDisabled()
         {
-            base.OnDisabled();
-
             HarmonyInstance?.UnpatchAll();
 
             Exiled.Events.Handlers.Server.RespawningTeam -= Handler.RunWhenTeamRespawns;
