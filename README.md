@@ -19,7 +19,7 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 - Grenade damage can be prevented (and SCP-018 damage)
 - Fall damage can be prevented (also can be toggled via RA command)
 - Warhead can be set off with a custom timer or immediately (only goes up to 1 minute and 43 seconds max)
-- Warhead destroys every door in the facility after detonation (WIP)
+- Warhead destroys every door in the facility after detonation
 - Decontamination can be force started (cannot be stopped if this happens)
 - Messages appear when interacting with certain doors, and with bypass, also with prying gates
 - SCP-018 can make the warhead set off every time it bounces
