@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace CreativeToolbox
 {
-    public class CreativeToolboxEventHandler
+    public sealed class CreativeToolboxEventHandler
     {
         public static HashSet<ReferenceHub> PlayersThatCanPryGates = new HashSet<ReferenceHub>();
         HashSet<ReferenceHub> PlayersWithRegen = new HashSet<ReferenceHub>();

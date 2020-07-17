@@ -1,29 +1,34 @@
 ﻿using Exiled.API.Features;
-using Exiled.API.Interfaces;
-using Exiled.Events.Handlers;
-using Exiled.Loader;
 using HarmonyLib;
-using System;
 
 namespace CreativeToolbox
 {
-    public class CreativeToolbox : Plugin<Config>
+    public sealed class CreativeToolbox : Plugin<Config>
     {
-        private static readonly Lazy<CreativeToolbox> LazyInstance = new Lazy<CreativeToolbox>(() => new CreativeToolbox());
-        private CreativeToolbox() { }
-        public static CreativeToolbox ConfigRef => LazyInstance.Value;
-        public static Harmony HarmonyInstance { private set; get; }
+        public static CreativeToolbox ConfigRef { get; private set; }
+        public static Harmony HarmonyInstance { get; private set; }
 
-        public static int harmonyCounter;
-        public CreativeToolboxEventHandler Handler;
+        public override string Author => "KoukoCocoa";
+        public override string Name => nameof(CreativeToolbox);
+
+        private static int harmonyCounter;
+        public CreativeToolboxEventHandler Handler { get; private set; }
+
+        private CreativeToolbox()
+        {
+            ConfigRef = this;
+        }
 
         public override void OnEnabled()
         {
             base.OnEnabled();
-            Handler = new CreativeToolboxEventHandler(this);
-            harmonyCounter++;
-            HarmonyInstance = new Harmony($"koukococoa.creativetoolbox_{harmonyCounter}");
+
+            if (Handler == null)
+                Handler = new CreativeToolboxEventHandler(this);
+
+            HarmonyInstance = new Harmony($"koukococoa.creativetoolbox_{++harmonyCounter}");
             HarmonyInstance.PatchAll();
+
             Exiled.Events.Handlers.Player.InteractingDoor += Handler.RunWhenDoorIsInteractedWith;
             Exiled.Events.Handlers.Player.Joined += Handler.RunOnPlayerJoin;
             Exiled.Events.Handlers.Player.Left += Handler.RunOnPlayerLeave;
@@ -40,11 +45,10 @@ namespace CreativeToolbox
 
         public override void OnDisabled()
         {
-            Log.Info("Disabling \"CreativeToolbox\"");
-            if (HarmonyInstance != null || HarmonyInstance != default)
-            {
-                HarmonyInstance.UnpatchAll();
-            }
+            base.OnDisabled();
+
+            HarmonyInstance?.UnpatchAll();
+
             Exiled.Events.Handlers.Server.RespawningTeam -= Handler.RunWhenTeamRespawns;
             Exiled.Events.Handlers.Warhead.Detonated -= Handler.RunWhenWarheadIsDetonated;
             Exiled.Events.Handlers.Player.EnteringFemurBreaker -= Handler.RunWhenPlayerEntersFemurBreaker;
@@ -57,7 +61,6 @@ namespace CreativeToolbox
             Exiled.Events.Handlers.Player.Left -= Handler.RunOnPlayerLeave;
             Exiled.Events.Handlers.Player.Joined -= Handler.RunOnPlayerJoin;
             Exiled.Events.Handlers.Player.InteractingDoor -= Handler.RunWhenDoorIsInteractedWith;
-            Handler = null;
         }
 
         public override void OnReloaded() { }

@@ -5,7 +5,7 @@ using HarmonyLib;
 namespace CreativeToolbox
 {
     [HarmonyPatch(typeof(Grenade), nameof(Grenade.Awake))]
-    class CreateCustomGrenadePatch
+    static class CreateCustomGrenadePatch
     {
         public static bool Prefix(Grenade __instance)
         {

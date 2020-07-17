@@ -6,7 +6,7 @@ using Exiled.API.Features;
 namespace CreativeToolbox
 {
     [HarmonyPatch(typeof(RespawnManager), nameof(RespawnManager.ForceSpawnTeam))]
-    class AddCustomCIAnnouncement
+    static class AddCustomCIAnnouncement
     {
         static Random CIAnnouncementChance = new Random();
         static double NewChance;

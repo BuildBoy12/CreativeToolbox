@@ -5,7 +5,7 @@ using HarmonyLib;
 namespace CreativeToolbox
 {
     [HarmonyPatch(typeof(FragGrenade), nameof(FragGrenade.Awake))]
-    class PreventExplosionDamage
+    static class PreventExplosionDamage
     {
         public static bool Prefix(FragGrenade __instance)
         {
