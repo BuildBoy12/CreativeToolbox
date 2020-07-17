@@ -5,7 +5,7 @@ using Respawning.NamingRules;
 namespace CreativeToolbox
 {
     [HarmonyPatch(typeof(UnitNamingRule), nameof(UnitNamingRule.ConfirmAnnouncement), typeof(string))]
-    class AddCustomNTFAnnouncement
+    static class AddCustomNTFAnnouncement
     {
         public static bool Prefix(UnitNamingRule __instance, string completeAnnouncement)
         {

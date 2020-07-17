@@ -6,7 +6,7 @@ using HarmonyLib;
 namespace CreativeToolbox
 {
     [HarmonyPatch(typeof(Scp018Grenade), nameof(Scp018Grenade.OnSpeedCollisionEnter))]
-    class SCP018EndgamePatch
+    static class SCP018EndgamePatch
     {
         public static void Postfix(Scp018Grenade __instance)
         {

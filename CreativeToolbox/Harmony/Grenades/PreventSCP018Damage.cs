@@ -5,7 +5,7 @@ using HarmonyLib;
 namespace CreativeToolbox
 {
     [HarmonyPatch(typeof(Scp018Grenade), nameof(Scp018Grenade.Awake))]
-    class PreventSCP018Damage
+    static class PreventSCP018Damage
     {
         public static bool Prefix(Scp018Grenade __instance)
         {

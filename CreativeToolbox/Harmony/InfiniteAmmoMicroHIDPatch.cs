@@ -4,7 +4,7 @@ using HarmonyLib;
 namespace CreativeToolbox
 {
     [HarmonyPatch(typeof(MicroHID), nameof(MicroHID.UpdateServerside))]
-    class InfiniteAmmoMicrioHIDPatch
+    static class InfiniteAmmoMicrioHIDPatch
     {
         public static bool Prefix(MicroHID __instance)
         {

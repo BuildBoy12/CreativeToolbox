@@ -6,7 +6,7 @@ using UnityEngine;
 namespace CreativeToolbox
 {
     [HarmonyPatch(typeof(Scp096), nameof(Scp096.AddTarget))]
-    class ModifySCP096ShieldPatch
+    static class ModifySCP096ShieldPatch
     {
         public static bool Prefix(Scp096 __instance, GameObject target)
         {
