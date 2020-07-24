@@ -25,7 +25,7 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 - Messages appear when interacting with certain doors, and with bypass, also with prying gates
 - SCP-018 can make the warhead set off every time it bounces
 - SCP-096 can gain a custom amount of Hume Shield when each target looks at them or shoots at them
-- Custom announcement messages for Mobile Task Force / Chaos Insurgency respawn waves (With support for unit names and numbers, also scp's left (MTF only))
+- Custom announcement messages for Mobile Task Force / Chaos Insurgency respawn waves (With support for unit names and numbers, also scp's left (unit names & numbers for NTF only, scp's left for both NTF and CI)
 - Custom jamming and glitch chances for custom announcement messages
 - Random chance for Chaos Insurgency Announcment
 
@@ -65,8 +65,8 @@ bypass_keycard_message | String | you bypassed the reader | The message displaye
 bypass_with_keycard_message | String | you bypassed the reader, but you did not need a keycard | The message displayed when the user bypasses a door with a keycard in their hand
 pry_gate_message | String | you pried the gate open | The message displayed when the user pries open a gate
 pry_gate_bypass_message | String | you pried the gate open, but you could bypass it | The message displayed when the user pries open a gate with a keycard in their hand
-chaos_insurgency_announcement | String | The ChaosInsurgency have entered the facility | The message that is broadcaster by CASSIE when Chaos Insurgency respawn
-nine_tailed_fox_announcement | String | 'MtfUnit Designated %unitname %unitnum HasEntered AllRemaining %scpnumber' | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
+chaos_insurgency_announcement | String | The ChaosInsurgency have entered the facility %scpnumber| The message that is broadcaster by CASSIE when Chaos Insurgency respawn
+nine_tailed_fox_announcement | String | MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining %scpnumber | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
 scp096_ahp | Integer | 250 | The amount of Shield SCP-096 gets when targets look or shoot at him
 grenade_timer_on_death | Float | 5 | The amount (in seconds) it takes to regenerate health for a given player
 regeneration_time | Float | 1 | The amount (in seconds) it takes to regenerate health for a given player
@@ -90,7 +90,8 @@ chaos_insurgency_announcement_chance | Integer | 50 | The chance that a Chaos In
 instant_warhead_detonation_chance | Integer | 10 | The chance that the warhead will be set off instantly if it is cancelled
 
 ### Note for Custom Announcements
-- You can use %unitname for the NTF Unit Name, %unitnum for the NTF Unit Number, and %scpnumber for the amount of SCPs left
+- You can use %unitname for the NTF Unit Name, %unitnumber for the NTF Unit Number, and %scpnumber for the amount of SCPs left
+- %scpnumber is the only variable that works with both Chaos Insurgency and NTF Announcements
 
 ### Permission Values
 - ct.* (all permissions)

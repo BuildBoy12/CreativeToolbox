@@ -9,16 +9,16 @@ namespace CreativeToolbox
 {
     public static class Extensions
     {
-        public static void SetWeaponAmmo(this ReferenceHub rh, int amount)
+        public static void SetWeaponAmmo(this ReferenceHub Rh, int Amount)
         {
-            rh.inventory.items.ModifyDuration(
-            rh.inventory.items.IndexOf(rh.inventory.GetItemInHand()),
-            amount);
+            Rh.inventory.items.ModifyDuration(
+            Rh.inventory.items.IndexOf(Rh.inventory.GetItemInHand()),
+            Amount);
         }
 
-        public static bool IsGun(this ItemType item)
+        public static bool IsGun(this ItemType Item)
         {
-            switch (item)
+            switch (Item)
             {
                 case ItemType.GunCOM15:
                 case ItemType.GunE11SR:
@@ -33,23 +33,43 @@ namespace CreativeToolbox
             }
         }
 
-        public static bool IsNotHuman(this RoleType role)
+        public static bool IsNotHuman(this RoleType Role, bool OnlySCPs)
         {
-            switch (role)
+            if (OnlySCPs)
             {
-                case RoleType.Scp049:
-                case RoleType.Scp0492:
-                case RoleType.Scp079:
-                case RoleType.Scp096:
-                case RoleType.Scp106:
-                case RoleType.Scp173:
-                case RoleType.Scp93953:
-                case RoleType.Scp93989:
-                case RoleType.Spectator:
-                case RoleType.None:
-                    return true;
-                default:
-                    return false;
+                switch (Role)
+                {
+                    case RoleType.Scp049:
+                    case RoleType.Scp0492:
+                    case RoleType.Scp079:
+                    case RoleType.Scp096:
+                    case RoleType.Scp106:
+                    case RoleType.Scp173:
+                    case RoleType.Scp93953:
+                    case RoleType.Scp93989:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            else
+            {
+                switch (Role)
+                {
+                    case RoleType.Scp049:
+                    case RoleType.Scp0492:
+                    case RoleType.Scp079:
+                    case RoleType.Scp096:
+                    case RoleType.Scp106:
+                    case RoleType.Scp173:
+                    case RoleType.Scp93953:
+                    case RoleType.Scp93989:
+                    case RoleType.Spectator:
+                    case RoleType.None:
+                        return true;
+                    default:
+                        return false;
+                }
             }
         }
 

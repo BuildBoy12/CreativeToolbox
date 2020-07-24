@@ -291,7 +291,7 @@ namespace CreativeToolbox
         public void RunWhenNTFSpawns(AnnouncingNtfEntranceEventArgs NTFAnnouncement)
         {
             NTFAnnouncement.IsAllowed = false;
-            NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(FormatNTFMessage(CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncement, NTFAnnouncement.UnitName, NTFAnnouncement.UnitNumber, NTFAnnouncement.ScpsLeft), CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncementGlitchChance * 0.01f, CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncementJamChance * 0.01f);
+            NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(FormatMessage(CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncement, NTFAnnouncement.UnitName, NTFAnnouncement.UnitNumber, NTFAnnouncement.ScpsLeft), CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncementGlitchChance * 0.01f, CreativeToolbox.ConfigRef.Config.NineTailedFoxAnnouncementJamChance * 0.01f);
         }
 
         public void RevivePlayer(Player ply)
@@ -370,9 +370,14 @@ namespace CreativeToolbox
             Timing.KillCoroutines(ChaosRespawnHandle);
         }
 
-        public static string FormatNTFMessage(string Input, string UnitName, int UnitNumber, int ScpsLeft)
+        public static string FormatMessage(string Input, string UnitName, int UnitNumber, int ScpsLeft)
         {
-            return RogerFKTokenReplace.ReplaceAfterToken(Input, '%', new Tuple<string, object>[] { new Tuple<string, object>("unitname", $"NATO_{UnitName.ElementAt(0)}"), new Tuple<string, object>("unitnum", UnitNumber), new Tuple<string, object>("scpnumber", ((ScpsLeft > 0) ? $"AwaitingRecontainment {ScpsLeft.ToString()} {(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? "XMAS_SCPSUBJECTS" : "SCPs")}" : "NoSCPsLeft")) });
+            return RogerFKTokenReplace.ReplaceAfterToken(Input, '%', new Tuple<string, object>[] { new Tuple<string, object>("unitname", $"NATO_{UnitName.ElementAt(0)}"), new Tuple<string, object>("unitnumber", UnitNumber), new Tuple<string, object>("scpnumber", ((ScpsLeft > 0) ? $"AwaitingRecontainment {ScpsLeft.ToString()} {(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? "XMAS_SCPSUBJECTS" : "SCPs")}" : "NoSCPsLeft"))});
+        }
+
+        public static string FormatMessage(string Input, int ScpsLeft)
+        {
+            return RogerFKTokenReplace.ReplaceAfterToken(Input, '%', new Tuple<string, object>[] { new Tuple<string, object>("scpnumber", ((ScpsLeft > 0) ? $"AwaitingRecontainment {ScpsLeft.ToString()} {(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? "XMAS_SCPSUBJECTS" : "SCPs")}" : "NoSCPsLeft"))});
         }
     }
 }

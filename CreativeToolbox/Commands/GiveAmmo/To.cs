@@ -34,7 +34,7 @@ namespace CreativeToolbox.Commands.GiveAmmo
                 response = $"Player \"{arguments.At(0)}\" not found";
                 return false;
             }
-            else if (Plyr.Role.IsNotHuman())
+            else if (Plyr.Role.IsNotHuman(false))
             {
                 response = $"Player \"{arguments.At(0)}\" is not a valid class to give ammo to";
                 return false;

@@ -36,8 +36,8 @@ namespace CreativeToolbox
         public string BypassWithKeycardMessage { get; set; } = "you bypassed the reader, but you did not need a keycard";
         public string PryGateMessage { get; set; } = "you pried the gate open";
         public string PryGateBypassMessage { get; set; } = "you pried the gate open, but you could bypass it";
-        public string ChaosInsurgencyAnnouncement { get; set; } = "The ChaosInsurgency have entered the facility";
-        public string NineTailedFoxAnnouncement { get; set; } = "MtfUnit Epsilon 11 Designated %unitname %unitnum HasEntered AllRemaining %scpnumber";
+        public string ChaosInsurgencyAnnouncement { get; set; } = "The ChaosInsurgency have entered the facility %scpnumber";
+        public string NineTailedFoxAnnouncement { get; set; } = "MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining %scpnumber";
         public int Scp096Ahp { get; set; } = 250;
         public float GrenadeTimerOnDeath { get; set; } = 5f;
         public float RegenerationTime { get; set; } = 1f;

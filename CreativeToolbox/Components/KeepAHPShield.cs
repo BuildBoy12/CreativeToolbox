@@ -44,7 +44,7 @@ namespace CreativeToolbox
             if (ChangedRole.Player != Hub)
                 return;
     
-            if (ChangedRole.NewRole.IsNotHuman())
+            if (ChangedRole.NewRole.IsNotHuman(false))
             {
                 Timing.KillCoroutines(Handle);
                 if (ChangedRole.NewRole == RoleType.Scp096)

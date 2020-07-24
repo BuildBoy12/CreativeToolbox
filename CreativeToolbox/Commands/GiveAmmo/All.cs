@@ -42,7 +42,7 @@ namespace CreativeToolbox.Commands.GiveAmmo
 
             foreach (Player Ply in Player.List)
             {
-                if (Ply.Role.IsNotHuman())
+                if (Ply.Role.IsNotHuman(false))
                     continue;
                 
                 Ply.SetAmmo(Ammo, (uint)(Ply.GetAmmo(Ammo) + AmmoAmount));
