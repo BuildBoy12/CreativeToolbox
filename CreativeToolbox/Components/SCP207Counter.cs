@@ -50,9 +50,9 @@ namespace CreativeToolbox
 
             if (Counter == CreativeToolbox.ConfigRef.Config.Scp207PryGateLimit)
             {
-                if (!CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Hub.ReferenceHub))
+                if (!CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Hub))
                 {
-                    CreativeToolboxEventHandler.PlayersThatCanPryGates.Add(Hub.ReferenceHub);
+                    CreativeToolboxEventHandler.PlayersThatCanPryGates.Add(Hub);
                     Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nyou can now pry gates open", new HintParameter[]
                     {
                     new StringHintParameter("")
@@ -62,6 +62,8 @@ namespace CreativeToolbox
 
             if (Counter >= CreativeToolbox.ConfigRef.Config.Scp207DrinkLimit)
             {
+                if (CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Hub))
+                    CreativeToolboxEventHandler.PlayersThatCanPryGates.Remove(Hub);
                 CreativeToolboxEventHandler.SpawnGrenadeOnPlayer(Hub, false);
                 Counter = 0;
                 Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nyou drank too much and your body could not handle it", new HintParameter[]

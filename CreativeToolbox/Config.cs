@@ -16,6 +16,7 @@ namespace CreativeToolbox
         public bool EnableKeepScale { get; set; } = false;
         public bool EnableGrenadeOnDeath { get; set; } = false;
         public bool EnableDoorMessages { get; set; } = false;
+        public bool EnableKillMessages { get; set; } = false;
         public bool EnableExplodingAfterDrinkingScp207 { get; set; } = false;
         public bool EnableScp018WarheadBounce { get; set; } = false;
         public bool EnableAhpShield { get; set; } = false;
@@ -25,8 +26,9 @@ namespace CreativeToolbox
         public bool EnableReverseRoleRespawnWaves { get; set; } = false;
         public bool EnableDoorsDestroyedWithWarhead { get; set; } = false;
         public bool EnableRandomChaosInsurgencyAnnouncementChance { get; set; } = false;
+        public bool EnableWarheadDetonationWhenCanceledChance { get; set; } = false;
         public bool DisableAutoScaleMessages { get; set; } = false;
-        public bool DisableFallModification { get; set; } = false;
+        public bool UseXmasScpInAnnouncement { get; set; } = false;
         public string LockedDoorMessage { get; set; } = "you need a better keycard to open this door!";
         public string UnlockedDoorMessage { get; set; } = "you held the keycard next to the reader";
         public string NeedKeycardMessage { get; set; } = "this door requires a keycard";
@@ -35,7 +37,7 @@ namespace CreativeToolbox
         public string PryGateMessage { get; set; } = "you pried the gate open";
         public string PryGateBypassMessage { get; set; } = "you pried the gate open, but you could bypass it";
         public string ChaosInsurgencyAnnouncement { get; set; } = "The ChaosInsurgency have entered the facility";
-        public string NineTailedFoxAnnouncement { get; set; } = "";
+        public string NineTailedFoxAnnouncement { get; set; } = "MtfUnit Epsilon 11 Designated %unitname %unitnum HasEntered AllRemaining %scpnumber";
         public int Scp096Ahp { get; set; } = 250;
         public float GrenadeTimerOnDeath { get; set; } = 5f;
         public float RegenerationTime { get; set; } = 1f;
@@ -56,6 +58,7 @@ namespace CreativeToolbox
         public float ChaosInsurgencyAnnouncementJamChance { get; set; } = 0f;
         public float NineTailedFoxAnnouncementGlitchChance { get; set; } = 0f;
         public float NineTailedFoxAnnouncementJamChance { get; set; } = 0f;
-        public double ChaosInsurgencyAnnouncementChance { get; set; } = 50;
+        public int ChaosInsurgencyAnnouncementChance { get; set; } = 50;
+        public int InstantWarheadDetonationChance { get; set; } = 10;
     }
 }

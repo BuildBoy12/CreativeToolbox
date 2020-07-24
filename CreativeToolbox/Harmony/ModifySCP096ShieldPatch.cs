@@ -15,13 +15,13 @@ namespace CreativeToolbox
 			{
 				if (!__instance._targets.IsEmpty<ReferenceHub>())
 				{
-					__instance.EnrageTimeLeft += __instance.EnrageTimePerReset;
+					__instance.AddReset();
 				}
 				__instance._targets.Add(hub);
 				if (CreativeToolbox.ConfigRef.Config.EnableCustomScp096Shield)
 					__instance.AdjustShield(CreativeToolbox.ConfigRef.Config.Scp096Ahp);
 				else
-					__instance.AdjustShield(250);
+					__instance.AdjustShield(200);
 			}
 			return false;
         }

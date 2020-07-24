@@ -10,26 +10,27 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 - Players can pry gates open if they drink enough SCP-207
 - Players can be exploded via command
 - Players can be located via command
-- Players can be automatically scaled (it can also be kept if people leave)
-- Players can be automatically respawned as a random class (or the same class)
+- Players can be automatically scaled (It can also be kept if people leave)
+- Players can be automatically respawned as a random class (Or the same class)
 - Players can have AHP that does not go down naturally, only by damage or up with more medical items
 - AHP can have a limit to prevent abuse
 - Grenades spawn on players after they die (support for custom timers)
-- Grenades can have custom timers (works independently from player grenade spawns)
-- Grenade damage can be prevented (and SCP-018 damage)
-- Fall damage can be prevented (also can be toggled via RA command)
-- Warhead can be set off with a custom timer or immediately (only goes up to 1 minute and 43 seconds max)
+- Grenades can have custom timers (Works independently from player grenade spawns)
+- Grenade damage can be prevented (And SCP-018 damage)
+- Fall damage can be prevented (Also can be toggled via RA command)
+- Warhead can be set off with a custom timer or immediately (Only goes up to 1 minute and 43 seconds max)
 - Warhead destroys every door in the facility after detonation
-- Decontamination can be force started (cannot be stopped if this happens)
+- Warhead can automatically be set off instantly by chance if it is cancelled
+- Decontamination can be force started (Cannot be stopped if this happens)
 - Messages appear when interacting with certain doors, and with bypass, also with prying gates
 - SCP-018 can make the warhead set off every time it bounces
 - SCP-096 can gain a custom amount of Hume Shield when each target looks at them or shoots at them
-- Custom announcement messages for Mobile Task Force / Chaos Insurgency respawn waves
+- Custom announcement messages for Mobile Task Force / Chaos Insurgency respawn waves (With support for unit names and numbers, also scp's left (MTF only))
 - Custom jamming and glitch chances for custom announcement messages
 - Random chance for Chaos Insurgency Announcment
 
 ### Notes
-- These values can be changed in game / overridden for only one round if people want to do events, if these plugins are enabled that is
+- A lot of these values can be changed in game / overridden for only one round if people want to do events, if these plugins are enabled that is
 - You must put the included 0harmony.dll file inside the "dependencies" folder within (%appdata%/exiled-ptb/plugins/dependencies for Windows or ~/.config/exiled-ptb/plugins/dependencies) for this plugin to work.
 
 ### Configuration Settings
@@ -52,7 +53,9 @@ enable_custom_announcements | Boolean | false | Whether CASSIE will say custom a
 enable_custom_scp096_shield | Boolean | false | Whether SCP-096 will get custom AHP Shield added for every target or not
 enable_reverse_role_respawn_waves | Boolean | false | Whether respawn waves will be reversed or not (MTF in Van, CI in Heli)
 enable_doors_destroyed_with_warhead | Boolean | false | Whether doors are destroyed after the warhead explodes or not (WARNING: It WILL lag players, potentially crash!)
-enable_random_chaos_insurgency_announcement_chance | Boolean | false | Whether the Chaos Insurgency Announcement will be played by a chance
+enable_random_chaos_insurgency_announcement_chance | Boolean | false | Whether the Chaos Insurgency Announcement will be played by a chance or not
+enable_warhead_detonation_when_cancelled_chance | Boolean | false | Whether disabling the warhead will blow it up instantly by chance or not
+use_xmas_scp_in_announcement | Boolean | false | Whether to use the name "Spoilsport Holiday Haters" over "SCPs"
 disable_autoscale_messages | Boolean | false | Whether to disable auto-scale related messages or not
 disable_fall_modification | Boolean | false | Whether people with RA access and permissions can modify fall damage
 locked_door_message | String | you need a better keycard to open this door! | The message displayed when the user tries to open a locked door with a lower keycard
@@ -63,7 +66,7 @@ bypass_with_keycard_message | String | you bypassed the reader, but you did not 
 pry_gate_message | String | you pried the gate open | The message displayed when the user pries open a gate
 pry_gate_bypass_message | String | you pried the gate open, but you could bypass it | The message displayed when the user pries open a gate with a keycard in their hand
 chaos_insurgency_announcement | String | The ChaosInsurgency have entered the facility | The message that is broadcaster by CASSIE when Chaos Insurgency respawn
-nine_tailed_fox_announcement | String | '' | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
+nine_tailed_fox_announcement | String | 'MtfUnit Designated %unitname %unitnum HasEntered AllRemaining %scpnumber' | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
 scp096_ahp | Integer | 250 | The amount of Shield SCP-096 gets when targets look or shoot at him
 grenade_timer_on_death | Float | 5 | The amount (in seconds) it takes to regenerate health for a given player
 regeneration_time | Float | 1 | The amount (in seconds) it takes to regenerate health for a given player
@@ -82,25 +85,30 @@ auto_scale_value | Float | 1 | The scale factor players are set to with auto-sca
 chaos_insurgency_announcement_glitch_chance | Float | 0 | The chance that CASSIE will glitch during a CI Announcement
 chaos_insurgency_announcement_jam_chance | Float | 0 | The chance that CASSIE will jam during a CI Announcement
 nine_tailed_fox_announcement_glitch_chance | Float | 0 | The chance that CASSIE will glitch during a NTF Announcement
-nine_tailed_fox_announcement_jamh_chance | Float | 0 | The chance that CASSIE will jam during a NTF Announcement
+nine_tailed_fox_announcement_jam_chance | Float | 0 | The chance that CASSIE will jam during a NTF Announcement
+chaos_insurgency_announcement_chance | Integer | 50 | The chance that a Chaos Insurgency announcement will play
+instant_warhead_detonation_chance | Integer | 10 | The chance that the warhead will be set off instantly if it is cancelled
+
+### Note for Custom Announcements
+- You can use %unitname for the NTF Unit Name, %unitnum for the NTF Unit Number, and %scpnumber for the amount of SCPs left
 
 ### Permission Values
 - ct.* (all permissions)
-- ct.arspawn (random auto respawn)
+- ct.autorespawn (random auto respawn)
 - ct.autoscale (forcing auto-scaling)
 - ct.explode (exploding users)
-- ct.fdamage (fall damage)
+- ct.falldamage (fall damage)
 - ct.giveammo (give ammo)
-- ct.gnade (grenade timers)
+- ct.customnade (grenade timers)
 - ct.infammo (infinite ammo)
 - ct.locate (locating users)
 - ct.nuke (custom nuke)
 - ct.prygates (prying gates)
 - ct.regen (regeneration)
-- ct.sdecon (force start decontamination)
+- ct.startdecon (force start decontamination)
 
 ### Remote Admin Commands
-- arspawn (on/off/time) (value (if "time" is selected))
+- autorespawn (on/off/time) (value (if "time" is selected))
   - on/off (Enables or disables randomly auto respawning)
   - time (value) (Changes the number (in seconds) it takes to respawn a player)
 - autoscale (on/off)
@@ -109,12 +117,12 @@ nine_tailed_fox_announcement_jamh_chance | Float | 0 | The chance that CASSIE wi
 - explode ((id/name)/(asterisk)/all)
   - id/name (Explodes the specified user)
   - (asterisk)/all (Explodes everyone)
-- fdamage (on/off)
+- falldamage (on/off)
   - on/off (Enables or disables fall damage)
 - giveammo ((id/name)/(asterisk)/all) (ammo type (5, 7, 9)) (amount)
   - id/name (ammo type) (amount) (Gives the player the specified amount of ammo for the specified ammo type)
   - (asterisk)/all (ammo type) (amount) (Gives everyone the specified amount of ammo for the specified ammo type)
-- gnade (frag/flash) (value)
+- customnade (frag/flash) (value)
   - frag (value) (Sets the time (in seconds) until frag grenades blow up)
   - flash (value) (Sets the time (in seconds) until flash grenades blow up)
 - infammo ((id/name)/(asterisk)/all/clear/list)
@@ -140,4 +148,4 @@ nine_tailed_fox_announcement_jamh_chance | Float | 0 | The chance that CASSIE wi
   - list (Lists all players with Regeneration)
   - time (value) (Sets the time (in seconds) it takes to regenerate health
   - value (value) (Sets the amount of health you gain per interval)
-- sdecon (Turns on Light Containment Zone decontamination (NOTE:  be reversible!))
+- startdecon (Turns on Light Containment Zone decontamination (NOTE:  be reversible!))

@@ -16,16 +16,12 @@ namespace CreativeToolbox
             {
                 NewChance = CIAnnouncementChance.Next(0, 100);
                 if (NewChance < CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementChance)
-                {
                     if (CreativeToolbox.ConfigRef.Config.EnableCustomAnnouncements && teamToSpawn == SpawnableTeamType.ChaosInsurgency)
                         NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncement, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementGlitchChance * 0.01f, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementJamChance * 0.01f);
-                }
             }
             else
-            {
                 if (CreativeToolbox.ConfigRef.Config.EnableCustomAnnouncements && teamToSpawn == SpawnableTeamType.ChaosInsurgency)
                     NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncement, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementGlitchChance * 0.01f, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementJamChance * 0.01f);
-            }
         }
     }
 }

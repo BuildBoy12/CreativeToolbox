@@ -33,24 +33,26 @@ namespace CreativeToolbox
             Exiled.Events.Handlers.Player.MedicalItemUsed += Handler.RunOnMedItemUsed;
             Exiled.Events.Handlers.Player.Hurting += Handler.RunOnPlayerHurt;
             Exiled.Events.Handlers.Player.Died += Handler.RunOnPlayerDeath;
-            Exiled.Events.Handlers.Server.SendingRemoteAdminCommand += Handler.RunOnRemoteAdminCommand;
             Exiled.Events.Handlers.Server.RestartingRound += Handler.RunOnRoundRestart;
             Exiled.Events.Handlers.Server.RoundStarted += Handler.RunOnRoundStart;
             Exiled.Events.Handlers.Player.EnteringFemurBreaker += Handler.RunWhenPlayerEntersFemurBreaker;
             Exiled.Events.Handlers.Warhead.Detonated += Handler.RunWhenWarheadIsDetonated;
             Exiled.Events.Handlers.Server.RespawningTeam += Handler.RunWhenTeamRespawns;
+            Exiled.Events.Handlers.Warhead.Stopping += Handler.RunWhenWarheadIsStopped;
+            Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += Handler.RunWhenNTFSpawns;
         }
 
         public override void OnDisabled()
         {
             HarmonyInstance?.UnpatchAll();
 
+            Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= Handler.RunWhenNTFSpawns;
+            Exiled.Events.Handlers.Warhead.Stopping -= Handler.RunWhenWarheadIsStopped;
             Exiled.Events.Handlers.Server.RespawningTeam -= Handler.RunWhenTeamRespawns;
             Exiled.Events.Handlers.Warhead.Detonated -= Handler.RunWhenWarheadIsDetonated;
             Exiled.Events.Handlers.Player.EnteringFemurBreaker -= Handler.RunWhenPlayerEntersFemurBreaker;
             Exiled.Events.Handlers.Server.RoundStarted -= Handler.RunOnRoundStart;
             Exiled.Events.Handlers.Server.RestartingRound -= Handler.RunOnRoundRestart;
-            Exiled.Events.Handlers.Server.SendingRemoteAdminCommand -= Handler.RunOnRemoteAdminCommand;
             Exiled.Events.Handlers.Player.Died -= Handler.RunOnPlayerDeath;
             Exiled.Events.Handlers.Player.Hurting -= Handler.RunOnPlayerHurt;
             Exiled.Events.Handlers.Player.MedicalItemUsed -= Handler.RunOnMedItemUsed;
