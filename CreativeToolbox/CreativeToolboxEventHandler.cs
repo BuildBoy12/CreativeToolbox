@@ -151,13 +151,13 @@ namespace CreativeToolbox
                         break;
                 }
             }
-            if (plugin.Config.EnableExplodingAfterDrinkingScp207)
+            if (plugin.Config.EnableCustomEffectsAfterDrinkingScp207)
             {
                 if (MedUsed.Item == ItemType.SCP207)
                 {
-                    if (!MedUsed.Player.ReferenceHub.TryGetComponent(out SCP207Counter ExplodeAfterDrinking))
+                    if (!MedUsed.Player.ReferenceHub.TryGetComponent(out SCP207AbilityCounter ExplodeAfterDrinking))
                     {
-                        MedUsed.Player.ReferenceHub.gameObject.AddComponent<SCP207Counter>();
+                        MedUsed.Player.ReferenceHub.gameObject.AddComponent<SCP207AbilityCounter>();
                         return;
                     }
                     ExplodeAfterDrinking.Counter++;
@@ -372,12 +372,16 @@ namespace CreativeToolbox
 
         public static string FormatMessage(string Input, string UnitName, int UnitNumber, int ScpsLeft)
         {
-            return RogerFKTokenReplace.ReplaceAfterToken(Input, '%', new Tuple<string, object>[] { new Tuple<string, object>("unitname", $"NATO_{UnitName.ElementAt(0)}"), new Tuple<string, object>("unitnumber", UnitNumber), new Tuple<string, object>("scpnumber", ((ScpsLeft > 0) ? $"AwaitingRecontainment {ScpsLeft.ToString()} {(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? "XMAS_SCPSUBJECTS" : "SCPs")}" : "NoSCPsLeft"))});
+            return RogerFKTokenReplace.ReplaceAfterToken(Input, '%', new Tuple<string, object>[] { 
+                new Tuple<string, object>("unitname", $"NATO_{UnitName.ElementAt(0)}"), 
+                new Tuple<string, object>("unitnumber", UnitNumber), 
+                new Tuple<string, object>("scpnumber", (ScpsLeft > 0) ? $"{(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? $"{ScpsLeft.ToString()} XMAS_SCPSUBJECTS" : $"AwaitingRecontainment {ScpsLeft.ToString()} ScpSubjects")}" : $"{(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? "0 XMAS_SCPSUBJECTS" : "NoSCPsLeft")}")});
         }
 
         public static string FormatMessage(string Input, int ScpsLeft)
         {
-            return RogerFKTokenReplace.ReplaceAfterToken(Input, '%', new Tuple<string, object>[] { new Tuple<string, object>("scpnumber", ((ScpsLeft > 0) ? $"AwaitingRecontainment {ScpsLeft.ToString()} {(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? "XMAS_SCPSUBJECTS" : "SCPs")}" : "NoSCPsLeft"))});
+            return RogerFKTokenReplace.ReplaceAfterToken(Input, '%', new Tuple<string, object>[] { 
+                new Tuple<string, object>("scpnumber", (ScpsLeft > 0) ? $"{(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? $"{ScpsLeft.ToString()} XMAS_SCPSUBJECTS" : $"AwaitingRecontainment {ScpsLeft.ToString()} ScpSubjects")}" : $"{(CreativeToolbox.ConfigRef.Config.UseXmasScpInAnnouncement ? "0 XMAS_SCPSUBJECTS" : "NoSCPsLeft")}")});
         }
     }
 }

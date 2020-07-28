@@ -5,7 +5,7 @@ using Hints;
 using UnityEngine;
 namespace CreativeToolbox
 {
-    public class SCP207Counter : MonoBehaviour
+    public class SCP207AbilityCounter : MonoBehaviour
     {
         private Player Hub;
         public int Counter = 0;
@@ -64,6 +64,7 @@ namespace CreativeToolbox
             {
                 if (CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Hub))
                     CreativeToolboxEventHandler.PlayersThatCanPryGates.Remove(Hub);
+                Hub.Kill();
                 CreativeToolboxEventHandler.SpawnGrenadeOnPlayer(Hub, false);
                 Counter = 0;
                 Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nyou drank too much and your body could not handle it", new HintParameter[]

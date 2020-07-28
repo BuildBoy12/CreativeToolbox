@@ -17,7 +17,7 @@ namespace CreativeToolbox
         public bool EnableGrenadeOnDeath { get; set; } = false;
         public bool EnableDoorMessages { get; set; } = false;
         public bool EnableKillMessages { get; set; } = false;
-        public bool EnableExplodingAfterDrinkingScp207 { get; set; } = false;
+        public bool EnableCustomEffectsAfterDrinkingScp207 { get; set; } = false;
         public bool EnableScp018WarheadBounce { get; set; } = false;
         public bool EnableAhpShield { get; set; } = false;
         public bool EnableScp106AdvancedGod { get; set; } = false;

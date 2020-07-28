@@ -9,7 +9,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Exiled200Path Condition="$(Exiled200Path) == ''">..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0</Exiled200Path>
     <Exiled201Path Condition="$(Exiled201Path) == ''">..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED (1)</Exiled201Path>
-	<Exiled205Path Condition="$(Exiled205Path) == ''">..\..\..\EXILEd 2.0\Exiled 2.0.5\Exiled</Exiled205Path>
+	<Exiled205Path Condition="$(Exiled205Path) == ''">..\..\..\EXILED 2.0\Exiled 2.0.5\Exiled</Exiled205Path>
     <SLManagedPath Condition="$(SLManagedPath) == ''">..\..\..\SCPSL_New_Server\SCPSL_Data\Managed</SLManagedPath>
   </PropertyGroup>
 
@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EXILED" Version="2.0.6" Private="false" PrivateAssets="All" />
-    <PackageReference Include="Lib.Harmony" Version="2.0.1" Private="false" PrivateAssets="All" />
+    <PackageReference Include="EXILED" Version="2.0.7" Private="false" PrivateAssets="All" />
+    <PackageReference Include="Lib.Harmony" Version="2.0.1" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" Private="false" PrivateAssets="All" />
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(Exiled200Path)\Assembly-CSharp-firstpass.dll" Private="false" />
 	<Reference Include="Assembly-CSharp_publicized" HintPath="$(Exiled205Path)\Assembly-CSharp_publicized.dll" Private="false" />
