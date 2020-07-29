@@ -45,7 +45,7 @@ enable_auto_scaling | Boolean | false | Whether auto-scaling at the start of the
 enable_keep_scale | Boolean | false | Whether the auto-scaling re-applies when the user re-joins or not
 enable_grenade_on_death | Boolean | false | Whether players will drop live grenades on their death or not
 enable_door_messages | Boolean | false | Whether door messages display on gates and doors or not
-enable_exploding_after_drinking_scp207 | Boolean | false | Whether users can pry gates and explode after drinking SCP-207 or not
+enable_custom_effects_after_drinking_scp207 | Boolean | false | Whether users can pry gates and explode after drinking SCP-207 or not
 enable_scp018_warhead_bounce | Boolean | false | Whether the warhead will get set off every time SCP-018 bounces or not
 enable_ahp_shield | Boolean | false | Whether the AHP Shield will remain constant or not (WARNING: It WILL affect SCP-096's AHP)
 enable_scp106_advanced_god | Boolean | false | Whether SCP-106 can be contained if he has godmode or not
@@ -66,7 +66,7 @@ bypass_with_keycard_message | String | you bypassed the reader, but you did not 
 pry_gate_message | String | you pried the gate open | The message displayed when the user pries open a gate
 pry_gate_bypass_message | String | you pried the gate open, but you could bypass it | The message displayed when the user pries open a gate with a keycard in their hand
 chaos_insurgency_announcement | String | The ChaosInsurgency have entered the facility %scpnumber| The message that is broadcaster by CASSIE when Chaos Insurgency respawn
-nine_tailed_fox_announcement | String | MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining %scpnumber | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
+nine_tailed_fox_announcement | String | MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining AwaitingRecontainment %scpnumber | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
 scp096_ahp | Integer | 250 | The amount of Shield SCP-096 gets when targets look or shoot at him
 grenade_timer_on_death | Float | 5 | The amount (in seconds) it takes to regenerate health for a given player
 regeneration_time | Float | 1 | The amount (in seconds) it takes to regenerate health for a given player
