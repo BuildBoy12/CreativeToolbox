@@ -6,40 +6,29 @@
     <PlatformTarget>x64</PlatformTarget>
     <Version>2.0.2</Version>
 
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
     <Exiled200Path Condition="$(Exiled200Path) == ''">..\..\..\Exiled Current 2.0 Beta\Exiled 2.0 New\Exiled-2.0</Exiled200Path>
     <Exiled201Path Condition="$(Exiled201Path) == ''">..\..\..\Exiled 2.0 Official\Exiled 2.0.1\EXILED (1)</Exiled201Path>
-	<Exiled205Path Condition="$(Exiled205Path) == ''">..\..\..\EXILED 2.0\Exiled 2.0.5\Exiled</Exiled205Path>
+    <Exiled205Path Condition="$(Exiled205Path) == ''">..\..\..\EXILED 2.0\Exiled 2.0.5\Exiled</Exiled205Path>
     <SLManagedPath Condition="$(SLManagedPath) == ''">..\..\..\SCPSL_New_Server\SCPSL_Data\Managed</SLManagedPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
   <ItemGroup>
-    <None Remove="Commands\InfAmmo\InfAmmo.cs~RF2448930.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="EXILED" Version="2.0.7" Private="false" PrivateAssets="All" />
+    <PackageReference Include="EXILED" Version="2.0.12" />
     <PackageReference Include="Lib.Harmony" Version="2.0.1" />
-    <PackageReference Include="YamlDotNet" Version="8.1.2" Private="false" PrivateAssets="All" />
+    <PackageReference Include="YamlDotNet" Version="8.1.2" />
+
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(Exiled200Path)\Assembly-CSharp-firstpass.dll" Private="false" />
-	<Reference Include="Assembly-CSharp_publicized" HintPath="$(Exiled205Path)\Assembly-CSharp_publicized.dll" Private="false" />
-	<Reference Include="CommandSystem.Core" HintPath="$(SLManagedPath)\CommandSystem.Core.dll" Private="false" />
+    <Reference Include="Assembly-CSharp_publicized" HintPath="$(Exiled205Path)\Assembly-CSharp_publicized.dll" Private="false" />
+    <Reference Include="CommandSystem.Core" HintPath="$(SLManagedPath)\CommandSystem.Core.dll" Private="false" />
     <Reference Include="Mirror" HintPath="$(SLManagedPath)\Mirror.dll" Private="false" />
     <Reference Include="UnityEngine" HintPath="$(SLManagedPath)\UnityEngine.dll" Private="false" />
     <Reference Include="UnityEngine.AudioModule" HintPath="$(SLManagedPath)\UnityEngine.AudioModule.dll" Private="false" />
     <Reference Include="UnityEngine.CoreModule" HintPath="$(SLManagedPath)\UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="UnityEngine.PhysicsModule" HintPath="$(SLManagedPath)\UnityEngine.PhysicsModule.dll" Private="false" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <!-- Since '$(OutputPath)\Exiled*.dll' doens't work, we just use this -->
-    <Delete Files="$([System.IO.Directory]::GetFiles(&quot;$(OutDir)&quot;, 'Exiled*.dll'))" />
-    <Delete Files="$([System.IO.Directory]::GetFiles(&quot;$(OutDir)&quot;, 'YamlDotNet*.dll'))" />
-    <Delete Files="$([System.IO.Directory]::GetFiles(&quot;$(OutDir)&quot;, '0Harmony*.dll'))" />
-  </Target>
 
 </Project>
