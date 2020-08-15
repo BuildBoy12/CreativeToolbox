@@ -34,7 +34,8 @@ namespace CreativeToolbox.Commands.AutoRespawn
             }
 
             CreativeToolboxEventHandler.AllowRespawning = true;
-            Map.Broadcast(5, "Auto respawning is now on!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, "Auto respawning is now on!");
             response = "Auto respawning is now on";
             return true;
         }

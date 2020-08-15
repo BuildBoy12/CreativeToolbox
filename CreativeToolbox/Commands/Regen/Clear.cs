@@ -32,7 +32,8 @@ namespace CreativeToolbox.Commands.Regen
                     UnityEngine.Object.Destroy(Regen);
 
             CreativeToolboxEventHandler.PlayersWithRegen.Clear();
-            Map.Broadcast(5, "Regeneration is taken away from everyone now!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, "Regeneration is taken away from everyone now!");
             response = "Regeneration has been taken away from everyone";
             return true;
         }

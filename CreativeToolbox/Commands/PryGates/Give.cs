@@ -36,14 +36,16 @@ namespace CreativeToolbox.Commands.PryGates
 
             if (!CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Ply))
             {
-                Ply.Broadcast(5, "You can pry gates open now!");
+                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                    Ply.Broadcast(5, "You can pry gates open now!");
                 CreativeToolboxEventHandler.PlayersThatCanPryGates.Add(Ply);
                 response = $"Player \"{Ply.Nickname}\" can now pry gates open";
                 return true;
             }
             else
             {
-                Ply.Broadcast(5, "You cannot pry gates open now!");
+                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                    Ply.Broadcast(5, "You cannot pry gates open now!");
                 CreativeToolboxEventHandler.PlayersThatCanPryGates.Remove(Ply);
                 response = $"Player \"{Ply.Nickname}\" cannot pry gates open now";
                 return true;

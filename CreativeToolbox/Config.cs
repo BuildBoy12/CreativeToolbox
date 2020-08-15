@@ -29,6 +29,7 @@ namespace CreativeToolbox
         public bool EnableWarheadDetonationWhenCanceledChance { get; set; } = false;
         public bool DisableAutoScaleMessages { get; set; } = false;
         public bool UseXmasScpInAnnouncement { get; set; } = false;
+        public bool PreventCtBroadcasts { get; set; } = false;
         public string LockedDoorMessage { get; set; } = "you need a better keycard to open this door!";
         public string UnlockedDoorMessage { get; set; } = "you held the keycard next to the reader";
         public string NeedKeycardMessage { get; set; } = "this door requires a keycard";
@@ -36,8 +37,11 @@ namespace CreativeToolbox
         public string BypassWithKeycardMessage { get; set; } = "you bypassed the reader, but you did not need a keycard";
         public string PryGateMessage { get; set; } = "you pried the gate open";
         public string PryGateBypassMessage { get; set; } = "you pried the gate open, but you could bypass it";
-        public string ChaosInsurgencyAnnouncement { get; set; } = "The ChaosInsurgency have entered the facility %scpnumber";
-        public string NineTailedFoxAnnouncement { get; set; } = "MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining %scpnumber";
+        public string DrinkingScp207Message { get; set; } = "Number of drinks consumed: %counter";
+        public string PryGatesWithScp207Message { get; set; } = "You can now pry gates open";
+        public string ExplodeAfterScp207Message { get; set; } = "You drank too much and your body could not handle it";
+        public string ChaosInsurgencyAnnouncement { get; set; } = "The ChaosInsurgency have entered the facility AwaitingRecontainment %scpnumber";
+        public string NineTailedFoxAnnouncement { get; set; } = "MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining AwaitingRecontainment %scpnumber";
         public int Scp096Ahp { get; set; } = 250;
         public float GrenadeTimerOnDeath { get; set; } = 5f;
         public float RegenerationTime { get; set; } = 1f;

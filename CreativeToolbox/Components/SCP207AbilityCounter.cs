@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using Hints;
@@ -42,7 +43,8 @@ namespace CreativeToolbox
             
             if (Counter < CreativeToolbox.ConfigRef.Config.Scp207DrinkLimit)
             {
-                Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nnumber of drinks consumed: {Counter}", new HintParameter[]
+                string MessageToReplace = RogerFKTokenReplace.ReplaceAfterToken(CreativeToolbox.ConfigRef.Config.DrinkingScp207Message, '%', new Tuple<string, object>[] { new Tuple<string, object>("counter", Counter) });
+                Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{MessageToReplace}", new HintParameter[]
                 {
                     new StringHintParameter("")
                 }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -50,10 +52,11 @@ namespace CreativeToolbox
 
             if (Counter == CreativeToolbox.ConfigRef.Config.Scp207PryGateLimit)
             {
+                string MessageToReplace = RogerFKTokenReplace.ReplaceAfterToken(CreativeToolbox.ConfigRef.Config.PryGatesWithScp207Message, '%', new Tuple<string, object>[] { new Tuple<string, object>("counter", Counter) });
                 if (!CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Hub))
                 {
                     CreativeToolboxEventHandler.PlayersThatCanPryGates.Add(Hub);
-                    Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nyou can now pry gates open", new HintParameter[]
+                    Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{MessageToReplace}", new HintParameter[]
                     {
                     new StringHintParameter("")
                     }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));
@@ -62,12 +65,15 @@ namespace CreativeToolbox
 
             if (Counter >= CreativeToolbox.ConfigRef.Config.Scp207DrinkLimit)
             {
+                string MessageToReplace = RogerFKTokenReplace.ReplaceAfterToken(CreativeToolbox.ConfigRef.Config.ExplodeAfterScp207Message, '%', new Tuple<string, object>[] { new Tuple<string, object>("counter", Counter) });
                 if (CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Hub))
                     CreativeToolboxEventHandler.PlayersThatCanPryGates.Remove(Hub);
+                Hub.Health = 0;
+                Hub.AdrenalineHealth = 0;
                 Hub.Kill();
                 CreativeToolboxEventHandler.SpawnGrenadeOnPlayer(Hub, false);
                 Counter = 0;
-                Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\nyou drank too much and your body could not handle it", new HintParameter[]
+                Used207.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{MessageToReplace}", new HintParameter[]
                 {
                     new StringHintParameter("")
                 }, HintEffectPresets.FadeInAndOut(0.25f, 1f, 0f)));

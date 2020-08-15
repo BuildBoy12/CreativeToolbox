@@ -28,7 +28,8 @@ namespace CreativeToolbox.Commands.PryGates
             }
 
             CreativeToolboxEventHandler.PlayersThatCanPryGates.Clear();
-            Map.Broadcast(5, "Everyone cannot pry gates open now!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, "Everyone cannot pry gates open now!");
             response = "The ability to pry gates is cleared from all players now";
             return true;
         }

@@ -29,7 +29,7 @@ namespace CreativeToolbox.Commands.Nuke
 
             if (!float.TryParse(arguments.At(0), out float nuketimer) || (nuketimer < 0.05 || nuketimer > 142))
             {
-                response = $"Invalid value for auto scaling value: {arguments.At(0)}";
+                response = $"Invalid value for nuke timer: {arguments.At(0)}";
                 return false;
             }
 

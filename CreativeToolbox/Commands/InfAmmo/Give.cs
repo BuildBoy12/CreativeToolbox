@@ -38,7 +38,8 @@ namespace CreativeToolbox.Commands.InfAmmo
             {
                 CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Add(Ply);
                 Ply.GameObject.AddComponent<InfiniteAmmoComponent>();
-                Ply.Broadcast(5, "Infinite ammo is enabled for you!");
+                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                    Ply.Broadcast(5, "Infinite ammo is enabled for you!");
                 response = $"Infinite ammo enabled for Player \"{Ply.Nickname}\"";
                 return true;
             }
@@ -46,7 +47,8 @@ namespace CreativeToolbox.Commands.InfAmmo
             {
                 CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Remove(Ply);
                 UnityEngine.Object.Destroy(InfAmmo);
-                Ply.Broadcast(5, "Infinite ammo is disabled for you!");
+                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                    Ply.Broadcast(5, "Infinite ammo is disabled for you!");
                 response = $"Infinite ammo disabled for Player \"{Ply.Nickname}\"";
                 return true;
             }

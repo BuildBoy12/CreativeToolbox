@@ -38,7 +38,8 @@ namespace CreativeToolbox.Commands.Regen
             {
                 CreativeToolboxEventHandler.PlayersWithRegen.Add(Ply);
                 Ply.GameObject.AddComponent<RegenerationComponent>();
-                Ply.Broadcast(5, "Regeneration is enabled for you!");
+                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                    Ply.Broadcast(5, "Regeneration is enabled for you!");
                 response = $"Regeneration enabled for Player \"{Ply.Nickname}\"";
                 return true;
             }
@@ -46,7 +47,8 @@ namespace CreativeToolbox.Commands.Regen
             {
                 CreativeToolboxEventHandler.PlayersWithRegen.Remove(Ply);
                 UnityEngine.Object.Destroy(Regen);
-                Ply.Broadcast(5, "Regeneration is disabled for you!");
+                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                    Ply.Broadcast(5, "Regeneration is disabled for you!");
                 response = $"Regeneration disabled for Player \"{Ply.Nickname}\"";
                 return true;
             }

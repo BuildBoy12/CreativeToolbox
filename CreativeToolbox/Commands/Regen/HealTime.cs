@@ -34,7 +34,8 @@ namespace CreativeToolbox.Commands.Regen
             }
 
             CreativeToolbox.ConfigRef.Config.RegenerationValue = healtime;
-            Map.Broadcast(5, $"Players with regeneration will heal every {healtime} seconds!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, $"Players with regeneration will heal every {healtime} seconds!");
             response = $"Players with regeneration will heal every {healtime} seconds";
             return true;
         }

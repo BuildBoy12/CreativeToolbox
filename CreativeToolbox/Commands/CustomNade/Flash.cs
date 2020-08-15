@@ -34,7 +34,8 @@ namespace CreativeToolbox.Commands.CustomNade
             }
 
             CreativeToolbox.ConfigRef.Config.FlashGrenadeFuseTimer = flashtime;
-            Map.Broadcast(5, $"Flash grenades will now explode after {flashtime} seconds!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, $"Flash grenades will now explode after {flashtime} seconds!");
             response = $"Flash grenades will now explode after {flashtime} seconds";
             return true;
         }

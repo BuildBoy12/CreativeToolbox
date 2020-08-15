@@ -34,7 +34,7 @@ namespace CreativeToolbox.Commands.GiveAmmo
                 return false;
             }
 
-            if (!int.TryParse(arguments.At(1), out int AmmoAmount) || AmmoAmount < 0)
+            if (!uint.TryParse(arguments.At(1), out uint AmmoAmount))
             {
                 response = $"Invalid ammo amount: {arguments.At(1)}";
                 return false;
@@ -44,8 +44,8 @@ namespace CreativeToolbox.Commands.GiveAmmo
             {
                 if (Ply.Role.IsNotHuman(false))
                     continue;
-                
-                Ply.SetAmmo(Ammo, (uint)(Ply.GetAmmo(Ammo) + AmmoAmount));
+
+                Ply.ReferenceHub.ammoBox[(int)Ammo] = Ply.ReferenceHub.ammoBox[(int)Ammo] + AmmoAmount;
             }
 
             Map.Broadcast(5, $"Everyone has been given {AmmoAmount} of {Ammo.ToString()} ammo!");

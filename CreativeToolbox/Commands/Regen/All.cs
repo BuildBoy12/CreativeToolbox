@@ -36,7 +36,8 @@ namespace CreativeToolbox.Commands.Regen
                 }
             }
 
-            Map.Broadcast(5, "Everyone has been given regeneration now!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, "Everyone has been given regeneration now!");
             response = "Everyone has been given regeneration";
             return true;
         }

@@ -35,7 +35,8 @@ namespace CreativeToolbox.Commands.AutoRespawn
             }
 
             CreativeToolbox.ConfigRef.Config.RandomRespawnTimer = respawn;
-            Map.Broadcast(5, $"Auto respawning timer is now set to {respawn}!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, $"Auto respawning timer is now set to {respawn}!");
             response = "Auto respawning timer is now set to {respawn}";
             return true;
         }

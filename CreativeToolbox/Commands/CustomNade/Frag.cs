@@ -34,7 +34,8 @@ namespace CreativeToolbox.Commands.CustomNade
             }
 
             CreativeToolbox.ConfigRef.Config.FragGrenadeFuseTimer = fragtime;
-            Map.Broadcast(5, $"Frag grenades will now explode after {fragtime} seconds!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, $"Frag grenades will now explode after {fragtime} seconds!");
             response = $"Frag grenades will now explode after {fragtime} seconds";
             return true;
         }

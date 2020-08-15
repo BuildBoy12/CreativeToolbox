@@ -22,11 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EXILED" Version="2.0.7" Private="false" PrivateAssets="All" />
+    <PackageReference Include="EXILED" Version="2.0.13" Private="false" PrivateAssets="All" />
     <PackageReference Include="Lib.Harmony" Version="2.0.1" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" Private="false" PrivateAssets="All" />
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(Exiled200Path)\Assembly-CSharp-firstpass.dll" Private="false" />
-	<Reference Include="Assembly-CSharp_publicized" HintPath="$(Exiled205Path)\Assembly-CSharp_publicized.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="..\..\..\SCPSL_OFFICIAL_20_SERVER\SCPSL_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll" Private="false" />
 	<Reference Include="CommandSystem.Core" HintPath="$(SLManagedPath)\CommandSystem.Core.dll" Private="false" />
     <Reference Include="Mirror" HintPath="$(SLManagedPath)\Mirror.dll" Private="false" />
     <Reference Include="UnityEngine" HintPath="$(SLManagedPath)\UnityEngine.dll" Private="false" />
