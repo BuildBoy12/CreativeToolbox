@@ -36,7 +36,8 @@ namespace CreativeToolbox.Commands.InfAmmo
                 }
             }
 
-            Map.Broadcast(5, "Everyone has been given infinite ammo now!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, "Everyone has been given infinite ammo now!");
             response = "Everyone has been given infinite ammo";
             return true;
         }

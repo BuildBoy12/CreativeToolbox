@@ -33,7 +33,8 @@ namespace CreativeToolbox.Commands.PryGates
                     CreativeToolboxEventHandler.PlayersThatCanPryGates.Add(Ply);
             }
 
-            Map.Broadcast(5, "Everyone has been given the ability to pry gates open!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, "Everyone has been given the ability to pry gates open!");
             response = "The ability to pry gates open is on for all players now";
             return true;
         }

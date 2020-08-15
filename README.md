@@ -18,7 +18,7 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 - Grenades can have custom timers (Works independently from player grenade spawns)
 - Grenade damage can be prevented (And SCP-018 damage)
 - Fall damage can be prevented (Also can be toggled via RA command)
-- Warhead can be set off with a custom timer or immediately (Only goes up to 1 minute and 43 seconds max)
+- Warhead can be set off with a custom timer or immediately (Only goes up to 1 minute and 42 seconds max)
 - Warhead destroys every door in the facility after detonation
 - Warhead can automatically be set off instantly by chance if it is cancelled
 - Decontamination can be force started (Cannot be stopped if this happens)
@@ -26,12 +26,21 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 - SCP-018 can make the warhead set off every time it bounces
 - SCP-096 can gain a custom amount of Hume Shield when each target looks at them or shoots at them
 - Custom announcement messages for Mobile Task Force / Chaos Insurgency respawn waves (With support for unit names and numbers, also scp's left (unit names & numbers for NTF only, scp's left for both NTF and CI)
+- Custom SCP-207 messages after drinking them
 - Custom jamming and glitch chances for custom announcement messages
 - Random chance for Chaos Insurgency Announcment
+- Option to disable all CreativeToolbox broadcasts
 
 ### Notes
 - A lot of these values can be changed in game / overridden for only one round if people want to do events, if these plugins are enabled that is
-- You must put the included 0harmony.dll file inside the "dependencies" folder within (%appdata%/exiled-ptb/plugins/dependencies for Windows or ~/.config/exiled-ptb/plugins/dependencies) for this plugin to work.
+- You must put the included 0harmony.dll file inside the "dependencies" folder within (%appdata%/exiled/plugins/dependencies for Windows or ~/.config/exiled/plugins/dependencies) for this plugin to work.
+
+### Note for Custom Announcements
+- You can use %unitname for the NTF Unit Name, %unitnumber for the NTF Unit Number, and %scpnumber for the amount of SCPs left
+- %scpnumber is the only variable that works with both Chaos Insurgency and NTF Announcements
+
+### Note for Custom SCP-207 messages
+- You can use %counter to show how many drinks the user consumed
 
 ### Configuration Settings
 Configuration Option | Configuration Data Type | Default Value | Description
@@ -56,6 +65,7 @@ enable_doors_destroyed_with_warhead | Boolean | false | Whether doors are destro
 enable_random_chaos_insurgency_announcement_chance | Boolean | false | Whether the Chaos Insurgency Announcement will be played by a chance or not
 enable_warhead_detonation_when_cancelled_chance | Boolean | false | Whether disabling the warhead will blow it up instantly by chance or not
 use_xmas_scp_in_announcement | Boolean | false | Whether to use the name "Spoilsport Holiday Haters" over "SCPs"
+prevent_ct_broadcasts | Boolean | false | Whether to display broadcasts for events in CreativeToolbox or not
 disable_autoscale_messages | Boolean | false | Whether to disable auto-scale related messages or not
 disable_fall_modification | Boolean | false | Whether people with RA access and permissions can modify fall damage
 locked_door_message | String | you need a better keycard to open this door! | The message displayed when the user tries to open a locked door with a lower keycard
@@ -65,6 +75,9 @@ bypass_keycard_message | String | you bypassed the reader | The message displaye
 bypass_with_keycard_message | String | you bypassed the reader, but you did not need a keycard | The message displayed when the user bypasses a door with a keycard in their hand
 pry_gate_message | String | you pried the gate open | The message displayed when the user pries open a gate
 pry_gate_bypass_message | String | you pried the gate open, but you could bypass it | The message displayed when the user pries open a gate with a keycard in their hand
+drinking_scp207_message | String | 'Number of drinks consumed: %counter' | The message displayed when the user drinks SCP-207
+pry_gates_with_scp207_message | String | you can now pry gates open | The message displayed when you can pry gates open after a certain amount of SCP-207
+explode_after_scp207_message | String | you drank too much and your body could not handle it | The message displayed after you explode from too much SCP-207 in your body
 chaos_insurgency_announcement | String | The ChaosInsurgency have entered the facility %scpnumber| The message that is broadcaster by CASSIE when Chaos Insurgency respawn
 nine_tailed_fox_announcement | String | MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining AwaitingRecontainment %scpnumber | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
 scp096_ahp | Integer | 250 | The amount of Shield SCP-096 gets when targets look or shoot at him
@@ -88,10 +101,6 @@ nine_tailed_fox_announcement_glitch_chance | Float | 0 | The chance that CASSIE 
 nine_tailed_fox_announcement_jam_chance | Float | 0 | The chance that CASSIE will jam during a NTF Announcement
 chaos_insurgency_announcement_chance | Integer | 50 | The chance that a Chaos Insurgency announcement will play
 instant_warhead_detonation_chance | Integer | 10 | The chance that the warhead will be set off instantly if it is cancelled
-
-### Note for Custom Announcements
-- You can use %unitname for the NTF Unit Name, %unitnumber for the NTF Unit Number, and %scpnumber for the amount of SCPs left
-- %scpnumber is the only variable that works with both Chaos Insurgency and NTF Announcements
 
 ### Permission Values
 - ct.* (all permissions)

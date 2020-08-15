@@ -28,7 +28,8 @@ namespace CreativeToolbox.Commands.FallDamage
             }
 
             CreativeToolboxEventHandler.PreventFallDamage = true;
-            Map.Broadcast(5, "Fall damage is off now!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, "Fall damage is off now!");
             response = "Fall damage is off";
             return true;
         }

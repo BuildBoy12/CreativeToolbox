@@ -61,7 +61,7 @@ namespace CreativeToolbox
                     AutoScaleOn = true;
                 }
             }
-            if (plugin.Config.EnableGrenadeOnDeath)
+            if (plugin.Config.EnableGrenadeOnDeath && !CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
                 Map.Broadcast(10, $"<color=red>Warning: Grenades spawn after you die, they explode after {plugin.Config.GrenadeTimerOnDeath} seconds of them spawning, be careful!</color>", Broadcast.BroadcastFlags.Normal);
             if (plugin.Config.EnableAhpShield)
             {
@@ -69,7 +69,8 @@ namespace CreativeToolbox
                 {
                     Ply.ReferenceHub.gameObject.AddComponent<KeepAHPShield>();
                 }
-                Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can go up if you get more AHP through medical items. The AHP Limit is: {plugin.Config.AhpValueLimit}</color>", Broadcast.BroadcastFlags.Normal);
+                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                    Map.Broadcast(10, $"<color=green>AHP will not go down naturally, only by damage, it can go up if you get more AHP through medical items. The AHP Limit is: {plugin.Config.AhpValueLimit}</color>", Broadcast.BroadcastFlags.Normal);
             }
         }
 
@@ -249,7 +250,8 @@ namespace CreativeToolbox
                     if (Ply.IsGodModeEnabled)
                     {
                         FemurBreaker.IsAllowed = false;
-                        FemurBreaker.Player.Broadcast(2, "SCP-106 has advanced godmode, you cannot contain him", Broadcast.BroadcastFlags.Normal);
+                        if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                            FemurBreaker.Player.Broadcast(2, "SCP-106 has advanced godmode, you cannot contain him", Broadcast.BroadcastFlags.Normal);
                         return;
                     }
                 }
@@ -277,7 +279,8 @@ namespace CreativeToolbox
                 {
                     Warhead.Start();
                     Warhead.DetonationTimer = 0.05f;
-                    Map.Broadcast(5, "<color=red>Someone tried to disable the warhead but pressed the wrong button</color>");
+                    if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                        Map.Broadcast(5, "<color=red>Someone tried to disable the warhead but pressed the wrong button</color>");
                 }
             }
         }

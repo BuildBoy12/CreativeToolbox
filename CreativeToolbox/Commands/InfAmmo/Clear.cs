@@ -32,7 +32,8 @@ namespace CreativeToolbox.Commands.InfAmmo
                     UnityEngine.Object.Destroy(InfAmmo);
 
             CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Clear();
-            Map.Broadcast(5, "Infinite ammo is taken away from everyone now!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, "Infinite ammo is taken away from everyone now!");
             response = "Infinite ammo has been taken away from everyone";
             return true;
         }

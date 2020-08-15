@@ -34,7 +34,8 @@ namespace CreativeToolbox.Commands.Regen
             }
 
             CreativeToolbox.ConfigRef.Config.RegenerationValue = healvalue;
-            Map.Broadcast(5, $"Players with regeneration will heal {healvalue} HP per interval!");
+            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, $"Players with regeneration will heal {healvalue} HP per interval!");
             response = $"Players with regeneration will heal {healvalue} HP per interval";
             return true;
         }

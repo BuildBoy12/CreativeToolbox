@@ -46,13 +46,13 @@ namespace CreativeToolbox.Commands.GiveAmmo
                 return false;
             }
 
-            if (!int.TryParse(arguments.At(2), out int AmmoAmount) || AmmoAmount < 0)
+            if (!uint.TryParse(arguments.At(2), out uint AmmoAmount))
             {
                 response = $"Invalid ammo amount: {arguments.At(2)}";
                 return false;
             }
 
-            Plyr.SetAmmo(Ammo, (uint)(Plyr.GetAmmo(Ammo) + AmmoAmount));
+            Plyr.ReferenceHub.ammoBox[(int)Ammo] = Plyr.ReferenceHub.ammoBox[(int)Ammo] + AmmoAmount;
             Plyr.Broadcast(5, $"You have been given {AmmoAmount} of {Ammo.ToString()} ammo!");
             response = $"Player \"{Plyr.Nickname}\" has been given {AmmoAmount} of {Ammo.ToString()} ammo";
             return true;
