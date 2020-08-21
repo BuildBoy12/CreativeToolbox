@@ -168,11 +168,12 @@ namespace CreativeToolbox
 
         public void RunWhenDoorIsInteractedWith(InteractingDoorEventArgs DoorInter)
         {
+            if (PlayersThatCanPryGates.Contains(DoorInter.Player))
+                DoorInter.Door.PryGate();
             if (plugin.Config.EnableDoorMessages)
             {
                 if (PlayersThatCanPryGates.Contains(DoorInter.Player) && GatesThatExist.Contains(DoorInter.Door.DoorName))
                 {
-                    DoorInter.Door.PryGate();
                     if (!DoorInter.Player.IsBypassModeEnabled)
                     {
                         DoorInter.Player.ReferenceHub.hints.Show(new TextHint($"\n\n\n\n\n\n\n\n\n{plugin.Config.PryGateMessage}", new HintParameter[]

@@ -28,7 +28,7 @@ namespace CreativeToolbox.Commands.GiveAmmo
                 return false;
             }
 
-            if (!Enum.TryParse(arguments.At(0), out AmmoType Ammo))
+            if (!Enum.TryParse(arguments.At(0), true, out AmmoType Ammo))
             {
                 response = $"Invalid ammo type: {arguments.At(0)}";
                 return false;
