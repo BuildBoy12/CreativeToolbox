@@ -43,64 +43,66 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 - You can use %counter to show how many drinks the user consumed
 
 ### Configuration Settings
-Configuration Option | Configuration Data Type | Default Value | Description
-:---: | :---: | :---: | :------
-is_enabled | Boolean | True | Whether the CreativeToolbox plugin will be enabled or not
-enable_custom_grenade_time | Boolean | False | Whether the custom grenade timers will apply in-game or not
-enable_custom_healing | Boolean | False | Whether the medical items can give AHP or not
-enable_fall_damage_prevention | Boolean | False | Whether the fall damage will be disabled by default or not
-enable_grenade_damage_prevention | Boolean | False | Whether explosives or SCP-018 will deal damage or not
-enable_auto_scaling | Boolean | false | Whether auto-scaling at the start of the round is enabled or not
-enable_keep_scale | Boolean | false | Whether the auto-scaling re-applies when the user re-joins or not
-enable_grenade_on_death | Boolean | false | Whether players will drop live grenades on their death or not
-enable_door_messages | Boolean | false | Whether door messages display on gates and doors or not
-enable_custom_effects_after_drinking_scp207 | Boolean | false | Whether users can pry gates and explode after drinking SCP-207 or not
-enable_scp018_warhead_bounce | Boolean | false | Whether the warhead will get set off every time SCP-018 bounces or not
-enable_ahp_shield | Boolean | false | Whether the AHP Shield will remain constant or not (WARNING: It WILL affect SCP-096's AHP)
-enable_scp106_advanced_god | Boolean | false | Whether SCP-106 can be contained if he has godmode or not
-enable_custom_announcements | Boolean | false | Whether CASSIE will say custom announcements when waves respawn or not
-enable_custom_scp096_shield | Boolean | false | Whether SCP-096 will get custom AHP Shield added for every target or not
-enable_reverse_role_respawn_waves | Boolean | false | Whether respawn waves will be reversed or not (MTF in Van, CI in Heli)
-enable_doors_destroyed_with_warhead | Boolean | false | Whether doors are destroyed after the warhead explodes or not (WARNING: It WILL lag players, potentially crash!)
-enable_random_chaos_insurgency_announcement_chance | Boolean | false | Whether the Chaos Insurgency Announcement will be played by a chance or not
-enable_warhead_detonation_when_cancelled_chance | Boolean | false | Whether disabling the warhead will blow it up instantly by chance or not
-use_xmas_scp_in_announcement | Boolean | false | Whether to use the name "Spoilsport Holiday Haters" over "SCPs"
-prevent_ct_broadcasts | Boolean | false | Whether to display broadcasts for events in CreativeToolbox or not
-disable_autoscale_messages | Boolean | false | Whether to disable auto-scale related messages or not
-disable_fall_modification | Boolean | false | Whether people with RA access and permissions can modify fall damage
-locked_door_message | String | you need a better keycard to open this door! | The message displayed when the user tries to open a locked door with a lower keycard
-unlocked_door_message | String | you held the keycard next to the reader| The message displayed when the user tries to open a locked door with a keycard
-need_keycard_message | String | this door requires a keycard | The message displayed when the user tries to open a locked door without a keycard
-bypass_keycard_message | String | you bypassed the reader | The message displayed when the user bypasses a door
-bypass_with_keycard_message | String | you bypassed the reader, but you did not need a keycard | The message displayed when the user bypasses a door with a keycard in their hand
-pry_gate_message | String | you pried the gate open | The message displayed when the user pries open a gate
-pry_gate_bypass_message | String | you pried the gate open, but you could bypass it | The message displayed when the user pries open a gate with a keycard in their hand
-drinking_scp207_message | String | 'Number of drinks consumed: %counter' | The message displayed when the user drinks SCP-207
-pry_gates_with_scp207_message | String | you can now pry gates open | The message displayed when you can pry gates open after a certain amount of SCP-207
-explode_after_scp207_message | String | you drank too much and your body could not handle it | The message displayed after you explode from too much SCP-207 in your body
-chaos_insurgency_announcement | String | The ChaosInsurgency have entered the facility %scpnumber| The message that is broadcaster by CASSIE when Chaos Insurgency respawn
-nine_tailed_fox_announcement | String | MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining AwaitingRecontainment %scpnumber | The message that is broadcaster by CASSIE when Nine Tailed Fox respawn
-scp096_ahp | Integer | 250 | The amount of Shield SCP-096 gets when targets look or shoot at him
-grenade_timer_on_death | Float | 5 | The amount (in seconds) it takes to regenerate health for a given player
-regeneration_time | Float | 1 | The amount (in seconds) it takes to regenerate health for a given player
-regeneration_value | Float | 5 | The amount of health regenerated per interval for a given player
-random_respawn_timer | Float | 0.05 | The amount (in seconds) it takes to automatically respawn a player
-frag_grenade_fuse_timer | Float | 5 | The amount (in seconds) it takes to blow up a frag grenade
-flash_grenade_fuse_timer | Float | 3 | The amount (in seconds) it takes to blow up a flash grenade
-painkiller_ahp_health_value | Float | 0 | The amount of AHP given if a player uses Painkillers
-medkit_ahp_health_value | Float | 0 | The amount of AHP given if a player uses Medkits
-adrenaline_ahp_health_value | Float | 0 | The amount of AHP given if a player uses Adrenaline
-scp500_ahp_health_value | Float | 0 | The amount of AHP given if a player uses SCP-500
-scp207_ahp_health_value | Float | 0 | The amount of AHP given if a player uses SCP-207
-scp207_drink_limit| Integer | 5 | The number of drinks it takes for a user to explode
-scp207_pry_gate_limit | Integer | 3 | The number of drinks it takes for a user to be able to pry gates
-auto_scale_value | Float | 1 | The scale factor players are set to with auto-scaling
-chaos_insurgency_announcement_glitch_chance | Float | 0 | The chance that CASSIE will glitch during a CI Announcement
-chaos_insurgency_announcement_jam_chance | Float | 0 | The chance that CASSIE will jam during a CI Announcement
-nine_tailed_fox_announcement_glitch_chance | Float | 0 | The chance that CASSIE will glitch during a NTF Announcement
-nine_tailed_fox_announcement_jam_chance | Float | 0 | The chance that CASSIE will jam during a NTF Announcement
-chaos_insurgency_announcement_chance | Integer | 50 | The chance that a Chaos Insurgency announcement will play
-instant_warhead_detonation_chance | Integer | 10 | The chance that the warhead will be set off instantly if it is cancelled
+```yaml
+creative_toolbox:
+  is_enabled: true
+  enable_custom_grenade_time: false
+  enable_custom_healing: false
+  enable_fall_damage_prevention: false
+  enable_grenade_damage_prevention: false
+  enable_auto_scaling: false
+  enable_keep_scale: false
+  enable_grenade_on_death: false
+  enable_door_messages: false
+  enable_kill_messages: false
+  enable_custom_effects_after_drinking_scp207: false
+  enable_scp018_warhead_bounce: false
+  enable_ahp_shield: false
+  enable_scp106_advanced_god: false
+  enable_custom_announcements: false
+  enable_custom_scp096_shield: false
+  enable_reverse_role_respawn_waves: false
+  enable_doors_destroyed_with_warhead: false
+  enable_random_chaos_insurgency_announcement_chance: false
+  enable_warhead_detonation_when_canceled_chance: false
+  disable_auto_scale_messages: false
+  use_xmas_scp_in_announcement: false
+  prevent_ct_broadcasts: false
+  locked_door_message: you need a better keycard to open this door!
+  unlocked_door_message: you held the keycard next to the reader
+  need_keycard_message: this door requires a keycard
+  bypass_keycard_message: you bypassed the reader
+  bypass_with_keycard_message: you bypassed the reader, but you did not need a keycard
+  pry_gate_message: you pried the gate open
+  pry_gate_bypass_message: you pried the gate open, but you could bypass it
+  drinking_scp207_message: 'Number of drinks consumed: %counter'
+  pry_gates_with_scp207_message: You can now pry gates open
+  explode_after_scp207_message: You drank too much and your body could not handle it
+  chaos_insurgency_announcement: The ChaosInsurgency have entered the facility AwaitingRecontainment %scpnumber
+  nine_tailed_fox_announcement: MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining AwaitingRecontainment %scpnumber
+  scp096_ahp: 250
+  grenade_timer_on_death: 5
+  regeneration_time: 1
+  regeneration_value: 5
+  random_respawn_timer: 0.0500000007
+  frag_grenade_fuse_timer: 5
+  flash_grenade_fuse_timer: 3
+  painkiller_ahp_health_value: 0
+  medkit_ahp_health_value: 0
+  adrenaline_ahp_health_value: 0
+  scp500_ahp_health_value: 0
+  scp207_ahp_health_value: 0
+  scp207_drink_limit: 5
+  scp207_pry_gate_limit: 3
+  auto_scale_value: 1
+  ahp_value_limit: 75
+  chaos_insurgency_announcement_glitch_chance: 0
+  chaos_insurgency_announcement_jam_chance: 0
+  nine_tailed_fox_announcement_glitch_chance: 0
+  nine_tailed_fox_announcement_jam_chance: 0
+  chaos_insurgency_announcement_chance: 50
+  instant_warhead_detonation_chance: 10
+```
 
 ### Permission Values
 - ct.* (all permissions)
