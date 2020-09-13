@@ -38,6 +38,7 @@ An SCP:SL EXILED plugin that makes your servers creative with a variety of custo
 ### Note for Custom Announcements
 - You can use %unitname for the NTF Unit Name, %unitnumber for the NTF Unit Number, and %scpnumber for the amount of SCPs left
 - %scpnumber is the only variable that works with both Chaos Insurgency and NTF Announcements
+- %scpnumber has AwaitingRecontainment in it, you do not need to re-add it in your announcement lines
 
 ### Note for Custom SCP-207 messages
 - You can use %counter to show how many drinks the user consumed
@@ -78,8 +79,8 @@ creative_toolbox:
   drinking_scp207_message: 'Number of drinks consumed: %counter'
   pry_gates_with_scp207_message: You can now pry gates open
   explode_after_scp207_message: You drank too much and your body could not handle it
-  chaos_insurgency_announcement: The ChaosInsurgency have entered the facility AwaitingRecontainment %scpnumber
-  nine_tailed_fox_announcement: MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining AwaitingRecontainment %scpnumber
+  chaos_insurgency_announcement: The ChaosInsurgency have entered the facility %scpnumber
+  nine_tailed_fox_announcement: MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining %scpnumber
   scp096_ahp: 250
   grenade_timer_on_death: 5
   regeneration_time: 1

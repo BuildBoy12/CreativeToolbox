@@ -40,8 +40,8 @@ namespace CreativeToolbox
         public string DrinkingScp207Message { get; set; } = "Number of drinks consumed: %counter";
         public string PryGatesWithScp207Message { get; set; } = "You can now pry gates open";
         public string ExplodeAfterScp207Message { get; set; } = "You drank too much and your body could not handle it";
-        public string ChaosInsurgencyAnnouncement { get; set; } = "The ChaosInsurgency have entered the facility AwaitingRecontainment %scpnumber";
-        public string NineTailedFoxAnnouncement { get; set; } = "MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining AwaitingRecontainment %scpnumber";
+        public string ChaosInsurgencyAnnouncement { get; set; } = "The ChaosInsurgency have entered the facility %scpnumber";
+        public string NineTailedFoxAnnouncement { get; set; } = "MtfUnit Epsilon 11 Designated %unitname %unitnumber HasEntered AllRemaining %scpnumber";
         public int Scp096Ahp { get; set; } = 250;
         public float GrenadeTimerOnDeath { get; set; } = 5f;
         public float RegenerationTime { get; set; } = 1f;

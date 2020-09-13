@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EXILED" Version="2.1.0" />
+    <PackageReference Include="EXILED" Version="2.1.3" />
     <PackageReference Include="Lib.Harmony" Version="2.0.1" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(Exiled200Path)\Assembly-CSharp-firstpass.dll" Private="false" />
