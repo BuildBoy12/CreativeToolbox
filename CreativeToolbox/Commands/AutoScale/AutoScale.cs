@@ -12,7 +12,7 @@
 
         public override string Command => "autoscale";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description => "Automatically scales players to a specified scale factor or resets their scale";
 

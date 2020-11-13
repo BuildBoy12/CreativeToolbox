@@ -9,7 +9,7 @@
     {
         public string Command => "room";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Returns the room name a user is in";
 

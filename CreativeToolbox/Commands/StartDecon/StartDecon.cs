@@ -12,7 +12,7 @@
     {
         public string Command => "startdecon";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Force starts Light Containment Zone decontamination";
 

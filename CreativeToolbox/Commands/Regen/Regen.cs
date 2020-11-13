@@ -12,7 +12,7 @@
 
         public override string Command => "regen";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description =>
             "Gives regeneration to players, clears regeneration from players, and shows who has regeneration";

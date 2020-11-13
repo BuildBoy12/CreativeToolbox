@@ -10,7 +10,7 @@
     {
         public string Command => "time";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Turns on automatic respawning for dead players";
 

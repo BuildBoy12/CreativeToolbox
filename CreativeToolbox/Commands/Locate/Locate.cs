@@ -12,7 +12,7 @@
 
         public override string Command => "locate";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description => "Locates a user by their coordinates or which room they are in";
 

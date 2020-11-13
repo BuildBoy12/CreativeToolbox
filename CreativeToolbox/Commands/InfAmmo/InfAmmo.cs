@@ -12,7 +12,7 @@
 
         public override string Command => "infammo";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description =>
             "Gives infinite ammo to players, clears infinite ammo from players, and shows who has infinite ammo";

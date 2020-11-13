@@ -11,7 +11,7 @@
     {
         public string Command => "off";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Turns off auto scaling and resets players to their normal size";
 

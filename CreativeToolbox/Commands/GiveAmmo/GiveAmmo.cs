@@ -12,7 +12,7 @@
 
         public override string Command => "giveammo";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description =>
             "Gives a specified user or users a specified ammount of a given ammo type";

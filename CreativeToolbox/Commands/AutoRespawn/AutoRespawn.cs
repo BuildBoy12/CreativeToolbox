@@ -12,7 +12,7 @@
 
         public override string Command => "autorespawn";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description =>
             "Lets you turn on/off respawning dead players as a random class and change respawn timers";

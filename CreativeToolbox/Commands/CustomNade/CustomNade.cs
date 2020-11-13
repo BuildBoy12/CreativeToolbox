@@ -13,7 +13,7 @@
 
         public override string Command => "customnade";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description => "Sets the time frag and flash grenades get set off";
 

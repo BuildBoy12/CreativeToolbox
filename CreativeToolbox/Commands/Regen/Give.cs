@@ -10,7 +10,7 @@
     {
         public string Command => "give";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Gives a player the ability to regenerate health";
 

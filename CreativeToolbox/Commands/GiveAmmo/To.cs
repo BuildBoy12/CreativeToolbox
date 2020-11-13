@@ -11,7 +11,7 @@
     {
         public string Command => "to";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Gives the specified user a specified amount of ammo for a given ammo type";
 

@@ -10,7 +10,7 @@
     {
         public string Command => "on";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Turns on fall damage";
 

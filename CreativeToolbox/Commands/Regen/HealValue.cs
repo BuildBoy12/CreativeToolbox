@@ -10,7 +10,7 @@
     {
         public string Command => "healvalue";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Sets the amount of health that is gained per interval";
 

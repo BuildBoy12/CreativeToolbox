@@ -9,7 +9,7 @@
     {
         public string Command => "instant";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Sets off the warhead instantly";
 

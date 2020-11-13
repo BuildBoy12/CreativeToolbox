@@ -13,7 +13,7 @@
 
         public override string Command => "falldamage";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description => "Turns on/off fall damage";
 

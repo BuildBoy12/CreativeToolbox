@@ -9,7 +9,7 @@
     {
         public string Command => "xyz";
 
-        public string[] Aliases => new string[0];
+        public string[] Aliases => Array.Empty<string>();
 
         public string Description => "Returns the coordinates a user is at";
 

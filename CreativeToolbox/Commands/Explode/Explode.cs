@@ -12,7 +12,7 @@
 
         public override string Command => "explode";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description => "Explodes a specified user or everyone instantly";
 

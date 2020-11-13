@@ -12,7 +12,7 @@
 
         public override string Command => "nuke";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description => "Sets off the warhead at a specified time";
 

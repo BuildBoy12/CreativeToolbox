@@ -12,7 +12,7 @@
 
         public override string Command => "prygates";
 
-        public override string[] Aliases => new string[0];
+        public override string[] Aliases => Array.Empty<string>();
 
         public override string Description =>
             "Gives the ability to pry gates to players, clear the ability from players, and shows who has the ability";
