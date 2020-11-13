@@ -1,29 +1,30 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-
-
-namespace CreativeToolbox.Commands.FallDamage
+﻿namespace CreativeToolbox.Commands.FallDamage
 {
+    using CommandSystem;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class FallDamage : ParentCommand
     {
         public FallDamage() => LoadGeneratedCommands();
 
-        public override string Command { get; } = "falldamage";
+        public override string Command => "falldamage";
 
-        public override string[] Aliases { get; } = new string[] { };
+        public override string[] Aliases => new string[0];
 
-        public override string Description { get; } = "Turns on/off fall damage";
+        public override string Description => "Turns on/off fall damage";
 
-        public override void LoadGeneratedCommands()
+        public sealed override void LoadGeneratedCommands()
         {
             RegisterCommand(new Off());
             RegisterCommand(new On());
         }
 
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender,
+            out string response)
         {
             if (!(sender as CommandSender).CheckPermission("ct.falldamage"))
             {
@@ -31,7 +32,7 @@ namespace CreativeToolbox.Commands.FallDamage
                 return false;
             }
 
-            if (!CreativeToolbox.ConfigRef.Config.EnableFallDamagePrevention)
+            if (!Instance.Config.EnableFallDamagePrevention)
             {
                 response = "You cannot modify fall damage as the setting is disabled";
                 return false;

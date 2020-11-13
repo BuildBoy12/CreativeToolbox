@@ -1,23 +1,23 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.PryGates
+﻿namespace CreativeToolbox.Commands.PryGates
 {
+    using CommandSystem;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class PryGates : ParentCommand
     {
         public PryGates() => LoadGeneratedCommands();
 
-        public override string Command { get; } = "prygates";
+        public override string Command => "prygates";
 
-        public override string[] Aliases { get; } = new string[] { };
+        public override string[] Aliases => new string[0];
 
-        public override string Description { get; } = "Gives the ability to pry gates to players, clear the ability from players, and shows who has the ability";
+        public override string Description =>
+            "Gives the ability to pry gates to players, clear the ability from players, and shows who has the ability";
 
-        public override void LoadGeneratedCommands()
+        public sealed override void LoadGeneratedCommands()
         {
             RegisterCommand(new All());
             RegisterCommand(new Clear());
@@ -25,7 +25,8 @@ namespace CreativeToolbox.Commands.PryGates
             RegisterCommand(new List());
         }
 
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender,
+            out string response)
         {
             if (!(sender as CommandSender).CheckPermission("ct.prygates"))
             {

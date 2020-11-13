@@ -1,28 +1,29 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-
-namespace CreativeToolbox.Commands.Nuke
+﻿namespace CreativeToolbox.Commands.Nuke
 {
+    using CommandSystem;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class Nuke : ParentCommand
     {
         public Nuke() => LoadGeneratedCommands();
 
-        public override string Command { get; } = "nuke";
+        public override string Command => "nuke";
 
-        public override string[] Aliases { get; } = new string[] { };
+        public override string[] Aliases => new string[0];
 
-        public override string Description { get; } = "Sets off the warhead at a specified time";
+        public override string Description => "Sets off the warhead at a specified time";
 
-        public override void LoadGeneratedCommands()
+        public sealed override void LoadGeneratedCommands()
         {
             RegisterCommand(new Instant());
             RegisterCommand(new Start());
         }
 
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender,
+            out string response)
         {
             if (!(sender as CommandSender).CheckPermission("ct.nuke"))
             {

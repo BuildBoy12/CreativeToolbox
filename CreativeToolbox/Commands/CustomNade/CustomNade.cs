@@ -1,28 +1,30 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-
-namespace CreativeToolbox.Commands.CustomNade
+﻿namespace CreativeToolbox.Commands.CustomNade
 {
+    using CommandSystem;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class CustomNade : ParentCommand
     {
         public CustomNade() => LoadGeneratedCommands();
 
-        public override string Command { get; } = "customnade";
+        public override string Command => "customnade";
 
-        public override string[] Aliases { get; } = new string[] { };
+        public override string[] Aliases => new string[0];
 
-        public override string Description { get; } = "Sets the time frag and flash grenades get set off";
+        public override string Description => "Sets the time frag and flash grenades get set off";
 
-        public override void LoadGeneratedCommands()
+        public sealed override void LoadGeneratedCommands()
         {
             RegisterCommand(new Flash());
             RegisterCommand(new Frag());
         }
 
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender,
+            out string response)
         {
             if (!(sender as CommandSender).CheckPermission("ct.customnade"))
             {
@@ -30,7 +32,7 @@ namespace CreativeToolbox.Commands.CustomNade
                 return false;
             }
 
-            if (!CreativeToolbox.ConfigRef.Config.EnableCustomGrenadeTime)
+            if (!Instance.Config.EnableCustomGrenadeTime)
             {
                 response = "You cannot modify grenade time as the setting is disabled";
                 return false;

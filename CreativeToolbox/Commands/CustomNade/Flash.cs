@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
-
-namespace CreativeToolbox.Commands.CustomNade
+﻿namespace CreativeToolbox.Commands.CustomNade
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     public class Flash : ICommand
     {
-        public string Command { get; } = "flash";
+        public string Command => "flash";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Modifies the fuse timer for flash grenades";
+        public string Description => "Modifies the fuse timer for flash grenades";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,16 +28,16 @@ namespace CreativeToolbox.Commands.CustomNade
                 return false;
             }
 
-            if (!float.TryParse(arguments.At(0), out float flashtime) || flashtime < 0.05)
+            if (!float.TryParse(arguments.At(0), out float time) || time < 0.05)
             {
                 response = $"Invalid value for flash grenade timer: {arguments.At(0)}";
                 return false;
             }
 
-            CreativeToolbox.ConfigRef.Config.FlashGrenadeFuseTimer = flashtime;
-            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
-                Map.Broadcast(5, $"Flash grenades will now explode after {flashtime} seconds!");
-            response = $"Flash grenades will now explode after {flashtime} seconds";
+            Instance.Config.FlashGrenadeFuseTimer = time;
+            if (!Instance.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, $"Flash grenades will now explode after {time} seconds!");
+            response = $"Flash grenades will now explode after {time} seconds";
             return true;
         }
     }

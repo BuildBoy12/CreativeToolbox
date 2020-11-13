@@ -1,19 +1,19 @@
-﻿using System;
-using Grenades;
-using HarmonyLib;
-
-namespace CreativeToolbox
+﻿namespace CreativeToolbox
 {
+    using Grenades;
+    using HarmonyLib;
+    using static CreativeToolbox;
+
     [HarmonyPatch(typeof(Scp018Grenade), nameof(Scp018Grenade.Awake))]
-    static class PreventSCP018Damage
+    internal static class PreventScp018Damage
     {
         public static bool Prefix(Scp018Grenade __instance)
         {
-            if (CreativeToolbox.ConfigRef.Config.EnableGrenadeDamagePrevention)
-            {
-                __instance.damageHurt = 0;
-                __instance.damageScpMultiplier = 0;
-            }
+            if (!Instance.Config.EnableGrenadeDamagePrevention)
+                return true;
+
+            __instance.damageHurt = 0;
+            __instance.damageScpMultiplier = 0;
             return true;
         }
     }

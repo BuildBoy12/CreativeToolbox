@@ -1,18 +1,19 @@
-﻿using System;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
-using UnityEngine;
-
-namespace CreativeToolbox.Commands.AutoScale
+﻿namespace CreativeToolbox.Commands.AutoScale
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using UnityEngine;
+    using static CreativeToolbox;
+
     public class On : ICommand
     {
-        public string Command { get; } = "on";
+        public string Command => "on";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Turns on auto scaling and sets players to a specified size";
+        public string Description => "Turns on auto scaling and sets players to a specified size";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -34,13 +35,13 @@ namespace CreativeToolbox.Commands.AutoScale
                 return false;
             }
 
-            foreach (Player Ply in Player.List)
+            foreach (Player ply in Player.List)
             {
-                Ply.Scale = new Vector3(scalevar, scalevar, scalevar);
-                CreativeToolboxEventHandler.PlayersWithRetainedScale.Add(Ply.UserId);
+                ply.Scale = new Vector3(scalevar, scalevar, scalevar);
+                CreativeToolboxEventHandler.PlayersWithRetainedScale.Add(ply.UserId);
             }
 
-            if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
+            if (!Instance.Config.DisableAutoScaleMessages)
                 Map.Broadcast(5, $"Everyone has been set to {scalevar}x their normal size!");
             CreativeToolboxEventHandler.AutoScaleOn = true;
             response = $"Everyone has been set to {scalevar}x their normal size";

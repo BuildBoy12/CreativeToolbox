@@ -1,17 +1,17 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.Nuke
+﻿namespace CreativeToolbox.Commands.Nuke
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     public class Start : ICommand
     {
-        public string Command { get; } = "start";
+        public string Command => "start";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Sets off the warhead at a specified time";
+        public string Description => "Sets off the warhead at a specified time";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,15 +27,15 @@ namespace CreativeToolbox.Commands.Nuke
                 return false;
             }
 
-            if (!float.TryParse(arguments.At(0), out float nuketimer) || (nuketimer < 0.05 || nuketimer > 142))
+            if (!float.TryParse(arguments.At(0), out float nukeTimer) || (nukeTimer < 0.05 || nukeTimer > 142))
             {
                 response = $"Invalid value for nuke timer: {arguments.At(0)}";
                 return false;
             }
 
             Warhead.Start();
-            Warhead.DetonationTimer = nuketimer;
-            response = $"The warhead has started at {nuketimer} seconds";
+            Warhead.DetonationTimer = nukeTimer;
+            response = $"The warhead has started at {nukeTimer} seconds";
             return true;
         }
     }

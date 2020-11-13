@@ -1,18 +1,17 @@
-﻿using System;
-using System.Text;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.InfAmmo
+﻿namespace CreativeToolbox.Commands.InfAmmo
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     public class List : ICommand
     {
-        public string Command { get; } = "list";
+        public string Command => "list";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Lists every player who has infinite ammo";
+        public string Description => "Lists every player who has infinite ammo";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -31,20 +30,18 @@ namespace CreativeToolbox.Commands.InfAmmo
             if (CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Count > 0)
             {
                 CreativeToolboxEventHandler.PlayerLister.Append("Players with infinite ammo: ");
-                foreach (Player Ply in CreativeToolboxEventHandler.PlayersWithInfiniteAmmo)
-                    CreativeToolboxEventHandler.PlayerLister.Append(Ply.Nickname + ", ");
+                foreach (Player ply in CreativeToolboxEventHandler.PlayersWithInfiniteAmmo)
+                    CreativeToolboxEventHandler.PlayerLister.Append(ply.Nickname + ", ");
 
                 int length = CreativeToolboxEventHandler.PlayerLister.ToString().Length;
                 response = CreativeToolboxEventHandler.PlayerLister.ToString().Substring(0, length - 2);
                 CreativeToolboxEventHandler.PlayerLister.Clear();
                 return true;
             }
-            else
-            {
-                response = "There are no players currently online with infinite ammo";
-                CreativeToolboxEventHandler.PlayerLister.Clear();
-                return true;
-            }
+
+            response = "There are no players currently online with infinite ammo";
+            CreativeToolboxEventHandler.PlayerLister.Clear();
+            return true;
         }
     }
 }

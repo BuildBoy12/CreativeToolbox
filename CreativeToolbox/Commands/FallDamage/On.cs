@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.FallDamage
+﻿namespace CreativeToolbox.Commands.FallDamage
 {
-    class On : ICommand
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
+    public class On : ICommand
     {
-        public string Command { get; } = "on";
+        public string Command => "on";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Turns on fall damage";
+        public string Description => "Turns on fall damage";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -28,7 +29,7 @@ namespace CreativeToolbox.Commands.FallDamage
             }
 
             CreativeToolboxEventHandler.PreventFallDamage = true;
-            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+            if (!Instance.Config.PreventCtBroadcasts)
                 Map.Broadcast(5, "Fall damage is on now!");
             response = "Fall damage is on";
             return true;

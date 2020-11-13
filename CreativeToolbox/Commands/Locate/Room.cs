@@ -1,17 +1,17 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.Locate
+﻿namespace CreativeToolbox.Commands.Locate
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     public class Room : ICommand
     {
-        public string Command { get; } = "room";
+        public string Command => "room";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Returns the room name a user is in";
+        public string Description => "Returns the room name a user is in";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,14 +27,14 @@ namespace CreativeToolbox.Commands.Locate
                 return false;
             }
 
-            Player Ply = Player.Get(arguments.At(0));
-            if (Ply == null)
+            Player ply = Player.Get(arguments.At(0));
+            if (ply == null)
             {
                 response = $"Player \"{arguments.At(0)}\" not found";
                 return false;
             }
 
-            response = $"Player \"{Ply.Nickname}\" is located at room: {Ply.CurrentRoom.Name}";
+            response = $"Player \"{ply.Nickname}\" is located at room: {ply.CurrentRoom.Name}";
             return true;
         }
     }

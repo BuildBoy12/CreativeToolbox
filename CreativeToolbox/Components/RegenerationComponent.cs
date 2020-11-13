@@ -1,37 +1,38 @@
-﻿using System;
-using UnityEngine;
-using MEC;
-using System.Collections.Generic;
-using Exiled.API.Features;
-
-namespace CreativeToolbox
+﻿namespace CreativeToolbox
 {
+    using Exiled.API.Features;
+    using MEC;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using static CreativeToolbox;
+
     public class RegenerationComponent : MonoBehaviour
     {
-        private Player Hub;
-        CoroutineHandle Handle;
+        private Player _ply;
+        private CoroutineHandle _handle;
+
         public void Awake()
         {
-            Hub = Player.Get(gameObject);
-            Handle = Timing.RunCoroutine(HealHealth(Hub));
+            _ply = Player.Get(gameObject);
+            _handle = Timing.RunCoroutine(HealHealth(_ply));
         }
 
         public void OnDestroy()
         {
-            Hub = null;
-            Timing.KillCoroutines(Handle);
+            _ply = null;
+            Timing.KillCoroutines(_handle);
         }
 
-        public IEnumerator<float> HealHealth(Player ply)
+        private IEnumerator<float> HealHealth(Player ply)
         {
             while (true)
             {
                 if (ply.Health < ply.MaxHealth)
-                    ply.Health += CreativeToolbox.ConfigRef.Config.RegenerationValue;
+                    ply.Health += Instance.Config.RegenerationValue;
                 else
                     ply.Health = ply.MaxHealth;
 
-                yield return Timing.WaitForSeconds(CreativeToolbox.ConfigRef.Config.RegenerationTime);
+                yield return Timing.WaitForSeconds(Instance.Config.RegenerationTime);
             }
         }
     }

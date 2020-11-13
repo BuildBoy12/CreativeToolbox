@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.Regen
+﻿namespace CreativeToolbox.Commands.Regen
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     public class Clear : ICommand
     {
-        public string Command { get; } = "clear";
+        public string Command => "clear";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Clears regeneration from everyone";
+        public string Description => "Clears regeneration from everyone";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,12 +28,12 @@ namespace CreativeToolbox.Commands.Regen
                 return false;
             }
 
-            foreach (Player Ply in Player.List)
-                if (Ply.ReferenceHub.TryGetComponent(out RegenerationComponent Regen))
-                    UnityEngine.Object.Destroy(Regen);
+            foreach (Player ply in Player.List)
+                if (ply.ReferenceHub.TryGetComponent(out RegenerationComponent regenerationComponent))
+                    UnityEngine.Object.Destroy(regenerationComponent);
 
             CreativeToolboxEventHandler.PlayersWithRegen.Clear();
-            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+            if (!Instance.Config.PreventCtBroadcasts)
                 Map.Broadcast(5, "Regeneration is taken away from everyone now!");
             response = "Regeneration has been taken away from everyone";
             return true;

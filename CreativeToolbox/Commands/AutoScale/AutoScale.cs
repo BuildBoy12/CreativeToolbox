@@ -1,20 +1,20 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-
-namespace CreativeToolbox.Commands.AutoScale
+﻿namespace CreativeToolbox.Commands.AutoScale
 {
+    using CommandSystem;
+    using Exiled.Permissions.Extensions;
+    using System;
+    
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class AutoScale : ParentCommand
     {
         public AutoScale() => LoadGeneratedCommands();
 
-        public override string Command { get; } = "autoscale";
+        public override string Command => "autoscale";
 
-        public override string[] Aliases { get; } = new string[] { };
+        public override string[] Aliases => new string[0];
 
-        public override string Description { get; } = "Automatically scales players to a specified scale factor or resets their scale";
+        public override string Description => "Automatically scales players to a specified scale factor or resets their scale";
 
         public override void LoadGeneratedCommands()
         {

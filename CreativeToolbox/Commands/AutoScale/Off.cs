@@ -1,18 +1,19 @@
-﻿using System;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
-using UnityEngine;
-
-namespace CreativeToolbox.Commands.AutoScale
+﻿namespace CreativeToolbox.Commands.AutoScale
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using UnityEngine;
+    using static CreativeToolbox;
+
     public class Off : ICommand
     {
-        public string Command { get; } = "off";
+        public string Command => "off";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Turns off auto scaling and resets players to their normal size";
+        public string Description => "Turns off auto scaling and resets players to their normal size";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -34,10 +35,10 @@ namespace CreativeToolbox.Commands.AutoScale
                 return false;
             }
 
-            foreach (Player Ply in Player.List)
-                Ply.Scale = Vector3.one;
+            foreach (Player ply in Player.List)
+                ply.Scale = Vector3.one;
 
-            if (!CreativeToolbox.ConfigRef.Config.DisableAutoScaleMessages)
+            if (!Instance.Config.DisableAutoScaleMessages)
                 Map.Broadcast(5, "Everyone has been restored to their normal size!");
             CreativeToolboxEventHandler.PlayersWithRetainedScale.Clear();
             CreativeToolboxEventHandler.AutoScaleOn = false;

@@ -1,17 +1,17 @@
-﻿using System;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
-
-namespace CreativeToolbox.Commands.Locate
+﻿namespace CreativeToolbox.Commands.Locate
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     public class Xyz : ICommand
     {
-        public string Command { get; } = "xyz";
+        public string Command => "xyz";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Returns the coordinates a user is at";
+        public string Description => "Returns the coordinates a user is at";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,14 +27,15 @@ namespace CreativeToolbox.Commands.Locate
                 return false;
             }
 
-            Player Ply = Player.Get(arguments.At(0));
-            if (Ply == null)
+            Player ply = Player.Get(arguments.At(0));
+            if (ply == null)
             {
                 response = $"Player \"{arguments.At(0)}\" not found";
                 return false;
             }
 
-            response = $"Player \"{Ply.Nickname}\" is located at X: {Ply.Position.x}, Y: {Ply.Position.y}, Z: {Ply.Position.z}";
+            response =
+                $"Player \"{ply.Nickname}\" is located at X: {ply.Position.x}, Y: {ply.Position.y}, Z: {ply.Position.z}";
             return true;
         }
     }

@@ -1,26 +1,22 @@
-﻿using System;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
-using LightContainmentZoneDecontamination;
-
-namespace CreativeToolbox.Commands.StartDecon
+﻿namespace CreativeToolbox.Commands.StartDecon
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using LightContainmentZoneDecontamination;
+    using System;
+
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
-    public class StartDecon : ParentCommand
+    public class StartDecon : ICommand
     {
-        public StartDecon() => LoadGeneratedCommands();
+        public string Command => "startdecon";
 
-        public override string Command { get; } = "startdecon";
+        public string[] Aliases => new string[0];
 
-        public override string[] Aliases { get; } = new string[] { };
+        public string Description => "Force starts Light Containment Zone decontamination";
 
-        public override string Description { get; } = "Force starts Light Containment Zone decontamination";
-
-        public override void LoadGeneratedCommands() { }
-
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!(sender as CommandSender).CheckPermission("ct.startdecon"))
             {
@@ -34,16 +30,18 @@ namespace CreativeToolbox.Commands.StartDecon
                 return false;
             }
 
-            if (Map.IsLCZDecontaminated || CreativeToolboxEventHandler.WasDeconCommandRun)
+            if (Map.IsLCZDecontaminated || CreativeToolboxEventHandler.WasDecontaminationCommandRun)
                 response = "Light Contaimnent Zone decontamination is already on";
             else
             {
-                CreativeToolboxEventHandler.WasDeconCommandRun = true;
-                DecontaminationController.Singleton._nextPhase = DecontaminationController.Singleton.DecontaminationPhases.Length - 1;
+                CreativeToolboxEventHandler.WasDecontaminationCommandRun = true;
+                DecontaminationController.Singleton._nextPhase =
+                    DecontaminationController.Singleton.DecontaminationPhases.Length - 1;
                 DecontaminationController.Singleton._decontaminationBegun = true;
                 Map.Broadcast(5, "Light Contaimnent Zone decontamination has been turned on!");
                 response = "Light Contaimnent Zone decontamination has been turned on";
             }
+
             return true;
         }
     }

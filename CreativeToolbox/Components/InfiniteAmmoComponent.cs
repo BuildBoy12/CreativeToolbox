@@ -1,60 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using Exiled.API.Features;
-using Exiled.Events.EventArgs;
-using MEC;
-using UnityEngine;
-
-namespace CreativeToolbox
+﻿namespace CreativeToolbox
 {
+    using Exiled.API.Extensions;
+    using Exiled.API.Features;
+    using Exiled.Events.EventArgs;
+    using MEC;
+    using System.Collections.Generic;
+    using UnityEngine;
+
     public class InfiniteAmmoComponent : MonoBehaviour
     {
-        private Player Hub;
-        CoroutineHandle Handle;
+        private Player _ply;
+        private CoroutineHandle _handle;
+
         public void Awake()
         {
-            Hub = Player.Get(gameObject);
+            _ply = Player.Get(gameObject);
             Exiled.Events.Handlers.Player.Shooting += RunWhenPlayerShoots;
             Exiled.Events.Handlers.Player.ItemDropped += RunWhenPlayerDropsItem;
-            Handle = Timing.RunCoroutine(ReplenishAmmo());
+            _handle = Timing.RunCoroutine(ReplenishAmmo());
         }
 
         public void OnDestroy()
         {
-            ModifyAmmo(Hub.ReferenceHub, 0);
-            Hub = null;
+            ModifyAmmo(_ply, 0);
+            _ply = null;
             Exiled.Events.Handlers.Player.ItemDropped -= RunWhenPlayerDropsItem;
             Exiled.Events.Handlers.Player.Shooting -= RunWhenPlayerShoots;
-            Timing.KillCoroutines(Handle);
+            Timing.KillCoroutines(_handle);
         }
 
-        public void RunWhenPlayerShoots(ShootingEventArgs s)
+        public void RunWhenPlayerShoots(ShootingEventArgs ev)
         {
-            if (s.Shooter.ReferenceHub != Hub.ReferenceHub)
+            if (ev.Shooter != _ply)
                 return;
 
-            ModifyAmmo(s.Shooter.ReferenceHub, 999);
+            ModifyAmmo(ev.Shooter, 999);
         }
 
-        public void RunWhenPlayerDropsItem(ItemDroppedEventArgs d)
+        public void RunWhenPlayerDropsItem(ItemDroppedEventArgs ev)
         {
-            if (d.Player != Hub)
+            if (ev.Player != _ply)
                 return;
 
-            if (d.Pickup.ItemId.IsGun())
-                UnityEngine.Object.Destroy(d.Pickup.gameObject);
+            if (ev.Pickup.ItemId.IsWeapon())
+                Destroy(ev.Pickup.gameObject);
         }
 
-        public void ModifyAmmo(ReferenceHub hub, int value)
+        public void ModifyAmmo(Player ply, int value)
         {
-            hub.SetWeaponAmmo(value);
+            ply.SetWeaponAmmo(value);
         }
 
-        public IEnumerator<float> ReplenishAmmo()
+        private IEnumerator<float> ReplenishAmmo()
         {
             while (true)
             {
-                ModifyAmmo(Hub.ReferenceHub, 999);
+                ModifyAmmo(_ply, 999);
                 yield return Timing.WaitForSeconds(0.5f);
             }
         }

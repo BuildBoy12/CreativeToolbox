@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
-
-namespace CreativeToolbox.Commands.InfAmmo
+﻿namespace CreativeToolbox.Commands.InfAmmo
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     public class All : ICommand
     {
-        public string Command { get; } = "all";
+        public string Command => "all";
 
-        public string[] Aliases { get; } = new string[] { "*" };
+        public string[] Aliases => new[] {"*"};
 
-        public string Description { get; } = "Gives everyone infinite ammo";
+        public string Description => "Gives everyone infinite ammo";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,16 +28,16 @@ namespace CreativeToolbox.Commands.InfAmmo
                 return false;
             }
 
-            foreach (Player Ply in Player.List)
+            foreach (Player ply in Player.List)
             {
-                if (!Ply.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent InfAmmo))
-                {
-                    Ply.ReferenceHub.gameObject.AddComponent<InfiniteAmmoComponent>();
-                    CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Add(Ply);
-                }
+                if (ply.ReferenceHub.GetComponent<InfiniteAmmoComponent>() != null)
+                    continue;
+
+                ply.ReferenceHub.gameObject.AddComponent<InfiniteAmmoComponent>();
+                CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Add(ply);
             }
 
-            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+            if (!Instance.Config.PreventCtBroadcasts)
                 Map.Broadcast(5, "Everyone has been given infinite ammo now!");
             response = "Everyone has been given infinite ammo";
             return true;

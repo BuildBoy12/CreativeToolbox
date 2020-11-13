@@ -1,33 +1,43 @@
-﻿using System;
-using Respawning;
-using HarmonyLib;
-using Exiled.API.Features;
-
-namespace CreativeToolbox
+﻿namespace CreativeToolbox
 {
+    using Exiled.API.Features;
+    using HarmonyLib;
+    using Respawning;
+    using System;
+    using static CreativeToolbox;
+
     [HarmonyPatch(typeof(RespawnManager), nameof(RespawnManager.ForceSpawnTeam))]
-    static class AddCustomCIAnnouncement
+    internal static class AddCustomCiAnnouncement
     {
-        static Random CIAnnouncementChance = new Random();
-        static double NewChance;
-        public static void Postfix(RespawnManager __instance, SpawnableTeamType teamToSpawn)
+        private static readonly Random CiAnnouncementChance = new Random();
+        private static double _newChance;
+
+        private static void Postfix(RespawnManager __instance, SpawnableTeamType teamToSpawn)
         {
             int counter = 0;
-            foreach (Player Ply in Player.List)
+            foreach (Player ply in Player.List)
             {
-                if (Ply.Role.IsNotHuman(true))
+                if (ply.Team == Team.SCP)
                     counter++;
             }
-            if (CreativeToolbox.ConfigRef.Config.EnableRandomChaosInsurgencyAnnouncementChance)
+
+            if (Instance.Config.EnableRandomChaosInsurgencyAnnouncementChance)
             {
-                NewChance = CIAnnouncementChance.Next(0, 100);
-                if (NewChance < CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementChance)
-                    if (CreativeToolbox.ConfigRef.Config.EnableCustomAnnouncements && teamToSpawn == SpawnableTeamType.ChaosInsurgency)
-                        NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(CreativeToolboxEventHandler.FormatMessage(CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncement, counter), CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementGlitchChance * 0.01f, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementJamChance * 0.01f);
+                _newChance = CiAnnouncementChance.Next(0, 100);
+                if (!(_newChance < Instance.Config.ChaosInsurgencyAnnouncementChance))
+                    return;
+
+                if (Instance.Config.EnableCustomAnnouncements && teamToSpawn == SpawnableTeamType.ChaosInsurgency)
+                    NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(
+                        CreativeToolboxEventHandler.FormatMessage(Instance.Config.ChaosInsurgencyAnnouncement, counter),
+                        Instance.Config.ChaosInsurgencyAnnouncementGlitchChance * 0.01f,
+                        Instance.Config.ChaosInsurgencyAnnouncementJamChance * 0.01f);
             }
-            else
-                if (CreativeToolbox.ConfigRef.Config.EnableCustomAnnouncements && teamToSpawn == SpawnableTeamType.ChaosInsurgency)
-                    NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(CreativeToolboxEventHandler.FormatMessage(CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncement, counter), CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementGlitchChance * 0.01f, CreativeToolbox.ConfigRef.Config.ChaosInsurgencyAnnouncementJamChance * 0.01f);
+            else if (Instance.Config.EnableCustomAnnouncements && teamToSpawn == SpawnableTeamType.ChaosInsurgency)
+                NineTailedFoxAnnouncer.singleton.ServerOnlyAddGlitchyPhrase(
+                    CreativeToolboxEventHandler.FormatMessage(Instance.Config.ChaosInsurgencyAnnouncement, counter),
+                    Instance.Config.ChaosInsurgencyAnnouncementGlitchChance * 0.01f,
+                    Instance.Config.ChaosInsurgencyAnnouncementJamChance * 0.01f);
         }
     }
 }

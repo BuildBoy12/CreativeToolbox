@@ -1,23 +1,23 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.Regen
+﻿namespace CreativeToolbox.Commands.Regen
 {
+    using CommandSystem;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class Regen : ParentCommand
     {
         public Regen() => LoadGeneratedCommands();
 
-        public override string Command { get; } = "regen";
+        public override string Command => "regen";
 
-        public override string[] Aliases { get; } = new string[] { };
+        public override string[] Aliases => new string[0];
 
-        public override string Description { get; } = "Gives regeneration to players, clears regeneration from players, and shows who has regeneration";
+        public override string Description =>
+            "Gives regeneration to players, clears regeneration from players, and shows who has regeneration";
 
-        public override void LoadGeneratedCommands()
+        public sealed override void LoadGeneratedCommands()
         {
             RegisterCommand(new All());
             RegisterCommand(new Clear());
@@ -27,7 +27,8 @@ namespace CreativeToolbox.Commands.Regen
             RegisterCommand(new List());
         }
 
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender,
+            out string response)
         {
             if (!(sender as CommandSender).CheckPermission("ct.regen"))
             {

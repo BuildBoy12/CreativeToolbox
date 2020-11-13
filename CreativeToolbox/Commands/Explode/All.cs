@@ -1,16 +1,17 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-
-namespace CreativeToolbox.Commands.Explode
+﻿namespace CreativeToolbox.Commands.Explode
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     public class All : ICommand
     {
-        public string Command { get; } = "all";
+        public string Command => "all";
 
-        public string[] Aliases { get; } = new string[] { "*" };
+        public string[] Aliases => new[] {"*"};
 
-        public string Description { get; } = "Explodes everyone instantly";
+        public string Description => "Explodes everyone instantly";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -26,14 +27,15 @@ namespace CreativeToolbox.Commands.Explode
                 return false;
             }
 
-            foreach (Exiled.API.Features.Player Ply in Exiled.API.Features.Player.List)
+            foreach (Player ply in Player.List)
             {
-                if (Ply.Role == RoleType.Spectator || Ply.Role == RoleType.None)
+                if (ply.Role == RoleType.Spectator || ply.Role == RoleType.None)
                     continue;
 
-                Ply.Kill();
-                CreativeToolboxEventHandler.SpawnGrenadeOnPlayer(Ply, false);
+                ply.Kill();
+                CreativeToolboxEventHandler.SpawnGrenadeOnPlayer(ply, false);
             }
+
             response = "Everyone exploded, Hubert cannot believe you have done this";
             return true;
         }

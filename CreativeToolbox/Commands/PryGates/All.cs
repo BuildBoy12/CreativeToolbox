@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.PryGates
+﻿namespace CreativeToolbox.Commands.PryGates
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     public class All : ICommand
     {
-        public string Command { get; } = "all";
+        public string Command => "all";
 
-        public string[] Aliases { get; } = new string[] { "*" };
+        public string[] Aliases => new[] {"*"};
 
-        public string Description { get; } = "Lets everyone pry gates open";
+        public string Description => "Lets everyone pry gates open";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,13 +28,13 @@ namespace CreativeToolbox.Commands.PryGates
                 return false;
             }
 
-            foreach (Player Ply in Player.List)
+            foreach (Player ply in Player.List)
             {
-                if (!CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(Ply))
-                    CreativeToolboxEventHandler.PlayersThatCanPryGates.Add(Ply);
+                if (!CreativeToolboxEventHandler.PlayersThatCanPryGates.Contains(ply))
+                    CreativeToolboxEventHandler.PlayersThatCanPryGates.Add(ply);
             }
 
-            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+            if (!Instance.Config.PreventCtBroadcasts)
                 Map.Broadcast(5, "Everyone has been given the ability to pry gates open!");
             response = "The ability to pry gates open is on for all players now";
             return true;

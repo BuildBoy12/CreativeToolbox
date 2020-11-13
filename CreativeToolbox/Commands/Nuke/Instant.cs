@@ -1,17 +1,17 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.Nuke
+﻿namespace CreativeToolbox.Commands.Nuke
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     public class Instant : ICommand
     {
-        public string Command { get; } = "instant";
+        public string Command => "instant";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Sets off the warhead instantly";
+        public string Description => "Sets off the warhead instantly";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {

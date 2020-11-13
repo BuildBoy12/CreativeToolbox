@@ -1,18 +1,19 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Enums;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.GiveAmmo
+﻿namespace CreativeToolbox.Commands.GiveAmmo
 {
+    using CommandSystem;
+    using Exiled.API.Enums;
+    using Exiled.API.Extensions;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     public class To : ICommand
     {
-        public string Command { get; } = "to";
+        public string Command => "to";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Gives the specified user a specified amount of ammo for a given ammo type";
+        public string Description => "Gives the specified user a specified amount of ammo for a given ammo type";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -28,33 +29,34 @@ namespace CreativeToolbox.Commands.GiveAmmo
                 return false;
             }
 
-            Player Plyr = Player.Get(arguments.At(0));
-            if (Plyr == null)
+            Player ply = Player.Get(arguments.At(0));
+            if (ply == null)
             {
                 response = $"Player \"{arguments.At(0)}\" not found";
                 return false;
             }
-            else if (Plyr.Role.IsNotHuman(false))
+
+            if (ply.Role.GetTeam() == Team.SCP || ply.Role == RoleType.Spectator)
             {
                 response = $"Player \"{arguments.At(0)}\" is not a valid class to give ammo to";
                 return false;
             }
 
-            if (!Enum.TryParse(arguments.At(1), true, out AmmoType Ammo))
+            if (!Enum.TryParse(arguments.At(1), true, out AmmoType ammo))
             {
                 response = $"Invalid ammo type: {arguments.At(1)}";
                 return false;
             }
 
-            if (!uint.TryParse(arguments.At(2), out uint AmmoAmount))
+            if (!uint.TryParse(arguments.At(2), out uint ammoAmount))
             {
                 response = $"Invalid ammo amount: {arguments.At(2)}";
                 return false;
             }
 
-            Plyr.ReferenceHub.ammoBox[(int)Ammo] = Plyr.ReferenceHub.ammoBox[(int)Ammo] + AmmoAmount;
-            Plyr.Broadcast(5, $"You have been given {AmmoAmount} of {Ammo.ToString()} ammo!");
-            response = $"Player \"{Plyr.Nickname}\" has been given {AmmoAmount} of {Ammo.ToString()} ammo";
+            ply.ReferenceHub.ammoBox[(int) ammo] = ply.ReferenceHub.ammoBox[(int) ammo] + ammoAmount;
+            ply.Broadcast(5, $"You have been given {ammoAmount} of {ammo.ToString()} ammo!");
+            response = $"Player \"{ply.Nickname}\" has been given {ammoAmount} of {ammo.ToString()} ammo";
             return true;
         }
     }

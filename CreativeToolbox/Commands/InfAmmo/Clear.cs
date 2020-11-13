@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
-
-namespace CreativeToolbox.Commands.InfAmmo
+﻿namespace CreativeToolbox.Commands.InfAmmo
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     public class Clear : ICommand
     {
-        public string Command { get; } = "clear";
+        public string Command => "clear";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Clears infinite ammo from everyone";
+        public string Description => "Clears infinite ammo from everyone";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,12 +28,12 @@ namespace CreativeToolbox.Commands.InfAmmo
                 return false;
             }
 
-            foreach (Player Ply in Player.List)
-                if (Ply.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent InfAmmo))
-                    UnityEngine.Object.Destroy(InfAmmo);
+            foreach (Player ply in Player.List)
+                if (ply.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent infiniteAmmoComponent))
+                    UnityEngine.Object.Destroy(infiniteAmmoComponent);
 
             CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Clear();
-            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+            if (!Instance.Config.PreventCtBroadcasts)
                 Map.Broadcast(5, "Infinite ammo is taken away from everyone now!");
             response = "Infinite ammo has been taken away from everyone";
             return true;

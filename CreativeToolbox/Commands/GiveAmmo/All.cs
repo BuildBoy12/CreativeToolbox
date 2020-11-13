@@ -1,18 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Enums;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.GiveAmmo
+﻿namespace CreativeToolbox.Commands.GiveAmmo
 {
-    class All : ICommand
+    using CommandSystem;
+    using Exiled.API.Enums;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+
+    public class All : ICommand
     {
-        public string Command { get; } = "all";
+        public string Command => "all";
 
-        public string[] Aliases { get; } = { "*" };
+        public string[] Aliases => new[] {"*"};
 
-        public string Description { get; } = "Gives all users a specified amount of a given ammo type";
+        public string Description => "Gives all users a specified amount of a given ammo type";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -28,28 +28,28 @@ namespace CreativeToolbox.Commands.GiveAmmo
                 return false;
             }
 
-            if (!Enum.TryParse(arguments.At(0), true, out AmmoType Ammo))
+            if (!Enum.TryParse(arguments.At(0), true, out AmmoType ammo))
             {
                 response = $"Invalid ammo type: {arguments.At(0)}";
                 return false;
             }
 
-            if (!uint.TryParse(arguments.At(1), out uint AmmoAmount))
+            if (!uint.TryParse(arguments.At(1), out uint ammoAmount))
             {
                 response = $"Invalid ammo amount: {arguments.At(1)}";
                 return false;
             }
 
-            foreach (Player Ply in Player.List)
+            foreach (Player ply in Player.List)
             {
-                if (Ply.Role.IsNotHuman(false))
+                if (ply.Team == Team.SCP || ply.Team == Team.RIP)
                     continue;
 
-                Ply.ReferenceHub.ammoBox[(int)Ammo] = Ply.ReferenceHub.ammoBox[(int)Ammo] + AmmoAmount;
+                ply.ReferenceHub.ammoBox[(int) ammo] = ply.ReferenceHub.ammoBox[(int) ammo] + ammoAmount;
             }
 
-            Map.Broadcast(5, $"Everyone has been given {AmmoAmount} of {Ammo.ToString()} ammo!");
-            response = $"Everyone has been given {AmmoAmount} of {Ammo.ToString()} ammo";
+            Map.Broadcast(5, $"Everyone has been given {ammoAmount} of {ammo.ToString()} ammo!");
+            response = $"Everyone has been given {ammoAmount} of {ammo.ToString()} ammo";
             return true;
         }
     }

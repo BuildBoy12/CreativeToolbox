@@ -1,18 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
-
-
-namespace CreativeToolbox.Commands.AutoRespawn
+﻿namespace CreativeToolbox.Commands.AutoRespawn
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     public class Time : ICommand
     {
-        public string Command { get; } = "time";
+        public string Command => "time";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Turns on automatic respawning for dead players";
+        public string Description => "Turns on automatic respawning for dead players";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -34,8 +34,8 @@ namespace CreativeToolbox.Commands.AutoRespawn
                 return false;
             }
 
-            CreativeToolbox.ConfigRef.Config.RandomRespawnTimer = respawn;
-            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
+            Instance.Config.RandomRespawnTimer = respawn;
+            if (!Instance.Config.PreventCtBroadcasts)
                 Map.Broadcast(5, $"Auto respawning timer is now set to {respawn}!");
             response = "Auto respawning timer is now set to {respawn}";
             return true;

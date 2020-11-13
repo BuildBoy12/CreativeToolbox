@@ -1,21 +1,21 @@
-﻿using System;
-using Grenades;
-using HarmonyLib;
-
-namespace CreativeToolbox
+﻿namespace CreativeToolbox
 {
+    using Grenades;
+    using HarmonyLib;
+    using static CreativeToolbox;
+
     [HarmonyPatch(typeof(Grenade), nameof(Grenade.Awake))]
-    static class CreateCustomGrenadePatch
+    internal static class CreateCustomGrenadePatch
     {
-        public static bool Prefix(Grenade __instance)
+        private static bool Prefix(Grenade __instance)
         {
-            if (CreativeToolbox.ConfigRef.Config.EnableCustomGrenadeTime)
-            {
-                if (__instance.GetType() == typeof(FragGrenade))
-                        __instance.fuseDuration = CreativeToolbox.ConfigRef.Config.FragGrenadeFuseTimer;
-                else if (__instance.GetType() == typeof(FlashGrenade))
-                    __instance.fuseDuration = CreativeToolbox.ConfigRef.Config.FlashGrenadeFuseTimer;
-            }
+            if (!Instance.Config.EnableCustomGrenadeTime)
+                return true;
+
+            if (__instance.GetType() == typeof(FragGrenade))
+                __instance.fuseDuration = Instance.Config.FragGrenadeFuseTimer;
+            else if (__instance.GetType() == typeof(FlashGrenade))
+                __instance.fuseDuration = Instance.Config.FlashGrenadeFuseTimer;
             return true;
         }
     }

@@ -1,17 +1,16 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.PryGates
+﻿namespace CreativeToolbox.Commands.PryGates
 {
+    using CommandSystem;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     public class List : ICommand
     {
-        public string Command { get; } = "list";
+        public string Command => "list";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Lists every player that can pry gates";
+        public string Description => "Lists every player that can pry gates";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -29,21 +28,13 @@ namespace CreativeToolbox.Commands.PryGates
 
             if (CreativeToolboxEventHandler.PlayersThatCanPryGates.Count > 0)
             {
-                CreativeToolboxEventHandler.PlayerLister.Append("Players that can pry gates: ");
-                foreach (Player Ply in CreativeToolboxEventHandler.PlayersThatCanPryGates)
-                    CreativeToolboxEventHandler.PlayerLister.Append(Ply.Nickname + ", ");
+                response =
+                    $"Players that can pry gates: {string.Join(", ", CreativeToolboxEventHandler.PlayersThatCanPryGates)}";
+                return true;
+            }
 
-                int length = CreativeToolboxEventHandler.PlayerLister.ToString().Length;
-                response = CreativeToolboxEventHandler.PlayerLister.ToString().Substring(0, length - 2);
-                CreativeToolboxEventHandler.PlayerLister.Clear();
-                return true;
-            }
-            else
-            {
-                response = "There are no players currently online that can pry gates";
-                CreativeToolboxEventHandler.PlayerLister.Clear();
-                return true;
-            }
+            response = "There are no players currently online that can pry gates";
+            return true;
         }
     }
 }

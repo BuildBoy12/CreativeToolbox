@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.Regen
+﻿namespace CreativeToolbox.Commands.Regen
 {
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
     public class HealTime : ICommand
     {
-        public string Command { get; } = "healtime";
+        public string Command => "healtime";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Sets the interval users are given health (in seconds)";
+        public string Description => "Sets the interval users are given health (in seconds)";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,16 +28,16 @@ namespace CreativeToolbox.Commands.Regen
                 return false;
             }
 
-            if (!float.TryParse(arguments.At(0), out float healtime) || healtime < 0.05)
+            if (!float.TryParse(arguments.At(0), out float healTime) || healTime < 0.05)
             {
                 response = $"Invalid value for healing time interval: {arguments.At(0)}";
                 return false;
             }
 
-            CreativeToolbox.ConfigRef.Config.RegenerationValue = healtime;
-            if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
-                Map.Broadcast(5, $"Players with regeneration will heal every {healtime} seconds!");
-            response = $"Players with regeneration will heal every {healtime} seconds";
+            Instance.Config.RegenerationValue = healTime;
+            if (!Instance.Config.PreventCtBroadcasts)
+                Map.Broadcast(5, $"Players with regeneration will heal every {healTime} seconds!");
+            response = $"Players with regeneration will heal every {healTime} seconds";
             return true;
         }
     }

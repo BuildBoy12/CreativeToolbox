@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.InfAmmo
+﻿namespace CreativeToolbox.Commands.InfAmmo
 {
-    class Give : ICommand
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
+    public class Give : ICommand
     {
-        public string Command { get; } = "give";
+        public string Command => "give";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Gives the player infinite ammo";
+        public string Description => "Gives the player infinite ammo";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,31 +28,29 @@ namespace CreativeToolbox.Commands.InfAmmo
                 return false;
             }
 
-            Player Ply = Player.Get(arguments.At(0));
-            if (Ply == null)
+            Player ply = Player.Get(arguments.At(0));
+            if (ply == null)
             {
                 response = $"Player \"{arguments.At(0)}\" not found";
                 return false;
             }
 
-            if (!Ply.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent InfAmmo))
+            if (!ply.ReferenceHub.TryGetComponent(out InfiniteAmmoComponent infiniteAmmoComponent))
             {
-                CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Add(Ply);
-                Ply.GameObject.AddComponent<InfiniteAmmoComponent>();
-                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
-                    Ply.Broadcast(5, "Infinite ammo is enabled for you!");
-                response = $"Infinite ammo enabled for Player \"{Ply.Nickname}\"";
+                CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Add(ply);
+                ply.GameObject.AddComponent<InfiniteAmmoComponent>();
+                if (!Instance.Config.PreventCtBroadcasts)
+                    ply.Broadcast(5, "Infinite ammo is enabled for you!");
+                response = $"Infinite ammo enabled for Player \"{ply.Nickname}\"";
                 return true;
             }
-            else
-            {
-                CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Remove(Ply);
-                UnityEngine.Object.Destroy(InfAmmo);
-                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
-                    Ply.Broadcast(5, "Infinite ammo is disabled for you!");
-                response = $"Infinite ammo disabled for Player \"{Ply.Nickname}\"";
-                return true;
-            }
+
+            CreativeToolboxEventHandler.PlayersWithInfiniteAmmo.Remove(ply);
+            UnityEngine.Object.Destroy(infiniteAmmoComponent);
+            if (!Instance.Config.PreventCtBroadcasts)
+                ply.Broadcast(5, "Infinite ammo is disabled for you!");
+            response = $"Infinite ammo disabled for Player \"{ply.Nickname}\"";
+            return true;
         }
     }
 }

@@ -1,15 +1,15 @@
-﻿using System;
-using Grenades;
-using HarmonyLib;
-
-namespace CreativeToolbox
+﻿namespace CreativeToolbox
 {
+    using Grenades;
+    using HarmonyLib;
+    using static CreativeToolbox;
+
     [HarmonyPatch(typeof(FragGrenade), nameof(FragGrenade.Awake))]
-    static class PreventExplosionDamage
+    internal static class PreventExplosionDamage
     {
-        public static bool Prefix(FragGrenade __instance)
+        private static bool Prefix(FragGrenade __instance)
         {
-            if (CreativeToolbox.ConfigRef.Config.EnableGrenadeDamagePrevention)
+            if (Instance.Config.EnableGrenadeDamagePrevention)
                 __instance.absoluteDamageFalloff = int.MaxValue;
             return true;
         }

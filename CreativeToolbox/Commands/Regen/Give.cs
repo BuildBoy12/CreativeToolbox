@@ -1,17 +1,18 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.Regen
+﻿namespace CreativeToolbox.Commands.Regen
 {
-    class Give : ICommand
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.Permissions.Extensions;
+    using System;
+    using static CreativeToolbox;
+
+    public class Give : ICommand
     {
-        public string Command { get; } = "give";
+        public string Command => "give";
 
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases => new string[0];
 
-        public string Description { get; } = "Gives a player the ability to regenerate health";
+        public string Description => "Gives a player the ability to regenerate health";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -27,31 +28,29 @@ namespace CreativeToolbox.Commands.Regen
                 return false;
             }
 
-            Player Ply = Player.Get(arguments.At(0));
-            if (Ply == null)
+            Player ply = Player.Get(arguments.At(0));
+            if (ply == null)
             {
                 response = $"Player \"{arguments.At(0)}\" not found";
                 return false;
             }
 
-            if (!Ply.ReferenceHub.TryGetComponent(out RegenerationComponent Regen))
+            if (!ply.ReferenceHub.TryGetComponent(out RegenerationComponent regenerationComponent))
             {
-                CreativeToolboxEventHandler.PlayersWithRegen.Add(Ply);
-                Ply.GameObject.AddComponent<RegenerationComponent>();
-                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
-                    Ply.Broadcast(5, "Regeneration is enabled for you!");
-                response = $"Regeneration enabled for Player \"{Ply.Nickname}\"";
+                CreativeToolboxEventHandler.PlayersWithRegen.Add(ply);
+                ply.GameObject.AddComponent<RegenerationComponent>();
+                if (!Instance.Config.PreventCtBroadcasts)
+                    ply.Broadcast(5, "Regeneration is enabled for you!");
+                response = $"Regeneration enabled for Player \"{ply.Nickname}\"";
                 return true;
             }
-            else
-            {
-                CreativeToolboxEventHandler.PlayersWithRegen.Remove(Ply);
-                UnityEngine.Object.Destroy(Regen);
-                if (!CreativeToolbox.ConfigRef.Config.PreventCtBroadcasts)
-                    Ply.Broadcast(5, "Regeneration is disabled for you!");
-                response = $"Regeneration disabled for Player \"{Ply.Nickname}\"";
-                return true;
-            }
+
+            CreativeToolboxEventHandler.PlayersWithRegen.Remove(ply);
+            UnityEngine.Object.Destroy(regenerationComponent);
+            if (!Instance.Config.PreventCtBroadcasts)
+                ply.Broadcast(5, "Regeneration is disabled for you!");
+            response = $"Regeneration disabled for Player \"{ply.Nickname}\"";
+            return true;
         }
     }
 }

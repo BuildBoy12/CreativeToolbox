@@ -1,29 +1,29 @@
-﻿using System;
-using CommandSystem;
-using Exiled.Permissions.Extensions;
-using Exiled.API.Features;
-
-namespace CreativeToolbox.Commands.Explode
+﻿namespace CreativeToolbox.Commands.Explode
 {
+    using CommandSystem;
+    using Exiled.Permissions.Extensions;
+    using System;
+
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class Explode : ParentCommand
     {
         public Explode() => LoadGeneratedCommands();
 
-        public override string Command { get; } = "explode";
+        public override string Command => "explode";
 
-        public override string[] Aliases { get; } = new string[] { };
+        public override string[] Aliases => new string[0];
 
-        public override string Description { get; } = "Explodes a specified user or everyone instantly";
+        public override string Description => "Explodes a specified user or everyone instantly";
 
-        public override void LoadGeneratedCommands()
+        public sealed override void LoadGeneratedCommands()
         {
             RegisterCommand(new All());
             RegisterCommand(new Person());
         }
 
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender,
+            out string response)
         {
             if (!(sender as CommandSender).CheckPermission("ct.explode"))
             {
