@@ -369,7 +369,7 @@ namespace CreativeToolbox
                 UnityEngine.Object.Instantiate(gm.availableGrenades[0].grenadeInstance.GetComponent<Grenade>());
             grenade.fuseDuration = useCustomTimer ? Instance.Config.GrenadeTimerOnDeath : 0.01f;
             grenade.FullInitData(gm, playerToSpawnGrenade.Position, Quaternion.Euler(grenade.throwStartAngle),
-                grenade.throwLinearVelocityOffset, grenade.throwAngularVelocity);
+                grenade.throwLinearVelocityOffset, grenade.throwAngularVelocity, playerToSpawnGrenade.Team);
             NetworkServer.Spawn(grenade.gameObject);
         }
 
